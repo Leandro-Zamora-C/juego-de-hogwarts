@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Magic Experience & Trivia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gryffindor: { red: '#740001', gold: '#D3A625' },
+                        slytherin: { green: '#1A472A', silver: '#AAAAAA' },
+                        ravenclaw: { blue: '#0E1A40', bronze: '#946B2D' },
+                        hufflepuff: { yellow: '#ECB939', black: '#372E29' },
+                        parchment: '#f4e4bc',
+                        parchmentDark: '#e2cb93',
+                        magicGold: '#ffd700'
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'Georgia', 'serif'],
+                        hand: ['Caveat', 'cursive'],
+                        sans: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #090807;
+            color: #f3f4f6;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-wizard {
+            font-family: 'Cinzel', serif;
+        }
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1c1917;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #78350f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b45309;
+        }
+
+        .parchment-bg {
+            background-color: #f4e4bc;
+            background-image: radial-gradient(#e2cb93 1px, transparent 0);
+            background-size: 16px 16px;
+            color: #291e0a;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .glow-card {
+            box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.15);
+            transition: all 0.3s ease;
+        }
+        .glow-card:hover {
+            box-shadow: 0 8px 30px 0px rgba(245, 158, 11, 0.3);
+        }
+
+        @media print {
+            header, footer, canvas, .no-print, #tab-letter > div:not(#letterParchment), #initialModal {
+                display: none !important;
+            }
+
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            #letterParchment {
+                box-shadow: none !important;
+                border: 2px solid #78350f !important;
+                background-color: #fefae0 !important;
+                width: 100% !important;
+                max-width: 650px !important;
+                margin: 0 auto !important;
+                padding: 40px !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative select-none">
+
+    <!-- Canvas for Wand Magic Trail -->
+    <canvas id="magicCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- Modal de Selección Inicial de Casa con Escudos Oficiales -->
+    <div id="initialModal" class="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-stone-900 border-2 border-amber-600/40 rounded-3xl p-6 md:p-10 shadow-2xl text-center space-y-6 overflow-hidden" 
+             style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.85), rgba(12, 10, 9, 0.95)), url('https://i.blogs.es/61a2ce/harry-potter-gran-comedor-problema-comida-2/500_333.jpeg'); background-size: cover; background-position: center;">
+            
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter Logo" class="h-20 md:h-28 mx-auto object-contain drop-shadow-lg filter brightness-110">
+
+            <div class="space-y-2">
+                <h2 class="text-xl md:text-2xl font-bold text-amber-300 font-wizard">Bienvenido al Gran Comedor</h2>
+                <p class="text-stone-300 text-xs md:text-sm max-w-xl mx-auto">
+                    Antes de ingresar al castillo, el Sombrero Seleccionador debe asignarte a tu Casa de Hogwarts:
+                </p>
+            </div>
+
+            <!-- Escudos PNG Oficiales -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <button onclick="selectInitialHouse('Gryffindor', 'https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png')" class="bg-stone-900/80 hover:bg-stone-800/90 border border-red-700 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:-translate-y-1">
+                    <img src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Gryffindor" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-red-400 font-bold text-sm">Gryffindor</span>
+                </button>
+                <button onclick="selectInitialHouse('Slytherin', 'https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png')" class="bg-stone-900/80 hover:bg-stone-800/90 border border-emerald-700 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:-translate-y-1">
+                    <img src="https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png" alt="Slytherin" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-emerald-400 font-bold text-sm">Slytherin</span>
+                </button>
+                <button onclick="selectInitialHouse('Ravenclaw', 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png')" class="bg-stone-900/80 hover:bg-stone-800/90 border border-blue-700 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:-translate-y-1">
+                    <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Ravenclaw" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-blue-400 font-bold text-sm">Ravenclaw</span>
+                </button>
+                <button onclick="selectInitialHouse('Hufflepuff', 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png')" class="bg-stone-900/80 hover:bg-stone-800/90 border border-yellow-600 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:-translate-y-1">
+                    <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Hufflepuff" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-yellow-400 font-bold text-sm">Hufflepuff</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navigation Bar -->
+    <header class="bg-stone-900/95 backdrop-blur border-b border-amber-800/30 sticky top-0 z-40 px-6 md:px-12 py-3.5 shadow-xl">
+        <div class="w-full flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-7 object-contain">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-wider text-amber-400 font-wizard">HOGWARTS EXPERIENCIA</h1>
+                    <p class="text-[10px] text-stone-400 font-wizard tracking-widest uppercase">Noche Mágica de Trivia & Pareja</p>
+                </div>
+            </div>
+
+            <!-- House Badge & Score Status -->
+            <div id="userHouseHeader" class="hidden flex items-center space-x-3 bg-stone-800/90 px-4 py-1.5 rounded-full border border-amber-500/30">
+                <img id="houseIconHeader" src="" alt="Escudo" class="w-6 h-6 object-contain">
+                <div class="text-xs">
+                    <span id="houseNameHeader" class="font-bold text-amber-300">Casa</span>
+                    <div class="text-amber-400/90"><i class="fa-solid fa-trophy mr-1"></i><span id="houseScoreHeader">0</span> pts</div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex items-center gap-2 text-xs md:text-sm font-semibold flex-wrap">
+                <button onclick="switchTab('home')" class="nav-btn px-4 py-2 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20"><i class="fa-solid fa-house mr-1.5"></i> Inicio</button>
+                <button onclick="switchTab('movies')" class="nav-btn px-4 py-2 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20"><i class="fa-solid fa-film mr-1.5"></i> Películas & Trivia</button>
+                <button onclick="switchTab('duel')" class="nav-btn px-4 py-2 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20"><i class="fa-solid fa-wand-sparkles mr-1.5"></i> Duelo 2P</button>
+                <button onclick="switchTab('wand')" class="nav-btn px-4 py-2 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Varita</button>
+                <button onclick="switchTab('letter')" class="nav-btn px-4 py-2 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20"><i class="fa-solid fa-envelope-open-text mr-1.5"></i> Carta</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow w-full px-6 md:px-12 xl:px-20 py-8 relative">
+
+        <!-- ================= HOME TAB ================= -->
+        <section id="tab-home" class="space-y-8">
+            <!-- Hero Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <div class="lg:col-span-8 relative rounded-3xl overflow-hidden bg-cover bg-center p-8 md:p-12 border border-amber-600/30 flex flex-col justify-center glow-card"
+                     style="background-image: linear-gradient(to right, rgba(12, 10, 9, 0.95), rgba(12, 10, 9, 0.6)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXyUJ0_X3or5I1ZRKA0g4ZsW_y6ViDHSZpQg-t5D1bbSQqnQH9xRKhdjkl&s=10');">
+                    <div class="relative z-10 space-y-5">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-16 md:h-20 object-contain drop-shadow-md">
+                        <h2 class="text-2xl md:text-3xl font-bold text-stone-200 tracking-wide leading-tight">
+                            Noche de Trivia, Duelos & Desafíos
+                        </h2>
+                        <p class="text-stone-300 text-sm md:text-base leading-relaxed max-w-2xl">
+                            Preparen sus varitas, elijan la dificultad deseada, compitan en pareja y demuestren su verdadero nivel de conocimiento mágico.
+                        </p>
+
+                        <div class="pt-2 flex flex-wrap gap-4">
+                            <button onclick="switchTab('movies')" class="bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold px-7 py-3.5 rounded-2xl transition shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> Comenzar Trivia por Películas
+                            </button>
+                            <button onclick="switchTab('duel')" class="bg-stone-800/80 hover:bg-stone-700/80 text-amber-300 font-semibold px-7 py-3.5 rounded-2xl border border-amber-500/30 transition flex items-center gap-2 backdrop-blur">
+                                <i class="fa-solid fa-shield-halved"></i> Duelo Mágico 2 Jugadores
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music & Sound Panel -->
+                <div class="lg:col-span-4 bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 glow-card">
+                    <div class="space-y-3 text-center">
+                        <i class="fa-solid fa-music text-4xl text-amber-400 animate-bounce"></i>
+                        <h3 class="text-xl font-bold text-amber-300">Ambiente Mágico</h3>
+                        <p class="text-stone-400 text-xs">Reproduce el tema musical principal sintetizado de Harry Potter para acompañar su velada.</p>
+                    </div>
+
+                    <button onclick="toggleBackgroundMusic()" id="musicToggleBtn" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Reproducir Música Mágica
+                    </button>
+                </div>
+            </div>
+
+            <!-- Movie Oracle & Spell Bar Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Movie Randomizer -->
+                <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-4 glow-card overflow-hidden relative"
+                     style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.95)), url('https://i0.wp.com/foodandwineespanol.com/wp-content/uploads/2021/05/cerveza-de-mantequilla-harry-potter.webp?fit=2560%2C1440&ssl=1'); background-size: cover;">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i class="fa-solid fa-dice text-2xl text-amber-400"></i>
+                            <h3 class="text-xl font-bold text-amber-300">Oráculo de Cine Mágico</h3>
+                        </div>
+                        <p class="text-stone-400 text-sm">¿No saben cuál película ver hoy? Dejen que la magia decida por ustedes junto a una sugerencia de snack temático.</p>
+                    </div>
+
+                    <div id="oracleResult" class="parchment-bg rounded-2xl p-5 text-center min-h-[110px] flex flex-col justify-center items-center border border-amber-800">
+                        <p class="font-handwriting text-2xl font-bold text-amber-950">Haz clic en el botón para girar la ruleta mágica</p>
+                    </div>
+
+                    <button onclick="spinMovieOracle()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic"></i> Seleccionar Película al Azar
+                    </button>
+                </div>
+
+                <!-- Spell Sound Spells Quick Bar -->
+                <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 space-y-4 glow-card">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-scroll text-2xl text-amber-400"></i>
+                        <h3 class="text-xl font-bold text-amber-300">Lanzador de Encantamientos</h3>
+                    </div>
+                    <p class="text-stone-400 text-sm">Prueben la magia acústica de su varita presionando los hechizos principales:</p>
+
+                    <div class="grid grid-cols-2 gap-3.5 pt-2">
+                        <button onclick="castSpell('Lumos')" class="bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/30 p-3.5 rounded-2xl text-left transition flex items-center space-x-3">
+                            <span class="text-2xl">💡</span>
+                            <div>
+                                <div class="font-bold text-amber-300 text-sm">Lumos</div>
+                                <div class="text-xs text-stone-400">Luz en la varita</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Expecto Patronum')" class="bg-stone-800/80 hover:bg-blue-900/40 border border-blue-500/30 p-3.5 rounded-2xl text-left transition flex items-center space-x-3">
+                            <span class="text-2xl">🦌</span>
+                            <div>
+                                <div class="font-bold text-blue-300 text-sm">Expecto Patronum</div>
+                                <div class="text-xs text-stone-400">Guardián mágico</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Expelliarmus')" class="bg-stone-800/80 hover:bg-red-900/40 border border-red-500/30 p-3.5 rounded-2xl text-left transition flex items-center space-x-3">
+                            <span class="text-2xl">⚡</span>
+                            <div>
+                                <div class="font-bold text-red-300 text-sm">Expelliarmus</div>
+                                <div class="text-xs text-stone-400">Desarme de varita</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Wingardium Leviosa')" class="bg-stone-800/80 hover:bg-yellow-900/40 border border-yellow-500/30 p-3.5 rounded-2xl text-left transition flex items-center space-x-3">
+                            <span class="text-2xl">🪶</span>
+                            <div>
+                                <div class="font-bold text-yellow-300 text-sm">Leviosa</div>
+                                <div class="text-xs text-stone-400">Levitación</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MOVIES & TRIVIA TAB ================= -->
+        <section id="tab-movies" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-amber-900/40 pb-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-amber-400">Selección de Película & Dificultad</h2>
+                    <p class="text-stone-400 text-sm">Elijan la película y filtren el nivel de dificultad para comenzar el desafío de trivia.</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center space-x-2 bg-stone-900 border border-amber-800/40 px-3 py-1.5 rounded-xl">
+                        <i class="fa-solid fa-layer-group text-amber-400 text-xs"></i>
+                        <span class="text-xs font-semibold text-stone-300">Dificultad:</span>
+                        <select id="difficultyFilter" onchange="filterQuizDifficulty()" class="bg-stone-950 text-amber-300 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/30 focus:outline-none">
+                            <option value="all">Todas (Fácil, Medio, Difícil)</option>
+                            <option value="easy">🟢 Fácil</option>
+                            <option value="medium">🟡 Medio</option>
+                            <option value="hard">🔴 Difícil</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-3 bg-stone-900 border border-amber-800/40 px-4 py-2 rounded-xl">
+                        <i class="fa-solid fa-hourglass-half text-amber-400"></i>
+                        <span class="text-xs font-semibold text-stone-300">Modo Giratiempo:</span>
+                        <input type="checkbox" id="timeAttackToggle" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movie Selector Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4" id="movieSelectorGrid">
+                <!-- Javascript injects movie cards here -->
+            </div>
+
+            <!-- Active Quiz Area Container -->
+            <div id="quizContainer" class="hidden bg-stone-900/90 border border-amber-800/50 rounded-3xl p-6 md:p-10 space-y-6 shadow-2xl relative">
+                <div class="flex justify-between items-center border-b border-amber-900/40 pb-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span id="quizMovieTitle" class="text-xs uppercase tracking-widest font-bold text-amber-500">Película 1</span>
+                            <span id="quizDiffBadge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Fácil</span>
+                        </div>
+                        <h3 id="quizQuestionNum" class="text-xl md:text-2xl font-bold text-stone-100">Pregunta 1 de 8</h3>
+                    </div>
+                    <div id="timerDisplay" class="hidden bg-amber-950 border border-amber-500 text-amber-400 px-4 py-1.5 rounded-xl font-mono font-bold text-lg">
+                        ⏱ <span id="timeLeft">15</span>s
+                    </div>
+                </div>
+
+                <div class="py-2">
+                    <p id="quizQuestionText" class="text-lg md:text-2xl font-semibold text-amber-100 leading-relaxed">
+                        ¿Texto de la pregunta aquí?
+                    </p>
+                </div>
+
+                <div id="quizOptionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic option buttons -->
+                </div>
+
+                <div id="quizFeedback" class="hidden p-5 rounded-2xl text-sm md:text-base leading-relaxed border transition"></div>
+
+                <div class="flex justify-end pt-2">
+                    <button id="nextQuestionBtn" onclick="nextQuestion()" class="hidden bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold px-7 py-3 rounded-2xl transition">
+                        Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= DUEL TAB (2 PLAYER MODE) ================= -->
+        <section id="tab-duel" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-amber-400">Duelo de Magos en Pareja 🪄</h2>
+                <p class="text-stone-400 text-sm">Personalicen sus nombres, compitan turno a turno respondiendo preguntas. ¡El primero en lograr 5 aciertos gana!</p>
+            </div>
+
+            <!-- Restored Duel Banner Image -->
+            <div class="max-w-2xl mx-auto rounded-3xl overflow-hidden border border-amber-600/40 shadow-xl h-48 md:h-64 bg-cover bg-center"
+                 style="background-image: url('https://www.prints4u.net/wp-content/uploads/2019/11/031_Harry_Potter_the_Order_of_the_Phoenix.jpg');">
+            </div>
+
+            <!-- Custom Names Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto bg-stone-900 p-4 rounded-2xl border border-amber-800/40">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-red-400">Nombre Mago / Jugador 1:</label>
+                    <input type="text" id="p1NameInput" value="Mago 1" oninput="updatePlayerNames()" class="w-full bg-stone-950 border border-red-700/50 rounded-xl px-3 py-2 text-sm text-stone-200 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-blue-400">Nombre Mago / Jugador 2:</label>
+                    <input type="text" id="p2NameInput" value="Mago 2" oninput="updatePlayerNames()" class="w-full bg-stone-950 border border-blue-700/50 rounded-xl px-3 py-2 text-sm text-stone-200 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <div class="bg-red-950/40 border border-red-700/50 p-6 rounded-2xl text-center space-y-2 glow-card">
+                    <h4 id="p1DisplayName" class="font-bold text-red-400 text-base md:text-lg">Mago 1</h4>
+                    <div id="p1Score" class="text-5xl font-black text-amber-400">0</div>
+                    <p class="text-xs text-stone-400">Puntos de acierto</p>
+                </div>
+                <div class="bg-blue-950/40 border border-blue-700/50 p-6 rounded-2xl text-center space-y-2 glow-card">
+                    <h4 id="p2DisplayName" class="font-bold text-blue-400 text-base md:text-lg">Mago 2</h4>
+                    <div id="p2Score" class="text-5xl font-black text-amber-400">0</div>
+                    <p class="text-xs text-stone-400">Puntos de acierto</p>
+                </div>
+            </div>
+
+            <!-- Turn Banner -->
+            <div id="duelTurnBanner" class="text-center bg-amber-950/40 border border-amber-600/30 p-3.5 rounded-2xl max-w-md mx-auto font-bold text-amber-300">
+                Turno actual: <span id="currentDuelPlayer" class="text-red-400">Mago 1</span>
+            </div>
+
+            <!-- Duel Question Card -->
+            <div id="duelCard" class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-10 max-w-3xl mx-auto space-y-6 shadow-2xl glow-card">
+                <div class="flex justify-between items-center border-b border-amber-900/30 pb-3">
+                    <span id="duelDiffBadge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">Dificultad: Aleatoria</span>
+                </div>
+                <p id="duelQuestionText" class="text-xl font-semibold text-stone-100 text-center leading-relaxed">
+                    Cargando desafío del duelo...
+                </p>
+
+                <div id="duelOptionsGrid" class="grid grid-cols-1 gap-3.5">
+                    <!-- Duel Options -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= WAND CREATOR TAB ================= -->
+        <section id="tab-wand" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-amber-400">🪄 Tienda de Varitas Ollivanders</h2>
+                <p class="text-stone-400 text-sm">"La varita escoge al mago". Personaliza tus materiales y descubre tu varita única.</p>
+            </div>
+
+            <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-8 md:p-10 max-w-3xl mx-auto space-y-6 shadow-2xl glow-card">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-amber-300">1. Tipo de Madera:</label>
+                    <select id="wandWood" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3.5 text-amber-100 focus:outline-none">
+                        <option value="Acebo">Acebo (Madera protectora y noble)</option>
+                        <option value="Sauce">Sauce (Madera ideal para hechizos curativos)</option>
+                        <option value="Roble">Roble (Madera de fuerza y lealtad)</option>
+                        <option value="Saúco">Saúco (Rara y de inmenso poder)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-amber-300">2. Núcleo Mágico:</label>
+                    <select id="wandCore" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3.5 text-amber-100 focus:outline-none">
+                        <option value="Pluma de Fénix">Pluma de Fénix (Gama mágica muy amplia)</option>
+                        <option value="Fibra de Corazón de Dragón">Fibra de Corazón de Dragón (Hechizos potentes y deslumbrantes)</option>
+                        <option value="Pelo de Unicornio">Pelo de Unicornio (Magia más consistente y pura)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-amber-300">3. Flexibilidad y Longitud:</label>
+                    <select id="wandLength" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3.5 text-amber-100 focus:outline-none">
+                        <option value="11 pulgadas, ligeramente flexible">11 pulgadas - Ligeramente flexible</option>
+                        <option value="12.5 pulgadas, rígida">12.5 pulgadas - Rígida y firme</option>
+                        <option value="10 pulgadas, flexible">10 pulgadas - Muy flexible</option>
+                    </select>
+                </div>
+
+                <button onclick="createWand()" class="w-full bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow">
+                    Revelar Mi Varita Mágica
+                </button>
+
+                <div id="wandResult" class="hidden parchment-bg rounded-2xl p-6 text-center space-y-3 text-amber-950 border border-amber-900">
+                    <span class="text-4xl">🪄</span>
+                    <h3 id="wandTitleResult" class="font-wizard text-xl font-bold">Varita de Acebo con Pluma de Fénix</h3>
+                    <p id="wandDescResult" class="font-handwriting text-xl">Una varita verdaderamente excepcional adaptada a tu poder.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= HOGWARTS ACCEPTANCE LETTER TAB ================= -->
+        <section id="tab-letter" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-amber-400">📜 Carta de Aceptación de Hogwarts</h2>
+                <p class="text-stone-400 text-sm">Personalicen e impriman su carta oficial firmada por la Profesora McGonagall.</p>
+            </div>
+
+            <div class="max-w-md mx-auto flex gap-3">
+                <input type="text" id="studentNameInput" placeholder="Escribe tu nombre aquí..." class="flex-grow bg-stone-900 border border-amber-800/50 rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none">
+                <button onclick="generateLetter()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold px-5 py-2.5 rounded-xl transition">
+                    Generar
+                </button>
+            </div>
+
+            <div id="letterParchment" class="parchment-bg rounded-3xl p-8 md:p-12 max-w-2xl mx-auto space-y-6 text-amber-950 border-2 border-amber-900 shadow-2xl relative">
+                <div class="text-center space-y-2 border-b border-amber-900/30 pb-4">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhe8SkzBdB1L9Q-FjsTk1gGsukGwdSYLaPF10_ixLf-Q&s=10" alt="Escudo Hogwarts" class="w-20 h-20 mx-auto object-contain">
+                    <h3 class="font-wizard text-2xl font-bold tracking-widest">COLEGIO HOGWARTS DE MAGIA Y HECHICERÍA</h3>
+                    <p class="text-xs font-wizard tracking-wider">Director: Albus Dumbledore</p>
+                </div>
+
+                <div class="space-y-4 font-handwriting text-xl md:text-2xl leading-relaxed">
+                    <p>Estimado/a <span id="letterStudentName" class="font-bold underline decoration-amber-800">Mago/Bruja</span>,</p>
+                    <p>Tenemos el placer de informarle de que dispone de un cupo en el Colegio Hogwarts de Magia y Hechicería. Adjunto encontrará la lista de todos los libros y del equipo necesarios.</p>
+                    <p>El curso comienza el 1 de septiembre. Esperamos su búho antes del 31 de julio.</p>
+                    <p class="pt-4">Con respecto,</p>
+                    <p class="font-wizard text-base font-bold">Minerva McGonagall<br><span class="text-xs font-normal">Directora Adjunta</span></p>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlI_xpt0gdIKd18TwvFTH8C3ty11rBHF0-OEb1d3XCUg&s=10" alt="Sello Cera" class="w-16 h-16 object-contain">
+                </div>
+
+                <div class="text-center pt-2 no-print">
+                    <button onclick="window.print()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 px-6 py-2.5 rounded-xl text-sm font-wizard transition">
+                        🖨️️ Imprimir o Guardar en PDF
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-950 border-t border-amber-900/30 py-6 text-center text-xs text-stone-500 space-y-1">
+        <p>Experiencia Mágica de Harry Potter creada para Noches de Trivia & Parejas ✨</p>
+        <p class="text-stone-600">Travesura Realizada 🪄</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* ================= AUDIO SYNTHESIS & MUSIC ================= */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMusicPlaying = false;
+        let musicOscillators = [];
+
+        function playSpellSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct' || type === 'Lumos') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong' || type === 'Expelliarmus') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.5);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+
+        function toggleBackgroundMusic() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const btn = document.getElementById('musicToggleBtn');
+            if (isMusicPlaying) {
+                musicOscillators.forEach(o => o.stop());
+                musicOscillators = [];
+                isMusicPlaying = false;
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Reproducir Música Mágica`;
+            } else {
+                isMusicPlaying = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pausar Música`;
+                playHedwigTheme();
+            }
+        }
+
+        function playHedwigTheme() {
+            if (!isMusicPlaying) return;
+
+            const notes = [
+                { f: 493.88, d: 0.4 },
+                { f: 659.25, d: 0.6 },
+                { f: 783.99, d: 0.3 },
+                { f: 739.99, d: 0.3 },
+                { f: 659.25, d: 0.7 },
+                { f: 987.77, d: 0.4 },
+                { f: 880.00, d: 0.8 },
+                { f: 739.99, d: 0.8 }
+            ];
+
+            let delay = 0;
+            notes.forEach((note) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = note.f;
+
+                const start = audioCtx.currentTime + delay;
+                gain.gain.setValueAtTime(0.15, start);
+                gain.gain.exponentialRampToValueAtTime(0.01, start + note.d);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(start);
+                osc.stop(start + note.d);
+
+                musicOscillators.push(osc);
+                delay += note.d + 0.05;
+            });
+
+            setTimeout(() => {
+                if (isMusicPlaying) playHedwigTheme();
+            }, delay * 1000 + 500);
+        }
+
+        /* ================= INITIAL HOUSE MODAL ================= */
+        function selectInitialHouse(name, badgeUrl) {
+            document.getElementById('initialModal').classList.add('hidden');
+            document.getElementById('userHouseHeader').classList.remove('hidden');
+            document.getElementById('houseNameHeader').innerText = name;
+            document.getElementById('houseIconHeader').src = badgeUrl;
+            
+            playSpellSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        /* ================= WAND PARTICLE CANVAS ================= */
+        const canvas = document.getElementById('magicCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let wandColor = '#ffd700';
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            for (let i = 0; i < 2; i++) {
+                particles.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    radius: Math.random() * 3 + 1,
+                    alpha: 1,
+                    color: wandColor
+                });
+            }
+        });
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.02;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* ================= MASSIVE EXTENDED QUESTION BANK BY MOVIE & DIFFICULTY ================= */
+        const moviesData = [
+            {
+                id: 1,
+                title: "La Piedra Filosofal",
+                year: "2001",
+                poster: "https://media.harrypotterfanzone.com/philosophers-stone-theatrical-poster-405x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (10)
+                    { q: "¿Qué regalo le da Hagrid a Harry por su cumpleaños número 11?", options: ["Una lechuza (Hedwig)", "Una escoba Nimbus 2000", "Una capa de invisibilidad", "Un pastel de calabaza"], correct: 0, diff: "easy", exp: "Hagrid le regala a Hedwig en el Callejón Diagon." },
+                    { q: "¿Cuál es la posición que juega Harry en el equipo de Quidditch?", options: ["Buscador", "Guardián", "Cazador", "Golpeador"], correct: 0, diff: "easy", exp: "Harry es el Buscador más joven en un siglo en Gryffindor." },
+                    { q: "¿Cómo se llama el perro de tres cabezas que vigila la trampilla?", options: ["Fluffy", "Fang", "Norbert", "Aragog"], correct: 0, diff: "easy", exp: "Fluffy pertenece a Hagrid y se duerme con música." },
+                    { q: "¿Qué hechizo utiliza Hermione para reparar los lentes de Harry?", options: ["Oculus Reparo", "Alohomora", "Lumos", "Wingardium Leviosa"], correct: 0, diff: "easy", exp: "Oculus Reparo es el primer hechizo demostrado por Hermione en el tren." },
+                    { q: "¿Cuál es el nombre de la tía de Harry que lo crió?", options: ["Petunia Dursley", "Marge Dursley", "Lethia Dursley", "Vernon Dursley"], correct: 0, diff: "easy", exp: "La tía Petunia era la hermana de Lily Potter." },
+                    { q: "¿En qué andén de la estación de King's Cross se aborda el Expreso de Hogwarts?", options: ["Andén 9 ¾", "Andén 8 ½", "Andén 10 ¾", "Andén 7 ½"], correct: 0, diff: "easy", exp: "Se ingresa atravesando la barrera mágica entre las plataformas 9 y 10." },
+                    { q: "¿Qué fantasma es el residente oficial de la casa Gryffindor?", options: ["Nick Casi Decapitado", "El Barón Sanguinario", "El Fraile Gordo", "Peeves"], correct: 0, diff: "easy", exp: "Sir Nicholas de Mimsy-Porpington es Nick Casi Decapitado." },
+                    { q: "¿Quién le regala a Harry su capa de invisibilidad en Navidad?", options: ["Albus Dumbledore (de forma anónima)", "Sirius Black", "Rubeus Hagrid", "Severus Snape"], correct: 0, diff: "easy", exp: "Dumbledore se la devuelve ya que pertenecía al padre de Harry, James." },
+                    { q: "¿Qué dulce temático cobra vida y salta por la ventana del tren?", options: ["Rana de chocolate", "Gragea Bertie Bott", "Pastel de caldero", "Pluma de azúcar"], correct: 0, diff: "easy", exp: "Las ranas de chocolate vienen con cromos de magos famosos." },
+                    { q: "¿Qué profesor imparte la clase de Pociones?", options: ["Severus Snape", "Minerva McGonagall", "Filius Flitwick", "Quirinus Quirrell"], correct: 0, diff: "easy", exp: "Snape es el jefe de la casa Slytherin y maestro de pociones." },
+
+                    // MEDIO (8)
+                    { q: "¿Qué espejo muestra los deseos más profundos del corazón?", options: ["El Espejo de Oesed", "El Espejo de Azkaban", "El Espejo del Pensadero", "El Espejo de la Verdad"], correct: 0, diff: "medium", exp: "'Oesed' leído al revés en inglés/español es 'Deseo'." },
+                    { q: "¿Quién era realmente el mago que ayudaba a Voldemort en Hogwarts?", options: ["Profesor Quirrell", "Profesor Snape", "Argus Filch", "Gilderoy Lockhart"], correct: 0, diff: "medium", exp: "Quirrell compartía su cuerpo ocultando el rostro de Voldemort bajo su turbante." },
+                    { q: "¿Qué pieza de ajedrez gigante monta Ron en el desafío final?", options: ["Un caballo", "Una torre", "Un alfil", "El rey"], correct: 0, diff: "medium", exp: "Ron demuestra maestría táctica sacrificándose como caballo." },
+                    { q: "¿Cómo se llama la escoba que el profesor McGonagall le regala a Harry?", options: ["Nimbus 2000", "Nimbus 2001", "Saeta de Fuego", "Cleansweep Seven"], correct: 0, diff: "medium", exp: "La Nimbus 2000 era el modelo de carreras más rápido de la época." },
+                    { q: "¿Qué planta atrapa a Harry, Ron y Hermione en los desafíos de la Piedra?", options: ["El Lazo del Diablo", "La Mandrágora", "El Acónito", "La Venenosa Tentacula"], correct: 0, diff: "medium", exp: "Hermione recuerda que el Lazo del Diablo odia la luz del sol y el fuego." },
+                    { q: "¿Qué contraseña se usaba para entrar a la sala común de Gryffindor en primer año?", options: ["Caput Draconis", "Fortuna Major", "Mimbulus Mimbletonia", "Abra Cadabra"], correct: 0, diff: "medium", exp: "'Caput Draconis' era la contraseña dada a la Señora Gorda." },
+                    { q: "¿Qué objeto mágico utiliza Dumbledore para apagar las luces de Privet Drive?", options: ["Desiluminador (o Apagador)", "Varita de Saúco", "Giratiempo", "Recordadora"], correct: 0, diff: "medium", exp: "El Desiluminador absorbe la luz de las farolas de la calle." },
+                    { q: "¿Qué criatura hiere a Harry en el Bosque Prohibido antes de ser rescatado por Firenze?", options: ["Voldemort bebiendo sangre de unicornio", "Un hombre lobo", "Aragog", "Un Troll de montaña"], correct: 0, diff: "medium", exp: "El centauro Firenze rescata a Harry de la figura encapuchada." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Cuál es el número de la cámara de Gringotts donde estaba guardada la Piedra Filosofal?", options: ["Cámara 713", "Cámara 687", "Cámara 394", "Cámara 711"], correct: 0, diff: "hard", exp: "Hagrid retira el paquete envuelto en papel de la cámara de alta seguridad 713." },
+                    { q: "¿Qué raza de dragón incuba Hagrid ilegalmente en su cabaña?", options: ["Ridgeback Noruego (Norberto)", "Colacuerno Húngaro", "Galés Verde", "Bola de Fuego China"], correct: 0, diff: "hard", exp: "Hagrid gana un huevo de Ridgeback Noruego jugando a las cartas en la taberna." },
+                    { q: "¿Qué ingrediente de pociones busca Harry que se encuentra en el estómago de una cabra?", options: ["Bezoar", "Dintel de colmillo", "Cuerno de Bicornio", "Sanguijuela"], correct: 0, diff: "hard", exp: "Snape pregunta sobre el Bezoar en la primera clase de pociones." },
+                    { q: "¿Cuántos puntos de ventaja otorga capturar la Snitch Dorada en Quidditch?", options: ["150 puntos", "100 puntos", "200 puntos", "50 puntos"], correct: 0, diff: "hard", exp: "Capturar la Snitch da 150 puntos y da por finalizado el partido." },
+                    { q: "¿Qué puntuación final saca Gryffindor para ganar la Copa de las Casas gracias a Neville?", options: ["482 puntos", "470 puntos", "450 puntos", "500 puntos"], correct: 0, diff: "hard", exp: "Dumbledore le otorga 10 puntos a Neville Longbottom por tener el valor de enfrentarse a sus amigos." },
+                    { q: "¿Cómo se llama el gato del celador Argus Filch?", options: ["Señora Norris", "Crookshanks", "Tibbles", "Mr. Paws"], correct: 0, diff: "hard", exp: "La Señora Norris patrulla los pasillos detectando estudiantes fuera de cama." },
+                    { q: "¿Qué posición de Quidditch jugaba el padre de Harry, James Potter?", options: ["Cazador", "Buscador", "Golpeador", "Guardián"], correct: 0, diff: "hard", exp: "En las películas se muestra la placa donde figura como Cazador." }
+                ]
+            },
+            {
+                id: 2,
+                title: "La Cámara Secreta",
+                year: "2002",
+                poster: "https://media.harrypotterfanzone.com/chamber-of-secrets-theatrical-poster-600x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Qué elfo doméstico intenta evitar que Harry regrese a Hogwarts?", options: ["Dobby", "Kreacher", "Winky", "Hockey"], correct: 0, diff: "easy", exp: "Dobby intenta salvar a Harry bloqueando la barrera del andén 9 ¾." },
+                    { q: "¿Qué auto volador usan Harry y Ron para ir al colegio?", options: ["Ford Anglia", "Rolls-Royce", "Mini Cooper", "Volkswagen Beetle"], correct: 0, diff: "easy", exp: "El Ford Anglia azul modificado por Arthur Weasley." },
+                    { q: "¿Qué criatura mítica habita en el interior de la Cámara Secreta?", options: ["Un Basilisco", "Un Acromántula", "Un Troll", "Un Dementor"], correct: 0, diff: "easy", exp: "El Basilisco es una serpiente gigante cuyos ojos matan al instante." },
+                    { q: "¿Quién es el vanidoso profesor de Defensa Contra las Artes Oscuras?", options: ["Gilderoy Lockhart", "Remus Lupin", "Severus Snape", "Alastor Moody"], correct: 0, diff: "easy", exp: "Lockhart escribió numerosos libros atribuyéndose hazañas ajenas." },
+                    { q: "¿Cómo se llama la hermana menor de Ron que ingresa a Hogwarts?", options: ["Ginny Weasley", "Luna Lovegood", "Cho Chang", "Lavender Brown"], correct: 0, diff: "easy", exp: "Ginny Weasley inicia su primer año y es seleccionada para Gryffindor." },
+                    { q: "¿Qué sauce gigante destruye el coche volador de los Weasley?", options: ["El Sauce Boxeador", "El Sauce Llorón", "El Roble de Azkaban", "El Tejo Mágico"], correct: 0, diff: "easy", exp: "El Sauce Boxeador ataca a cualquiera que se acerque a sus ramas." },
+                    { q: "¿En qué idioma habla Harry para comunicarse involuntariamente con las serpientes?", options: ["Pársel", "Simbólico", "Grumblish", "Rúnico"], correct: 0, diff: "easy", exp: "Hablar Pársel es la habilidad rara que compartía con Salazar Slytherin." },
+                    { q: "¿Qué ave fénix pertenece a Albus Dumbledore?", options: ["Fawkes", "Errol", "Pigwidgeon", "Hermes"], correct: 0, diff: "easy", exp: "Fawkes renace de sus cenizas y sus lágrimas tienen propiedades curativas." },
+
+                    // MEDIO (8)
+                    { q: "¿Quién abrió la Cámara Secreta por primera vez hace 50 años?", options: ["Tom Riddle", "Rubeus Hagrid", "Lucius Malfoy", "Albus Dumbledore"], correct: 0, diff: "medium", exp: "Tom Riddle abrió la cámara y culpó injustamente a Hagrid y su araña Aragog." },
+                    { q: "¿Qué planta mágica se cultiva para elaborar la poción que cura la petrificación?", options: ["Mandrágoras", "Branquialgas", "Lazo del Diablo", "Acónito"], correct: 0, diff: "medium", exp: "El llanto del brote de mandrágora es mortal, pero madura cura petrificaciones." },
+                    { q: "¿Cómo se llama el fantasma que habita en el baño de chicas del segundo piso?", options: ["Myrtle la Llorona", "La Dama Gris", "La Señora Gorda", "Helena Ravenclaw"], correct: 0, diff: "medium", exp: "Myrtle fue la estudiante asesinada cuando el Basilisco fue liberado hace 50 años." },
+                    { q: "¿Qué poción preparan Hermione, Ron y Harry en el baño de Myrtle para disfrazarse?", options: ["Poción Multijugos", "Felix Felicis", "Amortentia", "Veritaserum"], correct: 0, diff: "medium", exp: "La Poción Multijugos requiere un mes de preparación." },
+                    { q: "¿En qué animal se convierte erróneamente Hermione al tomar la Poción Multijugos?", options: ["Un gato", "Un perro", "Un búho", "Una rata"], correct: 0, diff: "medium", exp: "Hermione usó un pelo del túnica de Millicent Bulstrode que pertenecía a su gato." },
+                    { q: "¿Cómo libera Harry a Dobby de la familia Malfoy?", options: ["Escondiendo un calcetín en el diario de Tom Riddle", "Pagando galeones a Lucius", "Pidiendo ayuda a Dumbledore", "Usando un hechizo de desarme"], correct: 0, diff: "medium", exp: "Lucius le da el diario con el calcetín de Harry a Dobby, otorgándole la libertad." },
+                    { q: "¿Qué criatura gigante de 8 patas vive en el Bosque Prohibido y era amiga de Hagrid?", options: ["Aragog", "Mosag", "Norberto", "Grawp"], correct: 0, diff: "medium", exp: "Aragog es una acromántula traída por Hagrid cuando era estudiante." },
+                    { q: "¿Qué objeto mágico le permite a Harry ver los recuerdos del joven Tom Riddle?", options: ["El diario de Tom Riddle", "El Pensadero", "El Mapa del Merodeador", "El Espejo de Oesed"], correct: 0, diff: "medium", exp: "El diario transporta a Harry mágicamente a los recuerdos de hace 50 años." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Con qué objeto destruye Harry el diario de Tom Riddle?", options: ["Un colmillo de Basilisco", "La espada de Gryffindor", "El hechizo Avada Kedavra", "Fuego maldito"], correct: 0, diff: "hard", exp: "El veneno de basilisco en el colmillo destruye el horrocrux del diario." },
+                    { q: "¿Qué dos cosas trae Fawkes a la Cámara Secreta para ayudar a Harry?", options: ["El Sombrero Seleccionador y curación con sus lágrimas", "La capa de invisibilidad y una varita", "La espada de Slytherin y oro", "Una poción de curación y escoba"], correct: 0, diff: "hard", exp: "Fawkes le ciega los ojos al basilisco, le da el Sombrero y cura la herida de Harry." },
+                    { q: "¿De qué arma saca Harry la espada sagrada dentro de la Cámara Secreta?", options: ["Del interior del Sombrero Seleccionador", "De la boca de la estatua de Slytherin", "De las garras de Fawkes", "Del fondo del agua"], correct: 0, diff: "hard", exp: "Solo un verdadero Gryffindor puede sacar la espada del Sombrero Seleccionador." },
+                    { q: "¿Cuál es el nombre completo del fantasma Myrtle la Llorona?", options: ["Myrtle Elizabeth Warren", "Myrtle Jane Myrtle", "Myrtle Penelope Clear", "Myrtle Sally Vance"], correct: 0, diff: "hard", exp: "JK Rowling reveló que su nombre completo era Myrtle Elizabeth Warren." },
+                    { q: "¿Qué hechizo intenta lanzar Ron a Draco Malfoy pero le rebota por su varita rota?", options: ["Eat Slugs (Traga babosas / Slugulus Eructo)", "Expelliarmus", "Riddikulus", "Tarantallegra"], correct: 0, diff: "hard", exp: "La varita pegada con cinta adhesiva hace que Ron escupa babosas gigantes." },
+                    { q: "¿Qué ingrediente raro roba Hermione del despacho privado de Snape para la poción?", options: ["Piel de serpiente del insensato y cuerno de bicornio", "Sangre de salamandra", "Hojas de acónito", "Polvo de perla"], correct: 0, diff: "hard", exp: "Hermione genera una distracción en clase para entrar al armario de Snape." },
+                    { q: "¿Qué frase está escrita con sangre en el muro de Hogwarts indicando la amenaza?", options: ["La Cámara Secreta ha sido abierta. Enemigos del heredero, temed", "El señor tenebroso ha vuelto", "Hogwarts ya no es seguro", "Salazar Slytherin ha regresado"], correct: 0, diff: "hard", exp: "Ginny Weasley escribía las advertencias bajo la posesión del diario." }
+                ]
+            },
+            {
+                id: 3,
+                title: "El Prisionero de Azkaban",
+                year: "2004",
+                poster: "https://media.harrypotterfanzone.com/prisoner-of-azkaban-theatrical-poster-560x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿En qué animal se transforma el Patronus corporál de Harry Potter?", options: ["Un ciervo", "Un lobo", "Un perro negro", "Un águila"], correct: 0, diff: "easy", exp: "Un ciervo majestuoso, igual al animago de su padre James ('Cornamenta')." },
+                    { q: "¿Qué objeto utiliza Hermione para asistir a múltiples clases a la vez y viajar en el tiempo?", options: ["Giratiempo", "Pensadero", "Mapa del Merodeador", "Espejo Oesed"], correct: 0, diff: "easy", exp: "Un Giratiempo otorgado por la profesora McGonagall con permiso del Ministerio." },
+                    { q: "¿Cómo se llama el autobús mágico de tres pisos para magos desorientados?", options: ["Autobús Noctámbulo", "Expreso de Hogwarts", "Carruaje Volador", "Tranvía Mágico"], correct: 0, diff: "easy", exp: "El Autobús Noctámbulo es conducido por Ernie Prang y Stan Shunpike." },
+                    { q: "¿Quién es el nuevo profesor de Defensa Contra las Artes Oscuras en tercer año?", options: ["Remus Lupin", "Alastor Moody", "Severus Snape", "Gilderoy Lockhart"], correct: 0, diff: "easy", exp: "Remus Lupin les enseña a enfrentarse a Boggarts y Dementores." },
+                    { q: "¿Qué guardias oscuros de la prisión de Azkaban rondan Hogwarts buscando a Sirius Black?", options: ["Dementores", "Aurores", "Trolls", "Inferi"], correct: 0, diff: "easy", exp: "Los Dementores absorben la paz, la esperanza y la felicidad de las personas." },
+                    { q: "¿A qué familiar molesta Harry inflando como un globo gigante en Privet Drive?", options: ["Tía Marge", "Tía Petunia", "Tío Vernon", "Dudley"], correct: 0, diff: "easy", exp: "Harry pierde el control de su magia cuando Marge insulta a sus padres." },
+                    { q: "¿Cómo se llama el gato de pelaje espeso que adopta Hermione?", options: ["Crookshanks", "Mrs. Norris", "Fang", "Trevor"], correct: 0, diff: "easy", exp: "Crookshanks es medio Kneazle y desconfía de Scabbers desde el primer momento." },
+                    { q: "¿Qué frase se debe decir para borrar el contenido del Mapa del Merodeador?", options: ["Travesura realizada", "Juro solemnemente que mis intenciones no son buenas", "Nox", "Revelio"], correct: 0, diff: "easy", exp: "'Travesura realizada' deja el mapa como un trozo de pergamino en blanco." },
+
+                    // MEDIO (8)
+                    { q: "¿Cuál es la verdadera identidad del perro negro apodado 'El Grim' que persigue a Harry?", options: ["Sirius Black", "Remus Lupin", "Peter Pettigrew", "James Potter"], correct: 0, diff: "medium", exp: "Sirius es un animago no registrado capaz de transformarse en un perro negro." },
+                    { q: "¿Qué criatura se transforma en el mayor temor de quien se ponga enfrente?", options: ["Boggart", "Dementor", "Ghul", "Hippogrifo"], correct: 0, diff: "medium", exp: "Un Boggart se vence con el hechizo 'Riddikulus' pensando en algo gracioso." },
+                    { q: "¿Cuál es el nombre del Hippogrifo que Hagrid presenta en la clase de Cuidado de Criaturas Mágicas?", options: ["Buckbeak", "Fluffy", "Fang", "Aragog"], correct: 0, diff: "medium", exp: "Buckbeak exige respeto y reverencia antes de dejar que alguien se le acerque." },
+                    { q: "¿Quién le regala a Harry el Mapa del Merodeador?", options: ["Fred y George Weasley", "Ron Weasley", "Remus Lupin", "Albus Dumbledore"], correct: 0, diff: "medium", exp: "Los gemelos Weasley se lo regalaron porque ya se sabían todos los pasajes de memoria." },
+                    { q: "¿En qué animal se transforma el profesor Remus Lupin las noches de luna llena?", options: ["Un hombre lobo", "Un perro", "Un ciervo", "Una rata"], correct: 0, diff: "medium", exp: "Lupin padece de licantropía desde que fue mordido por Fenrir Greyback de niño." },
+                    { q: "¿Cuál era la verdadera forma animaga de la rata Scabbers de Ron?", options: ["Peter Pettigrew", "Sirius Black", "Barty Crouch", "Tom Riddle"], correct: 0, diff: "medium", exp: "Pettigrew vivió 12 años fingiendo ser una rata para esconderse." },
+                    { q: "¿Qué dulce mágico compra Harry en Honeydukes y les da calidez tras ver Dementores?", options: ["Chocolate", "Grageas", "Ranas de azúcar", "Caramelos de menta"], correct: 0, diff: "medium", exp: "El chocolate ayuda a recuperar energía y calidez contra los Dementores." },
+                    { q: "¿Qué contraseña activa el Mapa del Merodeador?", options: ["Juro solemnemente que mis intenciones no son buenas", "Travesura realizada", "Alohomora", "Aberto"], correct: 0, diff: "medium", exp: "Frase célebre creada por Moony, Wormtail, Padfoot y Prongs." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Qué apodo tenía Remus Lupin entre los creadores del Mapa del Merodeador?", options: ["Lunático (Moony)", "Canuto (Padfoot)", "Cornamenta (Prongs)", "Colagusano (Wormtail)"], correct: 0, diff: "hard", exp: "Lunático era Lupin, Canuto era Sirius, Cornamenta era James y Colagusano era Peter." },
+                    { q: "¿Cómo se llama la casa embrujada ubicada en Hogsmeade conectada por un pasadizo secreto?", options: ["La Casa de los Gritos", "La Mansión Malfoy", "La Cabaña de Hagrid", "Grimmauld Place"], correct: 0, diff: "hard", exp: "La Casa de los Gritos se construyó para aislar a Lupin durante sus transformaciones." },
+                    { q: "¿Qué hechizo requiere la invocación de un recuerdo muy feliz para repeler Dementores?", options: ["Expecto Patronum", "Expelliarmus", "Aresto Momentum", "Riddikulus"], correct: 0, diff: "hard", exp: "Inveca un guardián de luz positiva conocido como Patronus." },
+                    { q: "¿Qué importante escoba le regala Sirius Black a Harry al final de la película?", options: ["Saeta de Fuego (Firebolt)", "Nimbus 2001", "Cometa 260", "Cleansweep"], correct: 0, diff: "hard", exp: "La Saeta de Fuego es la escoba profesional más rápida del mundo mágico." },
+                    { q: "¿Cómo se llama el Executionador que viene a cortar la cabeza de Buckbeak?", options: ["Walden Macnair", "Cornelius Fudge", "Lucius Malfoy", "Corban Yaxley"], correct: 0, diff: "hard", exp: "Walden Macnair era el ejecutor oficial enviado por el Ministerio." },
+                    { q: "¿Qué poción toma el profesor Lupin para mantener su mente humana durante la transformación?", options: ["Poción Matalobos (Wolfsbane)", "Poción Multijugos", "Felix Felicis", "Elixir de la Vida"], correct: 0, diff: "hard", exp: "Snape le preparaba diariamente la compleja Poción Matalobos." },
+                    { q: "¿Qué pasadizo secreto del mapa conduce a la bodega de dulces Honeydukes?", options: ["El pasadizo detrás de la estatua de la bruja tuerta (Gunhilda)", "El pasadizo bajo el Sauce Boxeador", "El pasadizo del espejo roto", "El pasadizo de la mazmorra"], correct: 0, diff: "hard", exp: "Harry usa el hechizo 'Dissendium' sobre la bruja tuerta Gunhilda de Gorsemoor." }
+                ]
+            },
+            {
+                id: 4,
+                title: "El Cáliz de Fuego",
+                year: "2005",
+                poster: "https://media.harrypotterfanzone.com/goblet-of-fire-theatrical-poster-2-600x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Quién representa a Hogwarts como campeón oficial junto a Harry en el Torneo?", options: ["Cedric Diggory", "Viktor Krum", "Fleur Delacour", "Neville Longbottom"], correct: 0, diff: "easy", exp: "Cedric Diggory, estudiante popular de la casa Hufflepuff." },
+                    { q: "¿De qué colegio internacional de magia proviene el jugador de Quidditch Viktor Krum?", options: ["Durmstrang", "Beauxbatons", "Ilvermorny", "Uagadou"], correct: 0, diff: "easy", exp: "El Instituto Durmstrang está ubicado en el norte de Europa." },
+                    { q: "¿De qué academia mágica francesa proviene Fleur Delacour?", options: ["Beauxbatons", "Durmstrang", "Castelobruxo", "Mahoutokoro"], correct: 0, diff: "easy", exp: "La Academia de Magia Beauxbatons llegó en un carruaje volador gigante." },
+                    { q: "¿Qué gran evento deportivo mágico presencian al inicio de la historia?", options: ["El Mundial de Quidditch", "El Torneo de los Tres Magos", "La Copa de las Casas", "Las Olimpiadas Mágicas"], correct: 0, diff: "easy", exp: "Presencian la final del Mundial entre Irlanda y Bulgaria." },
+                    { q: "¿Qué objeto místico selecciona a los campeones del torneo expulsando papeles con sus nombres?", options: ["El Cáliz de Fuego", "El Sombrero Seleccionador", "El Espejo de la Verdad", "La Copa de los Tres Magos"], correct: 0, diff: "easy", exp: "El Cáliz de Fuego es un juez imparcial de madera tallada." },
+                    { q: "¿A qué baile formal deben asistir los estudiantes durante el torneo?", options: ["El Baile de Navidad (Yule Ball)", "El Baile de Gala de Hogwarts", "El Baile de San Valentín", "La Fiesta de los Fantasmas"], correct: 0, diff: "easy", exp: "Tradición del Torneo de los Tres Magos celebrada en Nochebuena." },
+                    { q: "¿Con quién asiste Ron Weasley al Baile de Navidad?", options: ["Padma Patil", "Parvati Patil", "Hermione Granger", "Fleur Delacour"], correct: 0, diff: "easy", exp: "Harry fue con Parvati y Ron acompañó a su hermana gemela Padma." },
+                    { q: "¿Qué hechizo utiliza Harry para invocar su escoba en la primera prueba?", options: ["Accio", "Alohomora", "Expelliarmus", "Imperio"], correct: 0, diff: "easy", exp: "'Accio Saeta de Fuego' atrae su escoba desde el castillo." },
+
+                    // MEDIO (8)
+                    { q: "¿Qué planta le otorga branquias y aletas a Harry para la segunda prueba bajo el agua?", options: ["Branquialgas (Gillyweed)", "Mandrágora", "Centinela", "Menta del diablo"], correct: 0, diff: "medium", exp: "Las branquialgas le permiten respirar en el Lago Negro durante una hora." },
+                    { q: "¿Quién se hizo pasar por el profesor Ojo Loco Moody usando Poción Multijugos?", options: ["Barty Crouch Jr.", "Lucius Malfoy", "Igor Karkarov", "Peter Pettigrew"], correct: 0, diff: "medium", exp: "Barty Crouch Jr. escapó de Azkaban y mantuvo encerrado al verdadero Moody." },
+                    { q: "¿A qué feroz dragón se enfrenta Harry durante la primera prueba?", options: ["Colacuerno Húngaro", "Galés Verde", "Híbrido Negro", "Bola de Fuego China"], correct: 0, diff: "medium", exp: "El Colacuerno Húngaro era el dragón más peligroso del grupo." },
+                    { q: "¿Qué pista oculta revela el huevo de oro al abrirlo sumergido bajo el agua?", options: ["Una canción de las sirenas del lago", "Un mapa del laberinto", "Un acertijo en Pársel", "Un mapa de constelaciones"], correct: 0, diff: "medium", exp: "Fuera del agua el huevo solo emitía un chillido insoportable." },
+                    { q: "¿Qué tres Maldiciones Imperdonables enseña el falso Moody en clase?", options: ["Imperio, Crucio y Avada Kedavra", "Expelliarmus, Lumos y Stupefy", "Sectumsempra, Morsmordre y Reducto", "Nox, Reparo y Alohomora"], correct: 0, diff: "medium", exp: "Las tres maldiciones conllevan cadena perpetua en Azkaban." },
+                    { q: "¿Qué símbolo oscuro proyectan los mortífagos en el cielo con el hechizo 'Morsmordre'?", options: ["La Marca Tenebrosa (Calavera con serpiente)", "La calavera de fuego", "El símbolo de las Reliquias", "La serpiente de Slytherin"], correct: 0, diff: "medium", exp: "La Marca Tenebrosa aterrorizaba al mundo mágico en la era de Voldemort." },
+                    { q: "¿Qué persona querida debe rescatar Harry del fondo del Lago Negro en la segunda prueba?", options: ["Ron Weasley", "Hermione Granger", "Cho Chang", "Ginny Weasley"], correct: 0, diff: "medium", exp: "Ron era lo que Harry más apreciaba; Hermione era la de Krum." },
+                    { q: "¿Qué era realmente la Copa del Torneo ubicada en el centro del laberinto final?", options: ["Un Traslador hacia el cementerio de Little Hangleton", "Un Horrocrux", "Una trampa explosiva", "Un espejismo"], correct: 0, diff: "medium", exp: "El falso Moody transformó la copa en un Traslador." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Cómo se llama el fenómeno mágico que ocurre cuando las varitas de Harry y Voldemort se conectan?", options: ["Priori Incantatem (Efecto del hechizo inverso)", "Nexus Magico", "V vínculo de sangre", "Resonancia de saúco"], correct: 0, diff: "hard", exp: "Ocurre cuando dos varitas que comparten el mismo núcleo (plumas de Fawkes) duelan." },
+                    { q: "¿Qué sirviente de Voldemort aporta su propia mano para el ritual de su resurrección corporal?", options: ["Peter Pettigrew (Colagusano)", "Barty Crouch Jr.", "Lucius Malfoy", "Fenrir Greyback"], correct: 0, diff: "hard", exp: "'Carne del sirviente, entregada voluntariamente, resucitará a su señor'." },
+                    { q: "¿De quién era el hueso robado de la tumba para completar la pócima del renacimiento de Voldemort?", options: ["Del padre de Voldemort (Tom Riddle Sr.)", "De Salazar Slytherin", "De su madre Merope Gaunt", "De Morfin Gaunt"], correct: 0, diff: "hard", exp: "'Hueso del padre, tomado sin permiso, renovará a tu hijo'." },
+                    { q: "¿Quién era el Ministro de Magia que se negaba a creer en el regreso de Voldemort?", options: ["Cornelius Fudge", "Rufus Scrimgeour", "Pius Thicknesse", "Kingsley Shacklebolt"], correct: 0, diff: "hard", exp: "Fudge temía perder su puesto y campaña política." },
+                    { q: "¿Qué pareja del Baile de Navidad llevó el famoso campeón Viktor Krum?", options: ["Hermione Granger", "Fleur Delacour", "Cho Chang", "Padma Patil"], correct: 0, diff: "hard", exp: "Krum sorprendió a todos invitando a la biblioteca a Hermione." },
+                    { q: "¿Quién era el director del Instituto Durmstrang que huyó al sentir arder la Marca Tenebrosa?", options: ["Igor Karkarov", "Olympe Maxime", "Gellert Grindelwald", "Anton Dukhov"], correct: 0, diff: "hard", exp: "Karkarov era un ex-mortífago que delató a sus compañeros para salir libre." },
+                    { q: "¿Cómo se llamaba el elfo doméstico de Barty Crouch Sr. (en el libro) involucrado en los eventos?", options: ["Winky", "Dobby", "Kreacher", "Hokey"], correct: 0, diff: "hard", exp: "Winky cuidaba a Barty Crouch Jr. bajo el encantamiento Imperius." }
+                ]
+            },
+            {
+                id: 5,
+                title: "La Orden del Fénix",
+                year: "2007",
+                poster: "https://media.harrypotterfanzone.com/order-of-the-phoenix-theatrical-poster-2-538x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Cómo se llama el grupo clandestino de estudiantes organizado por Harry para aprender defensa?", options: ["El Ejército de Dumbledore", "La Orden del Fénix", "Los Aurores", "El Club de las Potencias"], correct: 0, diff: "easy", exp: "Abreviado como E.D., practicaban hechizos reales a escondidas." },
+                    { q: "¿Qué odiosa bruja vestida de rosa es enviada por el Ministerio como Inquisidora?", options: ["Dolores Umbridge", "Bellatrix Lestrange", "Rita Skeeter", "Narcissa Malfoy"], correct: 0, diff: "easy", exp: "Umbridge prohibía la práctica de magia defensiva en clase." },
+                    { q: "¿Qué sala secreta que aparece cuando alguien la necesita usaban para entrenar?", options: ["La Sala de los Menesteres (o de los Requerimientos)", "La Cámara Secreta", "Las Mazmorras", "La Torre de Astronomía"], correct: 0, diff: "easy", exp: "La sala se adaptó con cojines, espejos y blancos de práctica." },
+                    { q: "¿Qué simpática y excéntrica estudiante de Ravenclaw se une al grupo y ve Thestrals?", options: ["Luna Lovegood", "Cho Chang", "Padma Patil", "Lavender Brown"], correct: 0, diff: "easy", exp: "Luna cree en criaturas mágicas raras y es hija del editor de El Quisquilloso." },
+                    { q: "¿A qué importante lugar del Ministerio ingresan para buscar una esfera de profecía?", options: ["El Departamento de Misterios", "El Tribunal de Wizengamot", "La Oficina de Aurores", "Atrio Principal"], correct: 0, diff: "easy", exp: "En la Sala de las Profecías se custodiaba la profecía de Harry y Voldemort." },
+                    { q: "¿Qué castigo cruel aplica Umbridge a Harry haciéndolo escribir con una pluma negra especial?", options: ["Escribir 'No debo decir mentiras' grabado con su propia sangre en la mano", "Limpiar los baños sin magia", "Expulsión inmediata", "Encierro en Azkaban"], correct: 0, diff: "easy", exp: "La pluma cortaba la piel del reverso de la mano del estudiante." },
+                    { q: "¿Quién es el padrino de Harry en cuya casa se reúne la Orden del Fénix?", options: ["Sirius Black", "Remus Lupin", "Albus Dumbledore", "Severus Snape"], correct: 0, diff: "easy", exp: "Sirius ofreció la casa de su familia en Grimmauld Place 12." },
+                    { q: "¿Qué animal gigante es el medio hermano de Hagrid que ocultaba en el bosque?", options: ["Grawp", "Aragog", "Buckbeak", "Fluffy"], correct: 0, diff: "easy", exp: "Grawp es un gigante que Hagrid trajo de las montañas." },
+
+                    // MEDIO (8)
+                    { q: "¿Qué criaturas aladas y esqueléticas solo pueden ver quienes han presenciado la muerte?", options: ["Thestrals", "Hippogrifos", "Dementores", "Ghouls"], correct: 0, diff: "medium", exp: "Harry los ve por primera vez tras presenciar la muerte de Cedric." },
+                    { q: "¿Dónde se ubica la sede secreta de la Orden del Fénix protegida por el encantamiento Fidelio?", options: ["Grimmauld Place 12", "La Madriguera", "Valle de Godric", "Callejón Diagon"], correct: 0, diff: "medium", exp: "Ubicada en Londres, invisible para los muggles." },
+                    { q: "¿Quién asesina a Sirius Black lanzándolo a través del Velo de la Muerte?", options: ["Bellatrix Lestrange", "Lucius Malfoy", "Lord Voldemort", "Severus Snape"], correct: 0, diff: "medium", exp: "Bellatrix celebra con euforia haber matado a su primo Sirius." },
+                    { q: "¿Qué clase de entrenamiento mental le imparte Snape a Harry para bloquear la mente de Voldemort?", options: ["Oclumancia", "Legeremancia", "Adivinación", "Transformaciones"], correct: 0, diff: "medium", exp: "La Oclumancia protege la mente contra la intrusión externa." },
+                    { q: "¿Qué periódico dirigido por el padre de Luna publica la entrevista real de Harry?", options: ["El Quisquilloso (The Quibbler)", "El Elprofeta", "Corazón de Bruja", "Noticias de la Magia"], correct: 0, diff: "medium", exp: "Xenophilius Lovegood publicó la verdad sobre el regreso de Voldemort." },
+                    { q: "¿Qué hermanos gemelos abandonan Hogwarts en medio de los exámenes lanzando fuegos artificiales?", options: ["Fred y George Weasley", "Ron y Harry", "Crabbe y Goyle", "Fleur y Gabrielle"], correct: 0, diff: "medium", exp: "Rebelión legendaria contra el régimen de Umbridge." },
+                    { q: "¿Quién era el Guardián Secreto original de la sede de la Orden del Fénix?", options: ["Albus Dumbledore", "Sirius Black", "Remus Lupin", "Mad-Eye Moody"], correct: 0, diff: "medium", exp: "Dumbledore era el Guardián Secreto hasta su fallecimiento." },
+                    { q: "¿Qué visión en la mente de Harry lo lleva a viajar de urgencia al Ministerio de Magia?", options: ["Sirius siendo torturado por Voldemort", "El ataque al castillo", "La muerte de Dumbledore", "Un robo en Gringotts"], correct: 0, diff: "medium", exp: "Era una falsa trampa mental implantada por Voldemort." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Quién reveló la existencia del Ejército de Dumbledore a Umbridge bajo presión o encantamiento?", options: ["Marietta Edgecombe (en libro) / Cho Chang (bajo Veritaserum en película)", "Neville Longbottom", "Seamus Finnigan", "Pansy Parkinson"], correct: 0, diff: "hard", exp: "En la película le dieron Veritaserum a Cho; en el libro fue su amiga Marietta." },
+                    { q: "¿Qué decía la profecía sobre el destino final de Harry Potter y Voldemort?", options: ["Ninguno de los dos podrá vivir mientras el otro siga con vida", "El mundo mágico se dividirá en dos", "Ambos caerán en la batalla final", "El elegido gobernará ambos mundos"], correct: 0, diff: "hard", exp: "Pronunciada originalmente por la profesora Sybill Trelawney." },
+                    { q: "¿Qué miembros del Wizengamot votaron a favor de absolver a Harry en su juicio por usar magia?", options: ["Albus Dumbledore y Arabella Figg (como testigo)", "Cornelius Fudge y Umbridge", "Lucius Malfoy", "Percy Weasley"], correct: 0, diff: "hard", exp: "La Sra. Figg, una Squib vecina de Harry, testificó sobre los Dementores." },
+                    { q: "¿Cuál es el hechizo de la Marca Tenebrosa que Bellatrix y los mortífagos usan frecuentemente?", options: ["Morsmordre", "Avada Kedavra", "Crucio", "Reducto"], correct: 0, diff: "hard", exp: "Morsmordre invoca la calavera verde en el cielo." },
+                    { q: "¿Cómo se llama la orden de decretos que Umbridge colocaba en la pared del Gran Comedor?", options: ["Decretos de Enseñanza (Educational Decrees)", "Leyes de la Magia", "Estatuto del Secreto", "Reglas de Hogwarts"], correct: 0, diff: "hard", exp: "Llegó a colgar docenas de decretos restrictivos." },
+                    { q: "¿Qué criatura mágica ataca a Arthur Weasley en el Ministerio durante el sueño de Harry?", options: ["Nagini (la serpiente de Voldemort)", "Un Basilisco", "Un Dementor", "Un Hombre Lobo"], correct: 0, diff: "hard", exp: "Harry presenció la agresión desde los ojos de la serpiente." },
+                    { q: "¿Qué pariente de Ron trabajaba como asistente personal del Ministro Fudge apoyando la campaña contra Harry?", options: ["Percy Weasley", "Bill Weasley", "Charlie Weasley", "George Weasley"], correct: 0, diff: "hard", exp: "Percy se distanció de su familia creyendo ciegamente en el Ministerio." }
+                ]
+            },
+            {
+                id: 6,
+                title: "El Misterio del Príncipe",
+                year: "2009",
+                poster: "https://media.harrypotterfanzone.com/half-blood-prince-theatrical-poster-600x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Quién resulta ser el célebre y misterioso 'Príncipe Mestizo'?", options: ["Severus Snape", "Tom Riddle", "Sirius Black", "Albus Dumbledore"], correct: 0, diff: "easy", exp: "Snape usaba el apellido de soltera de su madre Eileen Prince." },
+                    { q: "¿Qué poción de suerte dorada gana Harry en la clase del profesor Slughorn?", options: ["Felix Felicis", "Amortentia", "Multijugos", "Veritaserum"], correct: 0, diff: "easy", exp: "Conocida popularmente como 'Suerte Líquida'." },
+                    { q: "¿Qué nuevo profesor regresa a Hogwarts para impartir la asignatura de Pociones?", options: ["Horace Slughorn", "Severus Snape", "Remus Lupin", "Alastor Moody"], correct: 0, diff: "easy", exp: "Slughorn retorna mientras Snape obtiene finalmente Defensa Contra las Artes Oscuras." },
+                    { q: "¿Qué objeto peligroso intenta reparar Draco Malfoy en la Sala de Menesteres?", options: ["El Armario Evanescente", "El Anillo de Gaunt", "La Diadema", "El Espejo roto"], correct: 0, diff: "easy", exp: "Conectado directamente con otro armario en Borgin y Burkes." },
+                    { q: "¿Qué obsesiva poción de amor huele distinto para cada persona según lo que le atrae?", options: ["Amortentia", "Felix Felicis", "Veritaserum", "Poción de la paz"], correct: 0, diff: "easy", exp: "Hermione huele a césped cortado, pergamino nuevo y al cabello de Ron." },
+                    { q: "¿De quién se enamora apasionadamente Ron por culpa de unos chocolates con filtro de amor?", options: ["Romilda Vane", "Lavender Brown", "Hermione Granger", "Pansy Parkinson"], correct: 0, diff: "easy", exp: "Romilda Vane quería darle los chocolates a Harry." },
+                    { q: "¿Quién es la novia oficial de Ron Weasley durante gran parte del sexto año?", options: ["Lavender Brown", "Hermione Granger", "Padma Patil", "Cho Chang"], correct: 0, diff: "easy", exp: "Lavender lo llamaba cariñosamente 'Ro-Ro'." },
+                    { q: "¿Qué importante mago muere trágicamente en la cima de la Torre de Astronomía?", options: ["Albus Dumbledore", "Severus Snape", "Horace Slughorn", "Remus Lupin"], correct: 0, diff: "easy", exp: "Snape cumple el Juramento Inquebrantable matando a Dumbledore." },
+
+                    // MEDIO (8)
+                    { q: "¿Qué hechizo oscuro y sangriento encuentra Harry escrito en el libro del Príncipe y usa contra Malfoy?", options: ["Sectumsempra", "Levicorpus", "Muffliato", "Petrificus Totalus"], correct: 0, diff: "medium", exp: "Sectumsempra provoca cortes profundos como si fuera una espada invisible." },
+                    { q: "¿Qué promete Narcissa Malfoy a Snape mediante un Juramento Inquebrantable?", options: ["Proteger a Draco y realizar la tarea si él falla", "Matar a Harry Potter", "Destruir el libro de pociones", "Entregar el colegio"], correct: 0, diff: "medium", exp: "Bellatrix actuó como el testigo del pacto mágico mágico mortal." },
+                    { q: "¿Qué es un Horrocrux según la explicación que Dumbledore le da a Harry?", options: ["Un objeto donde un mago oculta un fragmento de su alma para ser inmortal", "Un hechizo de protección", "Una poción prohibida", "Un artefacto para viajar"], correct: 0, diff: "medium", exp: "Para crearlo se requiere cometer un asesinato, el acto supremo de maldad." },
+                    { q: "¿En cuántas partes decidió fragmentar su alma Tom Riddle?", options: ["7 partes (6 Horrocruxes + su alma)", "3 partes", "5 partes", "10 partes"], correct: 0, diff: "medium", exp: "El número 7 es considerado el número mágico más poderoso." },
+                    { q: "¿Qué líquido terrible debe beber Dumbledore en la cueva para obtener el guardapelo?", options: ["La Poción de la Desesperación (o del Tormento)", "Veneno de basilisco", "Sangre de dragón", "Agua muerta"], correct: 0, diff: "medium", exp: "El brebaje le provocaba alucinaciones y un dolor insoportable." },
+                    { q: "¿Qué criaturas cadavéricas emergen del agua de la cueva para arrastrar a Harry?", options: ["Inferi", "Dementores", "Ghouls", "Trolls de agua"], correct: 0, diff: "medium", exp: "Cuerpos reanimados por magia negra que obedecen al Señor Tenebroso." },
+                    { q: "¿Qué objeto falso encuentra Harry dentro del guardapelo al final de la aventura?", options: ["Una nota firmada por R.A.B.", "Una piedra común", "Un mapa antiguo", "Una carta de Snape"], correct: 0, diff: "medium", exp: "Regulus Arcturus Black había robado el verdadero horrocrux antes." },
+                    { q: "¿Qué tienda de bromas abren Fred y George en el Callejón Diagon?", options: ["Sortilegios Weasley (Weasleys' Wizard Wheezes)", "Honeydukes", "Borgin y Burkes", "Zonko"], correct: 0, diff: "medium", exp: "Tienda colorida de gran éxito financiada con el premio de Harry." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿De quién era el Anillo de Horrocrux que Dumbledore destruyó dañándose severamente la mano?", options: ["Marvolo Gaunt (su abuelo materno)", "Tom Riddle Sr.", "Salazar Slytherin", "Hepsibah Smith"], correct: 0, diff: "hard", exp: "El anillo contenía también la Piedra de la Resurrección." },
+                    { q: "¿Qué importante recuerdo distorsionado le pide Dumbledore a Harry que obtenga de Slughorn?", options: ["La conversación exacta donde Tom Riddle pregunta sobre los Horrocruxes", "La receta de la Amortentia", "El día que conoció a Lily", "El recuerdo de la cueva"], correct: 0, diff: "hard", exp: "Slughorn había alterado el recuerdo por vergüenza." },
+                    { q: "¿Quién era la madre de Severus Snape de quien heredó el apellido Prince?", options: ["Eileen Prince", "Walburga Black", "Merope Gaunt", "Druella Rosier"], correct: 0, diff: "hard", exp: "Eileen Prince era una bruja de sangre limpia casada con Tobias Snape (muggle)." },
+                    { q: "¿Qué veneno ocultaba el hidromiel destinado a Dumbledore que casi mata a Ron?", options: ["Veneno de veneno de serpiente / Mandrágora", "Bezoar", "Cicuta mágica", "Esencia de belladona"], correct: 0, diff: "hard", exp: "Harry le salvó la vida a Ron metiéndole un Bezoar en la garganta." },
+                    { q: "¿Cómo se llamaba el barrendero/conserje de Borgin & Burkes donde Draco vio el armario?", options: ["Mr. Borgin", "Caractacus Burke", "Mundungus Fletcher", "Knockturn"], correct: 0, diff: "hard", exp: "Mr. Borgin atiende a Draco en el Callejón Knockturn." },
+                    { q: "¿Qué estudiante fue maldecida por tocar un collar de ópalos embrujado destinado a Dumbledore?", options: ["Katie Bell", "Leanne", "Romilda Vane", "Lavender Brown"], correct: 0, diff: "hard", exp: "Katie tocó el collar a través de un agujero en sus guantes." },
+                    { q: "¿Qué hechizo usa Snape para contrarrestar los cortes del Sectumsempra en Malfoy?", options: ["Vulnera Sanentur", "Episkey", "Anapneo", "Ferula"], correct: 0, diff: "hard", exp: "Invocación cantada que sana las heridas y devuelve la sangre al cuerpo." }
+                ]
+            },
+            {
+                id: 7,
+                title: "Reliquias de la Muerte 1",
+                year: "2010",
+                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-1-harry-poster-480x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Cuáles son las 3 legendarias Reliquias de la Muerte?", options: ["La Varita de Saúco, la Piedra de la Resurrección y la Capa de Invisibilidad", "La Copa, el Guardapelo y la Diadema", "La Espada, el Anillo y el Espejo", "El Sombrero, el Mapa y la Varita"], correct: 0, diff: "easy", exp: "Artefactos creados según la Leyenda de los Tres Hermanos." },
+                    { q: "¿Qué leal elfo doméstico da su vida para salvar a Harry y sus amigos en la Mansión Malfoy?", options: ["Dobby", "Kreacher", "Winky", "Hockey"], correct: 0, diff: "easy", exp: "Dobby es herido por la daga de Bellatrix al desparecer." },
+                    { q: "¿En qué se transforman 6 miembros de la Orden usando Poción Multijugos para proteger a Harry?", options: ["En dobles exactos de Harry Potter", "En aurores del Ministerio", "En mortífagos", "En animales del bosque"], correct: 0, diff: "easy", exp: "La estrategia de los 'Siete Potters' para trasladarlo a la Madriguera." },
+                    { q: "¿Qué valioso horrocrux destruye Ron Weasley con la Espada de Gryffindor?", options: ["El Guardapelo de Salazar Slytherin", "El Anillo de Gaunt", "La Diadema de Ravenclaw", "La Copa de Hufflepuff"], correct: 0, diff: "easy", exp: "Ron vence las oscuras ilusiones del guardapelo en el estanque congelado." },
+                    { q: "¿Qué fiel lechuza de Harry muere durante la persecución en moto con Hagrid?", options: ["Hedwig", "Errol", "Pigwidgeon", "Hermes"], correct: 0, diff: "easy", exp: "Hedwig intercepta un hechizo mortal dirigido a Harry." },
+                    { q: "¿A qué lugar natal de sus padres viaja Harry en Navidad?", options: ["El Valle de Godric (Godric's Hollow)", "Hogsmeade", "Little Whinging", "Tinworth"], correct: 0, diff: "easy", exp: "Allí descansan las tumbas de Lily y James Potter." },
+                    { q: "¿Qué símbolo lleva colgado Xenophilius Lovegood en la boda de Bill y Fleur?", options: ["El símbolo de las Reliquias de la Muerte (Ojo, línea y triángulo)", "El escudo de Hogwarts", "La Marca Tenebrosa", "El símbolo de Ravenclaw"], correct: 0, diff: "easy", exp: "Representa la varita, la piedra y la capa." },
+                    { q: "¿En qué edificio ministerial irrumpen disfrazados con multijugos para robar el guardapelo?", options: ["El Ministerio de Magia en Londres", "El Banco Gringotts", "El Hospital San Mungo", "Azkaban"], correct: 0, diff: "easy", exp: "Se disfrazan de empleados para quitárselo a Dolores Umbridge." },
+
+                    // MEDIO (8)
+                    { q: "¿Qué vieja historiadora de la magia resulta ser la serpiente Nagini disfrazada en el Valle de Godric?", options: ["Bathilda Bagshot", "Rita Skeeter", "Griselda Marchbanks", "Augusta Longbottom"], correct: 0, diff: "medium", exp: "Voldemort tendió una trampa dejando a Nagini dentro del cuerpo de Bathilda." },
+                    { q: "¿Qué objeto heredado por Hermione de Dumbledore contiene el cuento de los Tres Hermanos?", options: ["Los Cuentos de Beedle el Bardo", "El Desiluminador", "La Snitch Dorada", "El libro de Pociones"], correct: 0, diff: "medium", exp: "Escrito en runas antiguas que Hermione sabía traducir." },
+                    { q: "¿Qué objeto le deja Dumbledore a Ron Weasley en su testamento?", options: ["El Desiluminador", "Los cuentos de Beedle", "La Snitch dorada", "La espada de Gryffindor"], correct: 0, diff: "medium", exp: "Le permite escuchar las voces de sus amigos y guiarse hacia ellos." },
+                    { q: "¿Qué texto secreto llevaba grabado la Snitch Dorada que Dumbledore le heredó a Harry?", options: ["'Me abro al cierre'", "'La victoria es de los valientes'", "'El final está cerca'", "'Siempre'"], correct: 0, diff: "medium", exp: "Guardaba la Piedra de la Resurrección en su interior." },
+                    { q: "¿Cómo se llaman los cazadores de recompensas que capturan a magos mestizos y fugitivos?", options: ["Carroñeros (Snatchers)", "Aurores", "Mortífagos", "Inferi"], correct: 0, diff: "medium", exp: "Liderados por Scabior, capturan al trío en el bosque." },
+                    { q: "¿Qué duende de Gringotts los ayuda a planear el robo en el banco a cambio de la Espada de Gryffindor?", options: ["Griphook", "Bogrod", "Gornuk", "Ragnok"], correct: 0, diff: "medium", exp: "Griphook exige la espada hecha por duendes." },
+                    { q: "¿Qué bruja y prometida se casa con Bill Weasley al inicio de la película?", options: ["Fleur Delacour", "Nymphadora Tonks", "Cho Chang", "Pansy Parkinson"], correct: 0, diff: "medium", exp: "Su boda es interrumpida por el ataque de los mortífagos." },
+                    { q: "¿Quién era el hermano menor de Sirius que robó el guardapelo original antes que Harry?", options: ["Regulus Arcturus Black (R.A.B.)", "Alphard Black", "Cygnus Black", "Orion Black"], correct: 0, diff: "medium", exp: "Regulus se arrepintió de servir a Voldemort y dio su vida con Kreacher." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿Qué encantamiento de protección utiliza Hermione alrededor del campamento en el bosque?", options: ["Protego Totalum, Repello Muggletum y Cave Inimicum", "Expelliarmus", "Avada Kedavra", "Morsmordre"], correct: 0, diff: "hard", exp: "Complejo conjunto de barreras invisibles y de desorientación." },
+                    { q: "¿En qué cuento popular se describe el origen de las Reliquias de la Muerte?", options: ["La Fábula de los Tres Hermanos", "El Fuente de la Buena Fortuna", "El Corazón Peludo del Brujo", "Babbitty Rabbitty"], correct: 0, diff: "hard", exp: "Tres hermanos superan a la Muerte en un río peligroso." },
+                    { q: "¿Qué nombre falso utiliza Harry cuando es capturado por los carroñeros?", options: ["Vernon Dudley", "Neville Longbottom", "Barny Weasley", "Dudley Dursley"], correct: 0, diff: "hard", exp: "Intenta ocultar su identidad con la cara deformada por un hechizo de Hermione." },
+                    { q: "¿Qué importante miembro de la Orden muere durante el traslado de los Siete Potters?", options: ["Alastor 'Ojo Loco' Moody", "Kingsley Shacklebolt", "Remus Lupin", "Arthur Weasley"], correct: 0, diff: "hard", exp: "Moody cayó atacado por Voldemort al inicio del vuelo." },
+                    { q: "¿Qué Varita legendaria busca Voldemort profanando la tumba de Albus Dumbledore?", options: ["La Varita de Saúco", "La Varita de Acebo", "La Varita de Tejo", "La Varita de Espino"], correct: 0, diff: "hard", exp: "La varita mágica más invencible jamás creada." },
+                    { q: "¿Quién era el fabricante de varitas que Voldemort tortura para descubrir el paradero de la Varita de Saúco?", options: ["Garrick Ollivander (y Mykew Gregorovitch)", "Salazar Slytherin", "Gellert Grindelwald", "Borgin"], correct: 0, diff: "hard", exp: "Gregorovitch fabricó la varita antes de ser robada por Grindelwald." },
+                    { q: "¿Qué duende o elfo acompañaba a Regulus Black a la cueva del guardapelo?", options: ["Kreacher", "Dobby", "Griphook", "Winky"], correct: 0, diff: "hard", exp: "Kreacher logró aparecerse fuera de la cueva gracias a la magia de elfos." }
+                ]
+            },
+            {
+                id: 8,
+                title: "Reliquias de la Muerte 2",
+                year: "2011",
+                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-2-it-all-ends-poster-600x0-c-default.jpg",
+                questions: [
+                    // FÁCIL (8)
+                    { q: "¿Quién destruye el último Horrocrux (la serpiente Nagini) con la Espada de Gryffindor?", options: ["Neville Longbottom", "Harry Potter", "Ron Weasley", "Hermione Granger"], correct: 0, diff: "easy", exp: "Neville demuestra la valentía de un verdadero Gryffindor decapitándola." },
+                    { q: "¿En qué banco mágico irrumpen para robar la Copa de Helga Hufflepuff de la cámara de Bellatrix?", options: ["Gringotts", "Azkaban", "El Ministerio", "Hogsmeade"], correct: 0, diff: "easy", exp: "Escapan a lomos de un dragón blanco ciego custodiado en las profundidades." },
+                    { q: "¿Qué criatura fantástica usan para escapar volando del banco Gringotts?", options: ["Un Dragón (Ironbelly Ucraniano)", "Un Hipogrifo", "Un Thestral", "Un Fénix"], correct: 0, diff: "easy", exp: "Rrompen los techos de cristal del banco para ganar libertad." },
+                    { q: "¿Qué fantasma de Ravenclaw (la Dama Gris) ayuda a Harry a encontrar la Diadema perdida?", options: ["Helena Ravenclaw", "Myrtle la Llorona", "La Señora Gorda", "El Barón Sanguinario"], correct: 0, diff: "easy", exp: "Helena era la hija de Rowena Ravenclaw." },
+                    { q: "¿En qué sala repleta de objetos ocultos se encontraba oculta la Diadema de Ravenclaw?", options: ["La Sala de los Menesteres", "La Cámara Secreta", "Las Mazmorras", "La Biblioteca"], correct: 0, diff: "easy", exp: "Donde los estudiantes ocultan cosas prohibidas desde hace siglos." },
+                    { q: "¿Qué poderoso hechizo protector pronuncian los profesores para animar las estatuas de piedra del castillo?", options: ["Piertotum Locomotor", "Protego Maxima", "Expecto Patronum", "Avada Kedavra"], correct: 0, diff: "easy", exp: "McGonagall confiesa felizmente que siempre había querido usar ese hechizo." },
+                    { q: "¿Qué recuerdo final le entrega Snape a Harry antes de morir?", options: ["Lágrimas con sus recuerdos para ver en el Pensadero", "Su varita", "El anillo", "Una carta"], correct: 0, diff: "easy", exp: "Le dice 'Mírame... tienes los ojos de tu madre'." },
+                    { q: "¿Cuál es la famosa frase con la que Snape demuestra su amor eterno por Lily Potter?", options: ["'Siempre' ('Always')", "'Por Hogwarts'", "'Jamás lo olvidaré'", "'Hasta el final'"], correct: 0, diff: "easy", exp: "Al mostrar que su Patronus sigue siendo una cierva igual al de Lily." },
+
+                    // MEDIO (8)
+                    { q: "¿Quién mata a la malvada mortífaga Bellatrix Lestrange para defender a su hija Ginny?", options: ["Molly Weasley", "Hermione Granger", "Minerva McGonagall", "Nymphadora Tonks"], correct: 0, diff: "medium", exp: "Molly exclama su célebre frase: '¡A mi hija no, perra!'." },
+                    { q: "¿Qué horrocrux destruyen Ron y Hermione en la Cámara Secreta usando un colmillo?", options: ["La Copa de Helga Hufflepuff", "La Diadema de Ravenclaw", "El Guardapelo", "El Anillo"], correct: 0, diff: "medium", exp: "Hermione clava el colmillo en la copa desatando una gran ola." },
+                    { q: "¿Quién resulta ser el séptimo Horrocrux no planeado creado involuntariamente por Voldemort?", options: ["Harry Potter", "Neville Longbottom", "Albus Dumbledore", "Severus Snape"], correct: 0, diff: "medium", exp: "La noche que intentó matarlo de bebé, un trozo de su alma se adhirió a Harry." },
+                    { q: "¿Dónde conversa Harry con Albus Dumbledore tras recibir el hechizo Avada Kedavra en el bosque?", options: ["En una versión luminosa y blanca de la Estación King's Cross", "En el Gran Comedor", "En la torre", "En Privet Drive"], correct: 0, diff: "medium", exp: "Dumbledore le aclara que todo ocurre dentro de su cabeza pero es real." },
+                    { q: "¿Quién es el verdadero dueño legítimo de la Varita de Saúco antes de que Harry la gane?", options: ["Draco Malfoy (y luego Harry Potter)", "Severus Snape", "Voldemort", "Albus Dumbledore"], correct: 0, diff: "medium", exp: "Draco desarmó a Dumbledore en la torre; por eso la varita nunca le obedeció a Snape ni a Voldemort." },
+                    { q: "¿Qué hace Harry con la invencible Varita de Saúco al finalizar la gran batalla?", options: ["La rompe en dos y la arroja al abismo", "La guarda en su bolsillo", "La devuelve a la tumba", "Se la da a Ron"], correct: 0, diff: "medium", exp: "Decide destruir su inmenso poder para que nadie vuelva a pelear por ella." },
+                    { q: "¿Qué madre miente a Voldemort asegurando que Harry está muerto tras preguntarle por su hijo Draco?", options: ["Narcissa Malfoy", "Bellatrix Lestrange", "Molly Weasley", "Augusta Longbottom"], correct: 0, diff: "medium", exp: "Narcissa salva a Harry solo para poder entrar al castillo y buscar a Draco." },
+                    { q: "¿Cómo se llama el hermano menor de Albus Dumbledore que atiende la taberna Cabeza de Puerco?", options: ["Aberforth Dumbledore", "Aurelius Dumbledore", "Ariana Dumbledore", "Percival Dumbledore"], correct: 0, diff: "medium", exp: "Aberforth ayuda al trío a ingresar secretamente a Hogwarts a través del retrato de Ariana." },
+
+                    // DIFÍCIL (7)
+                    { q: "¿En qué pasadizo secreto escondido detrás de un retrato ingresan a Hogwarts desde Hogsmeade?", options: ["Detrás del retrato de Ariana Dumbledore", "Detrás de la Señora Gorda", "En la estatua de la bruja tuerta", "En el Sauce Boxeador"], correct: 0, diff: "hard", exp: "El retrato conecta Cabeza de Puerco directamente con la Sala de Menesteres." },
+                    { q: "¿Qué fuego maldito invocado por Crabbe/Goyle destruye la Sala de Menesteres y la Diadema?", options: ["Fuego Feérico (Fiendfyre)", "Incendio", "Flagrate", "Bombarda Maxima"], correct: 0, diff: "hard", exp: "El Fiendfyre es una de las pocas sustancias capaces de destruir un Horrocrux." },
+                    { q: "¿Cuántos años transcurren en la escena final del epílogo en el Andén 9 ¾?", options: ["19 años después", "10 años después", "15 años después", "25 años después"], correct: 0, diff: "hard", exp: "Muestra a Harry, Ginny, Ron y Hermione acompañando a sus hijos a tomar el tren." },
+                    { q: "¿Cómo se llama el hijo menor de Harry Potter nombrado en honor a dos directores de Hogwarts?", options: ["Albus Severus Potter", "James Sirius Potter", "Teddy Lupin", "Scorpius Potter"], correct: 0, diff: "hard", exp: "'Llevas el nombre de dos directores de Hogwarts. Uno de ellos era de Slytherin y el hombre más valiente que conocí'." },
+                    { q: "¿Qué piedra mística usa Harry en el Bosque Prohibido para ver a sus padres, Sirius y Lupin?", options: ["La Piedra de la Resurrección", "La Piedra Filosofal", "El Espejo de Oesed", "El Giratiempo"], correct: 0, diff: "hard", exp: "Oculta en la Snitch dorada, le da fuerzas para entregarse al sacrificio." },
+                    { q: "¿Quién era la dueña original que robó la Diadema de Ravenclaw a su propia madre?", options: ["Helena Ravenclaw (La Dama Gris)", "Bloody Mary", "Fat Lady", "Rowena Ravenclaw"], correct: 0, diff: "hard", exp: "Helena robó la diadema por celos de la inteligencia de su madre y la escondió en Albania." },
+                    { q: "¿Quién mató a Fred Weasley, Remus Lupin y Nymphadora Tonks durante la Batalla de Hogwarts?", options: ["Caídos en el caos de la batalla (Lupin por Dolohov, Tonks por Bellatrix)", "Voldemort directamente", "Ejército de Dementores", "El derrumbe de las torres"], correct: 0, diff: "hard", exp: "Antonin Dolohov mató a Lupin y Bellatrix a Tonks en los patios." }
+                ]
+            }
+        ];
+
+        /* ================= APP STATE ================= */
+        let housePoints = 0;
+        let activeMovie = null;
+        let activeQuestionsFiltered = [];
+        let activeQuestionIndex = 0;
+        let timerInterval = null;
+        let p1Score = 0;
+        let p2Score = 0;
+        let p1Name = "Mago 1";
+        let p2Name = "Mago 2";
+        let currentDuelPlayer = 1;
+
+        /* ================= TAB SWITCHING ================= */
+        function switchTab(tabId) {
+            const tabs = ['home', 'movies', 'duel', 'wand', 'letter'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.add('hidden');
+            });
+            const selected = document.getElementById(`tab-${tabId}`);
+            if (selected) selected.classList.remove('hidden');
+
+            if (tabId === 'movies' && !activeMovie) {
+                renderMoviesGrid();
+            }
+            if (tabId === 'duel') {
+                initDuelQuestion();
+            }
+        }
+
+        function addHousePoints(pts) {
+            housePoints += pts;
+            document.getElementById('houseScoreHeader').innerText = housePoints;
+        }
+
+        /* ================= MOVIE ORACLE ================= */
+        function spinMovieOracle() {
+            playSpellSound('magic');
+            const randomMovie = moviesData[Math.floor(Math.random() * moviesData.length)];
+            const snacks = ["Cerveza de Mantequilla entibiada 🍺", "Ranas de Chocolate 🍫", "Grageas Bertie Bott 🍬", "Pasteles de Caldero 🥧"];
+            const randomSnack = snacks[Math.floor(Math.random() * snacks.length)];
+
+            const resultEl = document.getElementById('oracleResult');
+            resultEl.innerHTML = `
+                <img src="${randomMovie.poster}" class="h-20 object-contain rounded mb-1">
+                <h4 class="font-bold text-lg text-amber-950 font-wizard">${randomMovie.title} (${randomMovie.year})</h4>
+                <p class="text-xs text-amber-900"><strong>Snack sugerido:</strong> ${randomSnack}</p>
+            `;
+        }
+
+        /* ================= SPELL LAUNCHER ================= */
+        function castSpell(spellName) {
+            playSpellSound(spellName);
+            if (spellName === 'Lumos') wandColor = '#ffea00';
+            if (spellName === 'Expecto Patronum') wandColor = '#38bdf8';
+            if (spellName === 'Expelliarmus') wandColor = '#ef4444';
+            if (spellName === 'Wingardium Leviosa') wandColor = '#facc15';
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.5 } });
+            }
+        }
+
+        /* ================= MOVIES & TRIVIA RENDER ================= */
+        function renderMoviesGrid() {
+            const grid = document.getElementById('movieSelectorGrid');
+            grid.innerHTML = '';
+
+            moviesData.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = "bg-stone-900/90 border border-amber-800/40 hover:border-amber-400 p-2.5 rounded-2xl cursor-pointer transition transform hover:-translate-y-1 text-center glow-card flex flex-col justify-between overflow-hidden";
+                card.onclick = () => startMovieQuiz(movie.id);
+                card.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.title}" class="w-full h-44 object-cover rounded-xl mb-2">
+                    <div>
+                        <h4 class="font-bold text-amber-300 text-xs font-wizard leading-tight mb-1">${movie.title}</h4>
+                        <span class="text-[10px] text-stone-500 block">${movie.year} • ${movie.questions.length} preg.</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterQuizDifficulty() {
+            if (activeMovie) {
+                const diff = document.getElementById('difficultyFilter').value;
+                if (diff === 'all') {
+                    activeQuestionsFiltered = activeMovie.questions;
+                } else {
+                    activeQuestionsFiltered = activeMovie.questions.filter(q => q.diff === diff);
+                }
+                
+                if (activeQuestionsFiltered.length === 0) {
+                    activeQuestionsFiltered = activeMovie.questions;
+                }
+                activeQuestionIndex = 0;
+                loadQuestion();
+            }
+        }
+
+        function startMovieQuiz(movieId) {
+            activeMovie = moviesData.find(m => m.id === movieId);
+            const diff = document.getElementById('difficultyFilter').value;
+            if (diff === 'all') {
+                activeQuestionsFiltered = activeMovie.questions;
+            } else {
+                activeQuestionsFiltered = activeMovie.questions.filter(q => q.diff === diff);
+                if (activeQuestionsFiltered.length === 0) activeQuestionsFiltered = activeMovie.questions;
+            }
+
+            activeQuestionIndex = 0;
+            document.getElementById('quizContainer').classList.remove('hidden');
+            document.getElementById('quizMovieTitle').innerText = activeMovie.title;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            const q = activeQuestionsFiltered[activeQuestionIndex];
+            document.getElementById('quizQuestionNum').innerText = `Pregunta ${activeQuestionIndex + 1} de ${activeQuestionsFiltered.length}`;
+            document.getElementById('quizQuestionText').innerText = q.q;
+
+            const badge = document.getElementById('quizDiffBadge');
+            if (q.diff === 'easy') { badge.innerText = "🟢 Fácil"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"; }
+            else if (q.diff === 'medium') { badge.innerText = "🟡 Medio"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"; }
+            else { badge.innerText = "🔴 Difícil"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30"; }
+
+            const optionsGrid = document.getElementById('quizOptionsGrid');
+            optionsGrid.innerHTML = '';
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/20 p-4 md:p-5 rounded-2xl transition text-stone-200 text-sm md:text-base font-semibold";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx);
+                optionsGrid.appendChild(btn);
+            });
+
+            if (document.getElementById('timeAttackToggle').checked) {
+                document.getElementById('timerDisplay').classList.remove('hidden');
+                let timeLeft = 15;
+                document.getElementById('timeLeft').innerText = timeLeft;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timeLeft').innerText = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        checkAnswer(-1);
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('timerDisplay').classList.add('hidden');
+            }
+        }
+
+        function checkAnswer(selectedIdx) {
+            clearInterval(timerInterval);
+            const q = activeQuestionsFiltered[activeQuestionIndex];
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+
+            const buttons = document.getElementById('quizOptionsGrid').children;
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            if (selectedIdx === q.correct) {
+                playSpellSound('correct');
+                addHousePoints(10);
+                feedback.className = "p-5 rounded-2xl text-sm md:text-base leading-relaxed border bg-emerald-950/60 border-emerald-600 text-emerald-200";
+                feedback.innerHTML = `<strong>¡Excelente acierto! 🪄 (+10 pts)</strong><br>${q.exp}`;
+            } else {
+                playSpellSound('wrong');
+                feedback.className = "p-5 rounded-2xl text-sm md:text-base leading-relaxed border bg-red-950/60 border-red-600 text-red-200";
+                feedback.innerHTML = `<strong>¡Incorrecto! ⚡</strong><br>${q.exp}`;
+            }
+
+            document.getElementById('nextQuestionBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            activeQuestionIndex++;
+            if (activeQuestionIndex < activeQuestionsFiltered.length) {
+                loadQuestion();
+            } else {
+                alert("¡Felicidades! Han completado las preguntas de esta selección.");
+                document.getElementById('quizContainer').classList.add('hidden');
+            }
+        }
+
+        /* ================= DUEL MODE ================= */
+        let currentDuelQuestion = null;
+
+        function updatePlayerNames() {
+            p1Name = document.getElementById('p1NameInput').value.trim() || "Mago 1";
+            p2Name = document.getElementById('p2NameInput').value.trim() || "Mago 2";
+
+            document.getElementById('p1DisplayName').innerText = p1Name;
+            document.getElementById('p2DisplayName').innerText = p2Name;
+
+            const current = currentDuelPlayer === 1 ? p1Name : p2Name;
+            document.getElementById('currentDuelPlayer').innerText = current;
+        }
+
+        function initDuelQuestion() {
+            const allQuestions = moviesData.flatMap(m => m.questions);
+            currentDuelQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+
+            document.getElementById('duelQuestionText').innerText = currentDuelQuestion.q;
+            
+            const badge = document.getElementById('duelDiffBadge');
+            if (currentDuelQuestion.diff === 'easy') { badge.innerText = "Dificultad: 🟢 Fácil"; badge.className = "text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"; }
+            else if (currentDuelQuestion.diff === 'medium') { badge.innerText = "Dificultad: 🟡 Medio"; badge.className = "text-xs font-bold px-2.5 py-1 rounded-lg bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"; }
+            else { badge.innerText = "Dificultad: 🔴 Difícil"; badge.className = "text-xs font-bold px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30"; }
+
+            const grid = document.getElementById('duelOptionsGrid');
+            grid.innerHTML = '';
+
+            currentDuelQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/20 p-4 md:p-5 rounded-2xl transition text-stone-200 text-sm md:text-base font-semibold";
+                btn.innerText = opt;
+                btn.onclick = () => answerDuel(idx);
+                grid.appendChild(btn);
+            });
+        }
+
+        function answerDuel(selectedIdx) {
+            const winnerName = currentDuelPlayer === 1 ? p1Name : p2Name;
+
+            if (selectedIdx === currentDuelQuestion.correct) {
+                playSpellSound('correct');
+                if (currentDuelPlayer === 1) p1Score++;
+                else p2Score++;
+                
+                document.getElementById('p1Score').innerText = p1Score;
+                document.getElementById('p2Score').innerText = p2Score;
+
+                if (p1Score >= 5 || p2Score >= 5) {
+                    alert(`¡${winnerName} ha ganado el Duelo de Magos! 🎉⚡`);
+                    p1Score = 0; p2Score = 0;
+                    document.getElementById('p1Score').innerText = 0;
+                    document.getElementById('p2Score').innerText = 0;
+                }
+            } else {
+                playSpellSound('wrong');
+            }
+
+            currentDuelPlayer = currentDuelPlayer === 1 ? 2 : 1;
+            const nextName = currentDuelPlayer === 1 ? p1Name : p2Name;
+            document.getElementById('currentDuelPlayer').innerText = nextName;
+            document.getElementById('currentDuelPlayer').className = currentDuelPlayer === 1 ? "text-red-400" : "text-blue-400";
+
+            initDuelQuestion();
+        }
+
+        /* ================= WAND CREATOR ================= */
+        function createWand() {
+            const wood = document.getElementById('wandWood').value;
+            const core = document.getElementById('wandCore').value;
+            const len = document.getElementById('wandLength').value;
+
+            document.getElementById('wandTitleResult').innerText = `Varita de ${wood} con ${core}`;
+            document.getElementById('wandDescResult').innerText = `Longitud: ${len}. Una varita perfectamente equilibrada para tus encantamientos.`;
+            document.getElementById('wandResult').classList.remove('hidden');
+
+            playSpellSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 40, spread: 60 });
+            }
+        }
+
+        /* ================= HOGWARTS LETTER ================= */
+        function generateLetter() {
+            const name = document.getElementById('studentNameInput').value.trim() || "Mago/Bruja";
+            document.getElementById('letterStudentName').innerText = name;
+            playSpellSound('magic');
+        }
+    </script>
+</body>
+</html>
