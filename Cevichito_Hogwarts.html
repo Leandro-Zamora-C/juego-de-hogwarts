@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Magic Experience & Trivia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gryffindor: { red: '#740001', gold: '#D3A625' },
+                        slytherin: { green: '#1A472A', silver: '#AAAAAA' },
+                        ravenclaw: { blue: '#0E1A40', bronze: '#946B2D' },
+                        hufflepuff: { yellow: '#ECB939', black: '#372E29' },
+                        parchment: '#f4e4bc',
+                        parchmentDark: '#e2cb93',
+                        magicGold: '#ffd700'
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'Georgia', 'serif'],
+                        hand: ['Caveat', 'cursive'],
+                        sans: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #070605;
+            color: #f3f4f6;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-wizard {
+            font-family: 'Cinzel', serif;
+        }
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1c1917;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #78350f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b45309;
+        }
+
+        .parchment-bg {
+            background-color: #f4e4bc;
+            background-image: radial-gradient(#e2cb93 1px, transparent 0);
+            background-size: 16px 16px;
+            color: #291e0a;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        /* Animated Glowing Cards */
+        .glow-card {
+            position: relative;
+            background: rgba(23, 20, 18, 0.85);
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .glow-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 10px 30px -5px rgba(217, 119, 6, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
+            border-color: rgba(245, 158, 11, 0.6);
+        }
+
+        /* Floating Animation */
+        @keyframes floatMagic {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: floatMagic 5s ease-in-out infinite;
+        }
+
+        /* Pulsing Glow Effect */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        /* Mobile Overlay Scroll Fix */
+        .quiz-overlay-mobile {
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media print {
+            header, footer, canvas, .no-print, #tab-letter > div:not(#letterParchment), #initialModal {
+                display: none !important;
+            }
+
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            #letterParchment {
+                box-shadow: none !important;
+                border: 2px solid #78350f !important;
+                background-color: #fefae0 !important;
+                width: 100% !important;
+                max-width: 650px !important;
+                margin: 0 auto !important;
+                padding: 40px !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative select-none">
+
+    <!-- Canvas para Polvo de Estrellas y Varita Mágica -->
+    <canvas id="magicCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- Modal de Selección Inicial de Casa -->
+    <div id="initialModal" class="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-stone-900 border-2 border-amber-600/40 rounded-3xl p-6 md:p-10 shadow-2xl text-center space-y-6 overflow-hidden animate-float" 
+             style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.85), rgba(12, 10, 9, 0.95)), url('https://i.blogs.es/61a2ce/harry-potter-gran-comedor-problema-comida-2/500_333.jpeg'); background-size: cover; background-position: center;">
+            
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter Logo" class="h-20 md:h-28 mx-auto object-contain drop-shadow-2xl filter brightness-110">
+
+            <div class="space-y-2">
+                <h2 class="text-xl md:text-2xl font-bold text-amber-300 font-wizard">Bienvenido al Gran Comedor</h2>
+                <p class="text-stone-300 text-xs md:text-sm max-w-xl mx-auto">
+                    El Sombrero Seleccionador debe asignarte a tu Casa de Hogwarts antes de explorar la magia:
+                </p>
+            </div>
+
+            <!-- Escudos PNG Oficiales -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <button onclick="selectInitialHouse('Gryffindor', 'https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png')" class="bg-stone-900/80 hover:bg-red-950/80 border border-red-700/60 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:scale-105 shadow-lg active:scale-95">
+                    <img src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Gryffindor" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-red-400 font-bold text-sm">Gryffindor</span>
+                </button>
+                <button onclick="selectInitialHouse('Slytherin', 'https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png')" class="bg-stone-900/80 hover:bg-emerald-950/80 border border-emerald-700/60 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:scale-105 shadow-lg active:scale-95">
+                    <img src="https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png" alt="Slytherin" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-emerald-400 font-bold text-sm">Slytherin</span>
+                </button>
+                <button onclick="selectInitialHouse('Ravenclaw', 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png')" class="bg-stone-900/80 hover:bg-blue-950/80 border border-blue-700/60 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:scale-105 shadow-lg active:scale-95">
+                    <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Ravenclaw" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-blue-400 font-bold text-sm">Ravenclaw</span>
+                </button>
+                <button onclick="selectInitialHouse('Hufflepuff', 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png')" class="bg-stone-900/80 hover:bg-amber-950/80 border border-yellow-600/60 hover:border-amber-400 p-4 rounded-2xl flex flex-col items-center space-y-2 transition transform hover:scale-105 shadow-lg active:scale-95">
+                    <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Hufflepuff" class="w-16 h-16 object-contain">
+                    <span class="font-wizard text-yellow-400 font-bold text-sm">Hufflepuff</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navigation Bar -->
+    <header class="bg-stone-900/90 backdrop-blur-md border-b border-amber-800/30 sticky top-0 z-40 px-4 md:px-12 py-3 shadow-xl">
+        <div class="w-full flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-6 md:h-8 object-contain filter brightness-125">
+                <div>
+                    <h1 class="text-base md:text-xl font-black tracking-wider text-amber-400 font-wizard">HOGWARTS EXPERIENCIA</h1>
+                    <p class="text-[9px] text-stone-400 font-wizard tracking-widest uppercase">Trivia & Duelo de Magos</p>
+                </div>
+            </div>
+
+            <!-- House Badge & Score Status -->
+            <div id="userHouseHeader" class="hidden flex items-center space-x-2.5 bg-stone-800/90 px-3.5 py-1 rounded-full border border-amber-500/30 shadow">
+                <img id="houseIconHeader" src="" alt="Escudo" class="w-5 h-5 object-contain">
+                <div class="text-xs">
+                    <span id="houseNameHeader" class="font-bold text-amber-300">Casa</span>
+                    <div class="text-amber-400/90"><i class="fa-solid fa-trophy mr-1 text-[10px]"></i><span id="houseScoreHeader">0</span> pts</div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex items-center gap-1 md:gap-2 text-xs font-semibold overflow-x-auto w-full md:w-auto py-1 md:py-0 scrollbar-none">
+                <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-house mr-1"></i> Inicio</button>
+                <button onclick="switchTab('movies')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-film mr-1"></i> Películas & Trivia</button>
+                <button onclick="switchTab('duel')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-sparkles mr-1"></i> Duelo 2P</button>
+                <button onclick="switchTab('wand')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Varita</button>
+                <button onclick="switchTab('letter')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1"></i> Carta</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow w-full px-4 md:px-12 xl:px-20 py-6 md:py-8 relative">
+
+        <!-- ================= HOME TAB ================= -->
+        <section id="tab-home" class="space-y-6 md:space-y-8">
+            <!-- Hero Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <div class="lg:col-span-8 relative rounded-3xl overflow-hidden bg-cover bg-center p-6 md:p-12 border border-amber-600/30 flex flex-col justify-center glow-card shadow-2xl"
+                     style="background-image: linear-gradient(to right, rgba(12, 10, 9, 0.95), rgba(12, 10, 9, 0.6)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXyUJ0_X3or5I1ZRKA0g4ZsW_y6ViDHSZpQg-t5D1bbSQqnQH9xRKhdjkl&s=10');">
+                    <div class="relative z-10 space-y-4 md:space-y-5">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-12 md:h-20 object-contain drop-shadow-lg filter brightness-125">
+                        <h2 class="text-xl md:text-3xl font-bold text-stone-200 tracking-wide leading-snug">
+                            Noche Mágica de Trivia, Duelos & Desafíos
+                        </h2>
+                        <p class="text-stone-300 text-xs md:text-base leading-relaxed max-w-2xl">
+                            Preparen sus varitas, elijan la dificultad deseada, compitan en pareja y demuestren su verdadero nivel de conocimiento mágico.
+                        </p>
+
+                        <div class="pt-2 flex flex-wrap gap-3 md:gap-4">
+                            <button onclick="switchTab('movies')" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold px-5 md:px-7 py-3 rounded-2xl transition shadow-lg flex items-center gap-2 active:scale-95 text-xs md:text-sm">
+                                <i class="fa-solid fa-play"></i> Comenzar Trivia de Películas
+                            </button>
+                            <button onclick="switchTab('duel')" class="bg-stone-800/80 hover:bg-stone-700/80 text-amber-300 font-semibold px-5 md:px-7 py-3 rounded-2xl border border-amber-500/30 transition flex items-center gap-2 backdrop-blur active:scale-95 text-xs md:text-sm">
+                                <i class="fa-solid fa-shield-halved"></i> Duelo Mágico (2 Jugadores)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music & Sound Panel -->
+                <div class="lg:col-span-4 bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 glow-card">
+                    <div class="space-y-3 text-center">
+                        <i class="fa-solid fa-music text-4xl text-amber-400 animate-pulse"></i>
+                        <h3 class="text-xl font-bold text-amber-300">Ambiente Mágico</h3>
+                        <p class="text-stone-400 text-xs">Reproduce el tema musical sintetizado de Harry Potter para acompañar su velada.</p>
+                    </div>
+
+                    <button onclick="toggleBackgroundMusic()" id="musicToggleBtn" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2 active:scale-95 text-xs md:text-sm">
+                        <i class="fa-solid fa-play"></i> Reproducir Música Mágica
+                    </button>
+                </div>
+            </div>
+
+            <!-- Movie Oracle & Spell Bar Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Movie Randomizer -->
+                <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-4 glow-card overflow-hidden relative"
+                     style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.9), rgba(12, 10, 9, 0.95)), url('https://i0.wp.com/foodandwineespanol.com/wp-content/uploads/2021/05/cerveza-de-mantequilla-harry-potter.webp?fit=2560%2C1440&ssl=1'); background-size: cover;">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i class="fa-solid fa-dice text-2xl text-amber-400"></i>
+                            <h3 class="text-xl font-bold text-amber-300">Oráculo de Cine Mágico</h3>
+                        </div>
+                        <p class="text-stone-400 text-xs md:text-sm">¿No saben cuál película ver hoy? Dejen que la magia decida por ustedes junto a una sugerencia de snack temático.</p>
+                    </div>
+
+                    <div id="oracleResult" class="parchment-bg rounded-2xl p-4 text-center min-h-[100px] flex flex-col justify-center items-center border border-amber-800 shadow-inner">
+                        <p class="font-handwriting text-xl md:text-2xl font-bold text-amber-950">Haz clic para girar la ruleta mágica</p>
+                    </div>
+
+                    <button onclick="spinMovieOracle()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2 active:scale-95 text-xs md:text-sm">
+                        <i class="fa-solid fa-wand-magic"></i> Seleccionar Película al Azar
+                    </button>
+                </div>
+
+                <!-- Spell Sound Spells Quick Bar -->
+                <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-8 space-y-4 glow-card">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-scroll text-2xl text-amber-400"></i>
+                        <h3 class="text-xl font-bold text-amber-300">Lanzador de Encantamientos</h3>
+                    </div>
+                    <p class="text-stone-400 text-xs md:text-sm">Prueben la magia acústica de su varita presionando los hechizos principales:</p>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <button onclick="castSpell('Lumos')" class="bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/30 p-3 rounded-2xl text-left transition flex items-center space-x-3 active:scale-95">
+                            <span class="text-2xl">💡</span>
+                            <div>
+                                <div class="font-bold text-amber-300 text-xs md:text-sm">Lumos</div>
+                                <div class="text-[10px] text-stone-400">Luz en varita</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Expecto Patronum')" class="bg-stone-800/80 hover:bg-blue-900/40 border border-blue-500/30 p-3 rounded-2xl text-left transition flex items-center space-x-3 active:scale-95">
+                            <span class="text-2xl">🦌</span>
+                            <div>
+                                <div class="font-bold text-blue-300 text-xs md:text-sm">Expecto Patronum</div>
+                                <div class="text-[10px] text-stone-400">Guardián</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Expelliarmus')" class="bg-stone-800/80 hover:bg-red-900/40 border border-red-500/30 p-3 rounded-2xl text-left transition flex items-center space-x-3 active:scale-95">
+                            <span class="text-2xl">⚡</span>
+                            <div>
+                                <div class="font-bold text-red-300 text-xs md:text-sm">Expelliarmus</div>
+                                <div class="text-[10px] text-stone-400">Desarme</div>
+                            </div>
+                        </button>
+                        <button onclick="castSpell('Wingardium Leviosa')" class="bg-stone-800/80 hover:bg-yellow-900/40 border border-yellow-500/30 p-3 rounded-2xl text-left transition flex items-center space-x-3 active:scale-95">
+                            <span class="text-2xl">🪶</span>
+                            <div>
+                                <div class="font-bold text-yellow-300 text-xs md:text-sm">Leviosa</div>
+                                <div class="text-[10px] text-stone-400">Levitación</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MOVIES & TRIVIA TAB ================= -->
+        <section id="tab-movies" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-amber-900/40 pb-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-amber-400">Selección de Película</h2>
+                    <p class="text-stone-400 text-xs md:text-sm">Selecciona una película para desplegar su trivia interactiva de inmediato.</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <!-- Difficulty Selector Filter -->
+                    <div class="flex items-center space-x-2 bg-stone-900 border border-amber-800/40 px-3 py-1.5 rounded-xl text-xs w-full sm:w-auto justify-between">
+                        <span class="font-semibold text-stone-300"><i class="fa-solid fa-layer-group text-amber-400 mr-1"></i> Dificultad:</span>
+                        <select id="difficultyFilter" onchange="filterQuizDifficulty()" class="bg-stone-950 text-amber-300 font-bold px-2 py-1 rounded-lg border border-amber-500/30 focus:outline-none">
+                            <option value="all">Todas</option>
+                            <option value="easy">🟢 Fácil</option>
+                            <option value="medium">🟡 Medio</option>
+                            <option value="hard">🔴 Difícil</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Attack Toggle -->
+                    <div class="flex items-center space-x-2 bg-stone-900 border border-amber-800/40 px-3 py-1.5 rounded-xl text-xs">
+                        <i class="fa-solid fa-hourglass-half text-amber-400"></i>
+                        <span class="font-semibold text-stone-300">Giratiempo:</span>
+                        <input type="checkbox" id="timeAttackToggle" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movie Selector Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4" id="movieSelectorGrid">
+                <!-- Javascript injects movie cards here -->
+            </div>
+
+            <!-- Active Quiz Container (Mobile Popup Overlay & Desktop Focused View) -->
+            <div id="quizContainer" class="hidden fixed inset-0 md:relative z-50 md:z-auto bg-stone-950/90 md:bg-stone-900/90 backdrop-blur-md border border-amber-800/50 md:rounded-3xl p-5 md:p-10 space-y-5 shadow-2xl overflow-y-auto quiz-overlay-mobile flex flex-col justify-center">
+                
+                <!-- Close Button for Mobile Overlay -->
+                <div class="flex justify-between items-center border-b border-amber-900/40 pb-3">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span id="quizMovieTitle" class="text-xs uppercase tracking-widest font-bold text-amber-500">Película 1</span>
+                            <span id="quizDiffBadge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Fácil</span>
+                        </div>
+                        <h3 id="quizQuestionNum" class="text-lg md:text-2xl font-bold text-stone-100">Pregunta 1</h3>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div id="timerDisplay" class="hidden bg-amber-950 border border-amber-500 text-amber-400 px-3 py-1 rounded-xl font-mono font-bold text-sm md:text-lg">
+                            ⏱ <span id="timeLeft">15</span>s
+                        </div>
+                        <button onclick="closeQuizContainer()" class="bg-stone-800 hover:bg-stone-700 text-stone-300 w-8 h-8 rounded-full flex items-center justify-center border border-amber-500/30 transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <div class="py-2">
+                    <p id="quizQuestionText" class="text-base md:text-2xl font-semibold text-amber-100 leading-relaxed">
+                        ¿Texto de la pregunta aquí?
+                    </p>
+                </div>
+
+                <!-- Answer Options Grid -->
+                <div id="quizOptionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                    <!-- Dynamic option buttons -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="quizFeedback" class="hidden p-4 md:p-5 rounded-2xl text-xs md:text-base leading-relaxed border transition"></div>
+
+                <!-- Next Button -->
+                <div class="flex justify-end pt-2">
+                    <button id="nextQuestionBtn" onclick="nextQuestion()" class="hidden bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold px-6 py-3 rounded-2xl transition shadow">
+                        Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= DUEL TAB (2 PLAYER MODE) ================= -->
+        <section id="tab-duel" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-amber-400">Duelo de Magos en Pareja 🪄</h2>
+                <p class="text-stone-400 text-xs md:text-sm">Personalicen sus nombres y compitan turno a turno. ¡El primero en acumular 5 aciertos gana!</p>
+            </div>
+
+            <!-- Restored Duel Banner Image -->
+            <div class="max-w-2xl mx-auto rounded-3xl overflow-hidden border border-amber-600/40 shadow-xl h-40 md:h-64 bg-cover bg-center glow-card"
+                 style="background-image: url('https://www.prints4u.net/wp-content/uploads/2019/11/031_Harry_Potter_the_Order_of_the_Phoenix.jpg');">
+            </div>
+
+            <!-- Custom Names Inputs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto bg-stone-900/90 p-4 rounded-2xl border border-amber-800/40">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-red-400">Jugador / Mago 1:</label>
+                    <input type="text" id="p1NameInput" value="Mago 1" oninput="updatePlayerNames()" class="w-full bg-stone-950 border border-red-700/50 rounded-xl px-3 py-2 text-xs md:text-sm text-stone-200 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-blue-400">Jugador / Mago 2:</label>
+                    <input type="text" id="p2NameInput" value="Mago 2" oninput="updatePlayerNames()" class="w-full bg-stone-950 border border-blue-700/50 rounded-xl px-3 py-2 text-xs md:text-sm text-stone-200 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
+                <div class="bg-red-950/40 border border-red-700/50 p-4 md:p-6 rounded-2xl text-center space-y-1 glow-card">
+                    <h4 id="p1DisplayName" class="font-bold text-red-400 text-sm md:text-lg">Mago 1</h4>
+                    <div id="p1Score" class="text-4xl md:text-5xl font-black text-amber-400">0</div>
+                    <p class="text-[10px] text-stone-400">Aciertos</p>
+                </div>
+                <div class="bg-blue-950/40 border border-blue-700/50 p-4 md:p-6 rounded-2xl text-center space-y-1 glow-card">
+                    <h4 id="p2DisplayName" class="font-bold text-blue-400 text-sm md:text-lg">Mago 2</h4>
+                    <div id="p2Score" class="text-4xl md:text-5xl font-black text-amber-400">0</div>
+                    <p class="text-[10px] text-stone-400">Aciertos</p>
+                </div>
+            </div>
+
+            <!-- Turn Banner -->
+            <div id="duelTurnBanner" class="text-center bg-amber-950/40 border border-amber-600/30 p-3 rounded-2xl max-w-md mx-auto font-bold text-amber-300 text-xs md:text-sm">
+                Turno actual: <span id="currentDuelPlayer" class="text-red-400">Mago 1</span>
+            </div>
+
+            <!-- Duel Question Card -->
+            <div id="duelCard" class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-5 md:p-10 max-w-3xl mx-auto space-y-5 shadow-2xl glow-card">
+                <div class="flex justify-between items-center border-b border-amber-900/30 pb-3">
+                    <span id="duelDiffBadge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">Dificultad: Aleatoria</span>
+                </div>
+                <p id="duelQuestionText" class="text-base md:text-xl font-semibold text-stone-100 text-center leading-relaxed">
+                    Cargando desafío del duelo...
+                </p>
+
+                <div id="duelOptionsGrid" class="grid grid-cols-1 gap-3">
+                    <!-- Duel Options -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= WAND CREATOR TAB ================= -->
+        <section id="tab-wand" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-amber-400">🪄 Tienda de Varitas Ollivanders</h2>
+                <p class="text-stone-400 text-xs md:text-sm">"La varita escoge al mago". Personaliza tus materiales y descubre tu varita única.</p>
+            </div>
+
+            <div class="bg-stone-900/90 border border-amber-800/40 rounded-3xl p-6 md:p-10 max-w-3xl mx-auto space-y-5 shadow-2xl glow-card">
+                <div class="space-y-1.5">
+                    <label class="text-xs md:text-sm font-bold text-amber-300">1. Tipo de Madera:</label>
+                    <select id="wandWood" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3 text-xs md:text-sm text-amber-100 focus:outline-none">
+                        <option value="Acebo">Acebo (Madera protectora y noble)</option>
+                        <option value="Sauce">Sauce (Madera ideal para hechizos curativos)</option>
+                        <option value="Roble">Roble (Madera de fuerza y lealtad)</option>
+                        <option value="Saúco">Saúco (Rara y de inmenso poder)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs md:text-sm font-bold text-amber-300">2. Núcleo Mágico:</label>
+                    <select id="wandCore" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3 text-xs md:text-sm text-amber-100 focus:outline-none">
+                        <option value="Pluma de Fénix">Pluma de Fénix (Gama mágica muy amplia)</option>
+                        <option value="Fibra de Corazón de Dragón">Fibra de Corazón de Dragón (Hechizos potentes)</option>
+                        <option value="Pelo de Unicornio">Pelo de Unicornio (Magia más consistente y pura)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs md:text-sm font-bold text-amber-300">3. Longitud & Flexibilidad:</label>
+                    <select id="wandLength" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl p-3 text-xs md:text-sm text-amber-100 focus:outline-none">
+                        <option value="11 pulgadas, ligeramente flexible">11 pulgadas - Ligeramente flexible</option>
+                        <option value="12.5 pulgadas, rígida">12.5 pulgadas - Rígida y firme</option>
+                        <option value="10 pulgadas, flexible">10 pulgadas - Muy flexible</option>
+                    </select>
+                </div>
+
+                <button onclick="createWand()" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 text-stone-950 font-bold py-3.5 rounded-2xl transition shadow active:scale-95 text-xs md:text-sm">
+                    Revelar Mi Varita Mágica
+                </button>
+
+                <div id="wandResult" class="hidden parchment-bg rounded-2xl p-6 text-center space-y-2 text-amber-950 border border-amber-900">
+                    <span class="text-4xl">🪄</span>
+                    <h3 id="wandTitleResult" class="font-wizard text-lg md:text-xl font-bold">Varita de Acebo con Pluma de Fénix</h3>
+                    <p id="wandDescResult" class="font-handwriting text-lg md:text-xl">Una varita verdaderamente excepcional adaptada a tu poder.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= HOGWARTS ACCEPTANCE LETTER TAB ================= -->
+        <section id="tab-letter" class="hidden space-y-6">
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-amber-400">📜 Carta de Aceptación de Hogwarts</h2>
+                <p class="text-stone-400 text-xs md:text-sm">Personalicen e impriman su carta oficial firmada por la Profesora McGonagall.</p>
+            </div>
+
+            <div class="max-w-md mx-auto flex gap-2.5">
+                <input type="text" id="studentNameInput" placeholder="Escribe tu nombre aquí..." class="flex-grow bg-stone-900 border border-amber-800/50 rounded-xl px-4 py-2.5 text-xs md:text-sm text-amber-100 focus:outline-none">
+                <button onclick="generateLetter()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold px-5 py-2.5 rounded-xl transition text-xs md:text-sm">
+                    Generar
+                </button>
+            </div>
+
+            <div id="letterParchment" class="parchment-bg rounded-3xl p-6 md:p-12 max-w-2xl mx-auto space-y-5 text-amber-950 border-2 border-amber-900 shadow-2xl relative">
+                <div class="text-center space-y-2 border-b border-amber-900/30 pb-4">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhe8SkzBdB1L9Q-FjsTk1gGsukGwdSYLaPF10_ixLf-Q&s=10" alt="Escudo Hogwarts" class="w-16 h-16 md:w-20 md:h-20 mx-auto object-contain">
+                    <h3 class="font-wizard text-xl md:text-2xl font-bold tracking-widest">COLEGIO HOGWARTS DE MAGIA Y HECHICERÍA</h3>
+                    <p class="text-[10px] font-wizard tracking-wider">Director: Albus Dumbledore</p>
+                </div>
+
+                <div class="space-y-3 font-handwriting text-lg md:text-2xl leading-relaxed">
+                    <p>Estimado/a <span id="letterStudentName" class="font-bold underline decoration-amber-800">Mago/Bruja</span>,</p>
+                    <p>Tenemos el placer de informarle de que dispone de un cupo en el Colegio Hogwarts de Magia y Hechicería. Adjunto encontrará la lista de todos los libros y del equipo necesarios.</p>
+                    <p>El curso comienza el 1 de septiembre. Esperamos su búho antes del 31 de julio.</p>
+                    <p class="pt-2">Con respecto,</p>
+                    <p class="font-wizard text-sm md:text-base font-bold">Minerva McGonagall<br><span class="text-xs font-normal">Directora Adjunta</span></p>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlI_xpt0gdIKd18TwvFTH8C3ty11rBHF0-OEb1d3XCUg&s=10" alt="Sello Cera" class="w-14 h-14 object-contain">
+                </div>
+
+                <div class="text-center pt-2 no-print">
+                    <button onclick="window.print()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 px-6 py-2 rounded-xl text-xs font-wizard transition">
+                        🖨️ Imprimir o Guardar en PDF
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-950 border-t border-amber-900/30 py-6 text-center text-xs text-stone-500 space-y-1">
+        <p>Experiencia Mágica de Harry Potter creada para Noches de Trivia & Parejas ✨</p>
+        <p class="text-stone-600">Travesura Realizada 🪄</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* ================= AUDIO SYNTHESIS & MUSIC ================= */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMusicPlaying = false;
+        let musicOscillators = [];
+
+        function playSpellSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct' || type === 'Lumos') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong' || type === 'Expelliarmus') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.5);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+
+        function toggleBackgroundMusic() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const btn = document.getElementById('musicToggleBtn');
+            if (isMusicPlaying) {
+                musicOscillators.forEach(o => o.stop());
+                musicOscillators = [];
+                isMusicPlaying = false;
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Reproducir Música Mágica`;
+            } else {
+                isMusicPlaying = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pausar Música`;
+                playHedwigTheme();
+            }
+        }
+
+        function playHedwigTheme() {
+            if (!isMusicPlaying) return;
+
+            const notes = [
+                { f: 493.88, d: 0.4 },
+                { f: 659.25, d: 0.6 },
+                { f: 783.99, d: 0.3 },
+                { f: 739.99, d: 0.3 },
+                { f: 659.25, d: 0.7 },
+                { f: 987.77, d: 0.4 },
+                { f: 880.00, d: 0.8 },
+                { f: 739.99, d: 0.8 }
+            ];
+
+            let delay = 0;
+            notes.forEach((note) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = note.f;
+
+                const start = audioCtx.currentTime + delay;
+                gain.gain.setValueAtTime(0.15, start);
+                gain.gain.exponentialRampToValueAtTime(0.01, start + note.d);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(start);
+                osc.stop(start + note.d);
+
+                musicOscillators.push(osc);
+                delay += note.d + 0.05;
+            });
+
+            setTimeout(() => {
+                if (isMusicPlaying) playHedwigTheme();
+            }, delay * 1000 + 500);
+        }
+
+        /* ================= INITIAL HOUSE MODAL ================= */
+        function selectInitialHouse(name, badgeUrl) {
+            document.getElementById('initialModal').classList.add('hidden');
+            document.getElementById('userHouseHeader').classList.remove('hidden');
+            document.getElementById('houseNameHeader').innerText = name;
+            document.getElementById('houseIconHeader').src = badgeUrl;
+            
+            playSpellSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
+            }
+        }
+
+        /* ================= ANIMATED SPARKLE CANVAS ================= */
+        const canvas = document.getElementById('magicCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let wandColor = '#ffd700';
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Background floating stars initialization
+        for (let i = 0; i < 40; i++) {
+            particles.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 0.5,
+                alpha: Math.random() * 0.8,
+                color: '#ffd700',
+                isBackground: true
+            });
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            for (let i = 0; i < 2; i++) {
+                particles.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    radius: Math.random() * 3 + 1,
+                    alpha: 1,
+                    color: wandColor,
+                    isBackground: false
+                });
+            }
+        });
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.isBackground) {
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.restore();
+                } else {
+                    p.alpha -= 0.025;
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                    } else {
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = p.color;
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* ================= EXTENDED QUESTION BANK BY DIFFICULTY ================= */
+        const moviesData = [
+            {
+                id: 1,
+                title: "La Piedra Filosofal",
+                year: "2001",
+                poster: "https://media.harrypotterfanzone.com/philosophers-stone-theatrical-poster-405x0-c-default.jpg",
+                questions: [
+                    { q: "¿Qué regalo le da Hagrid a Harry por su cumpleaños número 11?", options: ["Una lechuza (Hedwig)", "Una escoba Nimbus 2000", "Una capa de invisibilidad", "Un pastel de calabaza"], correct: 0, diff: "easy", exp: "Hagrid le regala a Hedwig en el Callejón Diagon." },
+                    { q: "¿Cuál es la posición que juega Harry en el equipo de Quidditch?", options: ["Buscador", "Guardián", "Cazador", "Golpeador"], correct: 0, diff: "easy", exp: "Harry es el Buscador más joven en un siglo." },
+                    { q: "¿Cómo se llama el perro de tres cabezas que vigila la trampilla?", options: ["Fluffy", "Fang", "Norbert", "Aragog"], correct: 0, diff: "easy", exp: "Fluffy se duerme cuando escucha música." },
+                    { q: "¿Qué hechizo utiliza Hermione para reparar los lentes de Harry?", options: ["Oculus Reparo", "Alohomora", "Lumos", "Wingardium Leviosa"], correct: 0, diff: "easy", exp: "Oculus Reparo es el primer hechizo demostrado por Hermione." },
+                    { q: "¿Qué espejo muestra los deseos más profundos del corazón?", options: ["El Espejo de Oesed", "El Espejo de Azkaban", "El Espejo del Pensadero", "El Espejo de la Verdad"], correct: 0, diff: "medium", exp: "'Oesed' leído al revés es 'Deseo'." },
+                    { q: "¿Quién era realmente el mago que ayudaba a Voldemort en Hogwarts?", options: ["Profesor Quirrell", "Profesor Snape", "Argus Filch", "Gilderoy Lockhart"], correct: 0, diff: "medium", exp: "Quirrell compartía su cuerpo con la cara de Voldemort." },
+                    { q: "¿Qué pieza de ajedrez gigante monta Ron en el desafío final?", options: ["Un caballo", "Una torre", "Un alfil", "El rey"], correct: 0, diff: "medium", exp: "Ron se sacrifica jugando como un caballo." },
+                    { q: "¿Cuál es el número de la cámara de Gringotts donde estaba la Piedra?", options: ["Cámara 713", "Cámara 687", "Cámara 394", "Cámara 711"], correct: 0, diff: "hard", exp: "Hagrid retira la piedra de la cámara 713." },
+                    { q: "¿Qué dragón incuba Hagrid en su cabaña?", options: ["Ridgeback Noruego (Norberto)", "Colacuerno Húngaro", "Galés Verde", "Bola de Fuego China"], correct: 0, diff: "hard", exp: "Un Ridgeback Noruego llamado Norberto." }
+                ]
+            },
+            {
+                id: 2,
+                title: "La Cámara Secreta",
+                year: "2002",
+                poster: "https://media.harrypotterfanzone.com/chamber-of-secrets-theatrical-poster-600x0-c-default.jpg",
+                questions: [
+                    { q: "¿Qué elfo doméstico intenta evitar que Harry regrese a Hogwarts?", options: ["Dobby", "Kreacher", "Winky", "Hockey"], correct: 0, diff: "easy", exp: "Dobby intenta salvar a Harry cerrando el paso al andén." },
+                    { q: "¿Qué auto volador usan Harry y Ron para ir al colegio?", options: ["Ford Anglia", "Rolls-Royce", "Mini Cooper", "Volkswagen Beetle"], correct: 0, diff: "easy", exp: "El Ford Anglia azul del señor Weasley." },
+                    { q: "¿Qué criatura habita en el interior de la Cámara Secreta?", options: ["Un Basilisco", "Un Acromántula", "Un Troll", "Un Dementor"], correct: 0, diff: "easy", exp: "El basilisco cuya mirada directa te mata." },
+                    { q: "¿Quién abrió la Cámara Secreta hace 50 años?", options: ["Tom Riddle", "Hagrid", "Lucius Malfoy", "Albus Dumbledore"], correct: 0, diff: "medium", exp: "Tom Riddle la abrió y culpó a Hagrid." },
+                    { q: "¿Qué planta mágica se utiliza para curar a los petrificados?", options: ["Mandrágoras", "Branquialgas", "Lazo del Diablo", "Acónito"], correct: 0, diff: "medium", exp: "El jugo de mandrágora restituye a los petrificados." },
+                    { q: "¿Cómo se llama el fantasma que habita los baños de chicas?", options: ["Myrtle la Llorona", "La Dama Gris", "La Señora Gorda", "Helena Ravenclaw"], correct: 0, diff: "medium", exp: "Myrtle fue la primera víctima del basilisco." },
+                    { q: "¿Con qué objeto destruye Harry el diario de Tom Riddle?", options: ["Un colmillo de Basilisco", "La espada de Gryffindor", "Avada Kedavra", "Fuego maldito"], correct: 0, diff: "hard", exp: "El veneno del colmillo destruye el horrocrux." }
+                ]
+            },
+            {
+                id: 3,
+                title: "El Prisionero de Azkaban",
+                year: "2004",
+                poster: "https://media.harrypotterfanzone.com/prisoner-of-azkaban-theatrical-poster-560x0-c-default.jpg",
+                questions: [
+                    { q: "¿En qué animal se transforma el Patronus de Harry Potter?", options: ["Un ciervo", "Un lobo", "Un perro negro", "Un águila"], correct: 0, diff: "easy", exp: "Un ciervo, igual al de su padre James." },
+                    { q: "¿Qué objeto utiliza Hermione para viajar en el tiempo?", options: ["Giratiempo", "Pensadero", "Mapa del Merodeador", "Espejo Oesed"], correct: 0, diff: "easy", exp: "Un Giratiempo otorgado por McGonagall." },
+                    { q: "¿Cómo se llama el autobús mágico de tres pisos?", options: ["Autobús Noctámbulo", "Expreso de Hogwarts", "Carruaje Volador", "Tranvía Mágico"], correct: 0, diff: "easy", exp: "El Autobús Noctámbulo rescata magos a la deriva." },
+                    { q: "¿Cuál es la verdadera identidad del perro negro 'El Grim'?", options: ["Sirius Black", "Remus Lupin", "Peter Pettigrew", "James Potter"], correct: 0, diff: "medium", exp: "Sirius es un animago no registrado." },
+                    { q: "¿Qué criatura se transforma en lo que más temes?", options: ["Boggart", "Dementor", "Ghul", "Hippogrifo"], correct: 0, diff: "medium", exp: "Se vence con la risa y el hechizo 'Riddikulus'." },
+                    { q: "¿Cuál es el nombre del Hipogrifo de Hagrid?", options: ["Buckbeak", "Fluffy", "Fang", "Aragog"], correct: 0, diff: "medium", exp: "Buckbeak es juzgado injustamente." },
+                    { q: "¿Qué apodo tenía Remus Lupin en el Mapa del Merodeador?", options: ["Lunático", "Canuto", "Cornamenta", "Colagusano"], correct: 0, diff: "hard", exp: "Lupin era Lunático debido a su condición de hombre lobo." }
+                ]
+            },
+            {
+                id: 4,
+                title: "El Cáliz de Fuego",
+                year: "2005",
+                poster: "https://media.harrypotterfanzone.com/goblet-of-fire-theatrical-poster-2-600x0-c-default.jpg",
+                questions: [
+                    { q: "¿Quién representa a Hogwarts junto a Harry en el Torneo?", options: ["Cedric Diggory", "Viktor Krum", "Fleur Delacour", "Neville"], correct: 0, diff: "easy", exp: "Cedric Diggory de Hufflepuff." },
+                    { q: "¿De qué colegio proviene Viktor Krum?", options: ["Durmstrang", "Beauxbatons", "Ilvermorny", "Uagadou"], correct: 0, diff: "easy", exp: "El colegio Durmstrang." },
+                    { q: "¿Qué planta le da Neville/Dobby a Harry para respirar bajo el agua?", options: ["Branquialgas", "Mandrágora", "Centinela", "Menta del diablo"], correct: 0, diff: "medium", exp: "Las branquialgas le dan branquias y aletas." },
+                    { q: "¿Quién se disfrazó de Ojo Loco Moody con poción multijugos?", options: ["Barty Crouch Jr.", "Lucius Malfoy", "Igor Karkarov", "Peter Pettigrew"], correct: 0, diff: "medium", exp: "Barty Crouch Jr. orquestó el regreso de Voldemort." },
+                    { q: "¿Qué hechizo usa Harry para atraer su escoba en la primera prueba?", options: ["Accio", "Alohomora", "Expelliarmus", "Imperio"], correct: 0, diff: "medium", exp: "'Accio Saeta de Fuego'." },
+                    { q: "¿A qué dragón se enfrenta Harry en la primera prueba?", options: ["Colacuerno Húngaro", "Galés Verde", "Híbrido Negro", "Bola de Fuego"], correct: 0, diff: "hard", exp: "El dragón más agresivo de todos." }
+                ]
+            },
+            {
+                id: 5,
+                title: "La Orden del Fénix",
+                year: "2007",
+                poster: "https://media.harrypotterfanzone.com/order-of-the-phoenix-theatrical-poster-2-538x0-c-default.jpg",
+                questions: [
+                    { q: "¿Cómo se llama el grupo de estudiantes liderado por Harry?", options: ["Ejército de Dumbledore", "Orden del Fénix", "Los Aurores", "Club de las Potencias"], correct: 0, diff: "easy", exp: "Practicaban en la Sala de los Menesteres." },
+                    { q: "¿Qué bruja vestida de rosa asume como Inquisidora de Hogwarts?", options: ["Dolores Umbridge", "Bellatrix Lestrange", "Rita Skeeter", "Narcissa Malfoy"], correct: 0, diff: "easy", exp: "Dolores Umbridge imponía severas reglas." },
+                    { q: "¿Qué criaturas solo pueden ver quienes han presenciado la muerte?", options: ["Thestrals", "Hippogrifos", "Dementores", "Ghouls"], correct: 0, diff: "medium", exp: "Harry y Luna podían ver los Thestrals." },
+                    { q: "¿Dónde está la sede secreta de la Orden del Fénix?", options: ["Grimmauld Place 12", "La Madriguera", "Valle de Godric", "Callejón Diagon"], correct: 0, diff: "medium", exp: "La casa ancestral de la familia Black." },
+                    { q: "¿Quién mata a Sirius Black en el Ministerio de Magia?", options: ["Bellatrix Lestrange", "Lucius Malfoy", "Voldemort", "Severus Snape"], correct: 0, diff: "hard", exp: "Bellatrix lanza el hechizo y Sirius cae tras el velo." }
+                ]
+            },
+            {
+                id: 6,
+                title: "El Misterio del Príncipe",
+                year: "2009",
+                poster: "https://media.harrypotterfanzone.com/half-blood-prince-theatrical-poster-600x0-c-default.jpg",
+                questions: [
+                    { q: "¿Quién resulta ser el 'Príncipe Mestizo'?", options: ["Severus Snape", "Tom Riddle", "Sirius Black", "Dumbledore"], correct: 0, diff: "easy", exp: "Snape usaba el apellido de soltera de su madre (Prince)." },
+                    { q: "¿Qué poción concede suerte perfecta a quien la bebe?", options: ["Felix Felicis", "Amortentia", "Multijugos", "Veritaserum"], correct: 0, diff: "easy", exp: "Felix Felicis, conocida como Suerte Líquida." },
+                    { q: "¿Qué objeto usa Malfoy en la Sala de Menesteres para transportar mortífagos?", options: ["Armario Evanescente", "Giratiempo", "Traslador", "Red Flu"], correct: 0, diff: "medium", exp: "Reparó el Armario Evanescente conectado con Borgin & Burkes." },
+                    { q: "¿Cómo se llama el hechizo peligroso inventado por Snape que corta al rival?", options: ["Sectumsempra", "Levicorpus", "Crucio", "Muffliato"], correct: 0, diff: "hard", exp: "Harry lo usa imprudentemente contra Malfoy." }
+                ]
+            },
+            {
+                id: 7,
+                title: "Reliquias de la Muerte 1",
+                year: "2010",
+                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-1-harry-poster-480x0-c-default.jpg",
+                questions: [
+                    { q: "¿Cuáles son las 3 Reliquias de la Muerte?", options: ["Varita de Saúco, Piedra de Resurrección y Capa de Invisibilidad", "Copa, Guardapelo y Diadema", "Espada, Anillo y Espejo", "Sombrero, Mapa y Varita"], correct: 0, diff: "easy", exp: "Las tres reliquias de la Leyenda de los Tres Hermanos." },
+                    { q: "¿Quién se sacrifica para salvar a Harry y sus amigos de la Mansión Malfoy?", options: ["Dobby", "Hedwig", "Mad-Eye Moody", "Fred Weasley"], correct: 0, diff: "easy", exp: "Dobby rescata al grupo pero es herido por Bellatrix." },
+                    { q: "¿Qué horrocrux destruye Ron con la Espada de Gryffindor?", options: ["El Guardapelo de Slytherin", "El Anillo de Gaunt", "La Diadema", "La Copa"], correct: 0, diff: "medium", exp: "Ron vence las visiones del guardapelo y lo destruye." }
+                ]
+            },
+            {
+                id: 8,
+                title: "Reliquias de la Muerte 2",
+                year: "2011",
+                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-2-it-all-ends-poster-600x0-c-default.jpg",
+                questions: [
+                    { q: "¿Quién destruye el último Horrocrux (la serpiente Nagini)?", options: ["Neville Longbottom", "Harry Potter", "Ron Weasley", "Hermione Granger"], correct: 0, diff: "easy", exp: "Neville decapita a Nagini usando la Espada de Gryffindor." },
+                    { q: "¿En qué banco irrumpen Harry, Ron y Hermione usando un dragón?", options: ["Gringotts", "Azkaban", "Ministerio", "Hogsmeade"], correct: 0, diff: "easy", exp: "Escapan de la cámara de Bellatrix en Gringotts." },
+                    { q: "¿Qué recuerdo revela las verdaderas lealtades de Severus Snape?", options: ["Su amor por Lily Potter", "Su odio a Voldemort", "Un pacto con Lucius", "Una promesa a James"], correct: 0, diff: "medium", exp: "Snape siempre protegió a Harry por amor a Lily ('Always')." }
+                ]
+            }
+        ];
+
+        /* ================= APP STATE ================= */
+        let housePoints = 0;
+        let activeMovie = null;
+        let activeQuestionsFiltered = [];
+        let activeQuestionIndex = 0;
+        let timerInterval = null;
+        let p1Score = 0;
+        let p2Score = 0;
+        let p1Name = "Mago 1";
+        let p2Name = "Mago 2";
+        let currentDuelPlayer = 1;
+
+        /* ================= TAB SWITCHING ================= */
+        function switchTab(tabId) {
+            const tabs = ['home', 'movies', 'duel', 'wand', 'letter'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.add('hidden');
+            });
+            const selected = document.getElementById(`tab-${tabId}`);
+            if (selected) selected.classList.remove('hidden');
+
+            if (tabId === 'movies' && !activeMovie) {
+                renderMoviesGrid();
+            }
+            if (tabId === 'duel') {
+                initDuelQuestion();
+            }
+        }
+
+        function addHousePoints(pts) {
+            housePoints += pts;
+            document.getElementById('houseScoreHeader').innerText = housePoints;
+        }
+
+        /* ================= MOVIE ORACLE ================= */
+        function spinMovieOracle() {
+            playSpellSound('magic');
+            const randomMovie = moviesData[Math.floor(Math.random() * moviesData.length)];
+            const snacks = ["Cerveza de Mantequilla entibiada 🍺", "Ranas de Chocolate 🍫", "Grageas Bertie Bott 🍬", "Pasteles de Caldero 🥧"];
+            const randomSnack = snacks[Math.floor(Math.random() * snacks.length)];
+
+            const resultEl = document.getElementById('oracleResult');
+            resultEl.innerHTML = `
+                <img src="${randomMovie.poster}" class="h-16 md:h-20 object-contain rounded mb-1 shadow">
+                <h4 class="font-bold text-base md:text-lg text-amber-950 font-wizard">${randomMovie.title} (${randomMovie.year})</h4>
+                <p class="text-xs text-amber-900"><strong>Snack sugerido:</strong> ${randomSnack}</p>
+            `;
+        }
+
+        /* ================= SPELL LAUNCHER ================= */
+        function castSpell(spellName) {
+            playSpellSound(spellName);
+            if (spellName === 'Lumos') wandColor = '#ffea00';
+            if (spellName === 'Expecto Patronum') wandColor = '#38bdf8';
+            if (spellName === 'Expelliarmus') wandColor = '#ef4444';
+            if (spellName === 'Wingardium Leviosa') wandColor = '#facc15';
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.5 } });
+            }
+        }
+
+        /* ================= MOVIES & TRIVIA RENDER ================= */
+        function renderMoviesGrid() {
+            const grid = document.getElementById('movieSelectorGrid');
+            grid.innerHTML = '';
+
+            moviesData.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = "bg-stone-900/90 border border-amber-800/40 hover:border-amber-400 p-2 rounded-2xl cursor-pointer transition transform hover:scale-105 active:scale-95 text-center glow-card flex flex-col justify-between overflow-hidden shadow-lg";
+                card.onclick = () => startMovieQuiz(movie.id);
+                card.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.title}" class="w-full h-36 md:h-44 object-cover rounded-xl mb-1.5">
+                    <div>
+                        <h4 class="font-bold text-amber-300 text-[11px] md:text-xs font-wizard leading-tight mb-0.5">${movie.title}</h4>
+                        <span class="text-[9px] text-stone-500 block">${movie.year} • ${movie.questions.length} preg.</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterQuizDifficulty() {
+            if (activeMovie) {
+                const diff = document.getElementById('difficultyFilter').value;
+                if (diff === 'all') {
+                    activeQuestionsFiltered = activeMovie.questions;
+                } else {
+                    activeQuestionsFiltered = activeMovie.questions.filter(q => q.diff === diff);
+                }
+                
+                if (activeQuestionsFiltered.length === 0) {
+                    activeQuestionsFiltered = activeMovie.questions;
+                }
+                activeQuestionIndex = 0;
+                loadQuestion();
+            }
+        }
+
+        function startMovieQuiz(movieId) {
+            activeMovie = moviesData.find(m => m.id === movieId);
+            const diff = document.getElementById('difficultyFilter').value;
+            if (diff === 'all') {
+                activeQuestionsFiltered = activeMovie.questions;
+            } else {
+                activeQuestionsFiltered = activeMovie.questions.filter(q => q.diff === diff);
+                if (activeQuestionsFiltered.length === 0) activeQuestionsFiltered = activeMovie.questions;
+            }
+
+            activeQuestionIndex = 0;
+            const container = document.getElementById('quizContainer');
+            container.classList.remove('hidden');
+            document.getElementById('quizMovieTitle').innerText = activeMovie.title;
+            loadQuestion();
+
+            // Auto-scroll on mobile
+            if (window.innerWidth < 768) {
+                container.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function closeQuizContainer() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            clearInterval(timerInterval);
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            const q = activeQuestionsFiltered[activeQuestionIndex];
+            document.getElementById('quizQuestionNum').innerText = `Pregunta ${activeQuestionIndex + 1} de ${activeQuestionsFiltered.length}`;
+            document.getElementById('quizQuestionText').innerText = q.q;
+
+            const badge = document.getElementById('quizDiffBadge');
+            if (q.diff === 'easy') { badge.innerText = "🟢 Fácil"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"; }
+            else if (q.diff === 'medium') { badge.innerText = "🟡 Medio"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"; }
+            else { badge.innerText = "🔴 Difícil"; badge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30"; }
+
+            const optionsGrid = document.getElementById('quizOptionsGrid');
+            optionsGrid.innerHTML = '';
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/20 p-3.5 md:p-5 rounded-2xl transition text-stone-200 text-xs md:text-base font-semibold active:scale-95";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx);
+                optionsGrid.appendChild(btn);
+            });
+
+            if (document.getElementById('timeAttackToggle').checked) {
+                document.getElementById('timerDisplay').classList.remove('hidden');
+                let timeLeft = 15;
+                document.getElementById('timeLeft').innerText = timeLeft;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timeLeft').innerText = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        checkAnswer(-1);
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('timerDisplay').classList.add('hidden');
+            }
+        }
+
+        function checkAnswer(selectedIdx) {
+            clearInterval(timerInterval);
+            const q = activeQuestionsFiltered[activeQuestionIndex];
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+
+            const buttons = document.getElementById('quizOptionsGrid').children;
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            if (selectedIdx === q.correct) {
+                playSpellSound('correct');
+                addHousePoints(10);
+                feedback.className = "p-4 md:p-5 rounded-2xl text-xs md:text-base leading-relaxed border bg-emerald-950/60 border-emerald-600 text-emerald-200";
+                feedback.innerHTML = `<strong>¡Excelente acierto! 🪄 (+10 pts)</strong><br>${q.exp}`;
+                if (typeof confetti === 'function') confetti({ particleCount: 35, spread: 50, origin: { y: 0.7 } });
+            } else {
+                playSpellSound('wrong');
+                feedback.className = "p-4 md:p-5 rounded-2xl text-xs md:text-base leading-relaxed border bg-red-950/60 border-red-600 text-red-200";
+                feedback.innerHTML = `<strong>¡Incorrecto! ⚡</strong><br>${q.exp}`;
+            }
+
+            document.getElementById('nextQuestionBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            activeQuestionIndex++;
+            if (activeQuestionIndex < activeQuestionsFiltered.length) {
+                loadQuestion();
+            } else {
+                alert("¡Felicidades! Han completado las preguntas de esta selección.");
+                closeQuizContainer();
+            }
+        }
+
+        /* ================= DUEL MODE ================= */
+        let currentDuelQuestion = null;
+
+        function updatePlayerNames() {
+            p1Name = document.getElementById('p1NameInput').value.trim() || "Mago 1";
+            p2Name = document.getElementById('p2NameInput').value.trim() || "Mago 2";
+
+            document.getElementById('p1DisplayName').innerText = p1Name;
+            document.getElementById('p2DisplayName').innerText = p2Name;
+
+            const current = currentDuelPlayer === 1 ? p1Name : p2Name;
+            document.getElementById('currentDuelPlayer').innerText = current;
+        }
+
+        function initDuelQuestion() {
+            const allQuestions = moviesData.flatMap(m => m.questions);
+            currentDuelQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+
+            document.getElementById('duelQuestionText').innerText = currentDuelQuestion.q;
+            
+            const badge = document.getElementById('duelDiffBadge');
+            if (currentDuelQuestion.diff === 'easy') { badge.innerText = "Dificultad: 🟢 Fácil"; badge.className = "text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"; }
+            else if (currentDuelQuestion.diff === 'medium') { badge.innerText = "Dificultad: 🟡 Medio"; badge.className = "text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-lg bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"; }
+            else { badge.innerText = "Dificultad: 🔴 Difícil"; badge.className = "text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30"; }
+
+            const grid = document.getElementById('duelOptionsGrid');
+            grid.innerHTML = '';
+
+            currentDuelQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-stone-800/80 hover:bg-amber-900/40 border border-amber-500/20 p-3.5 md:p-5 rounded-2xl transition text-stone-200 text-xs md:text-base font-semibold active:scale-95";
+                btn.innerText = opt;
+                btn.onclick = () => answerDuel(idx);
+                grid.appendChild(btn);
+            });
+        }
+
+        function answerDuel(selectedIdx) {
+            const winnerName = currentDuelPlayer === 1 ? p1Name : p2Name;
+
+            if (selectedIdx === currentDuelQuestion.correct) {
+                playSpellSound('correct');
+                if (currentDuelPlayer === 1) p1Score++;
+                else p2Score++;
+                
+                document.getElementById('p1Score').innerText = p1Score;
+                document.getElementById('p2Score').innerText = p2Score;
+
+                if (p1Score >= 5 || p2Score >= 5) {
+                    alert(`¡${winnerName} ha ganado el Duelo de Magos! 🎉⚡`);
+                    p1Score = 0; p2Score = 0;
+                    document.getElementById('p1Score').innerText = 0;
+                    document.getElementById('p2Score').innerText = 0;
+                }
+            } else {
+                playSpellSound('wrong');
+            }
+
+            currentDuelPlayer = currentDuelPlayer === 1 ? 2 : 1;
+            const nextName = currentDuelPlayer === 1 ? p1Name : p2Name;
+            document.getElementById('currentDuelPlayer').innerText = nextName;
+            document.getElementById('currentDuelPlayer').className = currentDuelPlayer === 1 ? "text-red-400" : "text-blue-400";
+
+            initDuelQuestion();
+        }
+
+        /* ================= WAND CREATOR ================= */
+        function createWand() {
+            const wood = document.getElementById('wandWood').value;
+            const core = document.getElementById('wandCore').value;
+            const len = document.getElementById('wandLength').value;
+
+            document.getElementById('wandTitleResult').innerText = `Varita de ${wood} con ${core}`;
+            document.getElementById('wandDescResult').innerText = `Longitud: ${len}. Una varita perfectamente equilibrada para tus encantamientos.`;
+            document.getElementById('wandResult').classList.remove('hidden');
+
+            playSpellSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 50, spread: 60 });
+            }
+        }
+
+        /* ================= HOGWARTS LETTER ================= */
+        function generateLetter() {
+            const name = document.getElementById('studentNameInput').value.trim() || "Mago/Bruja";
+            document.getElementById('letterStudentName').innerText = name;
+            playSpellSound('magic');
+        }
+    </script>
+</body>
+</html>
