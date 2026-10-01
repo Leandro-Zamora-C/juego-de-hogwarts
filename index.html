@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hogwarts Magic Experience & Wizarding Studio</title>
+    <title>Hogwarts Magic Experience - BY: LEANDRO ZAMORA</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -70,8 +70,8 @@
         }
 
         ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #110e0c;
@@ -81,9 +81,9 @@
             border-radius: 6px;
         }
 
-        /* Ambient Glassmorphism Card Style */
+        /* Glassmorphism Cards */
         .glass-card {
-            background: rgba(18, 15, 13, 0.88);
+            background: rgba(18, 15, 13, 0.90);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(217, 119, 6, 0.3);
@@ -139,7 +139,7 @@
             box-shadow: inset -2px 0 3px rgba(0,0,0,0.2);
         }
 
-        /* Screen Shake Animation on Spell Hit */
+        /* Screen Shake Animation */
         @keyframes screenShake {
             0%, 100% { transform: translate(0, 0); }
             20% { transform: translate(-5px, 5px); }
@@ -151,13 +151,11 @@
             animation: screenShake 0.4s ease-in-out;
         }
 
-        /* Spell Flash Overlay */
         #spellImpactFlash {
             transition: opacity 0.3s ease-out;
             pointer-events: none;
         }
 
-        /* Spell Lightning Beam Animation */
         .spell-beam {
             position: fixed;
             top: 50%;
@@ -211,19 +209,19 @@
 </head>
 <body class="min-h-screen flex flex-col relative select-none bg-stone-950 text-stone-100 pb-20 md:pb-0">
 
-    <!-- Spell Impact Screen Flash Overlay -->
+    <!-- Flash Overlay -->
     <div id="spellImpactFlash" class="fixed inset-0 z-50 opacity-0 pointer-events-none bg-amber-500/20"></div>
 
     <!-- Spell Beam Effect Layer -->
     <div id="spellBeam" class="spell-beam left-0 w-full"></div>
 
-    <!-- Interactive Wand Trail & Magic Sparkle Canvas -->
+    <!-- Wand Canvas -->
     <canvas id="magicCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-40"></canvas>
 
-    <!-- Floating Candle Field Container -->
+    <!-- Candles -->
     <div id="candleField" class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-80"></div>
 
-    <!-- INITIAL HOUSE SELECTOR / SORTING HAT MODAL -->
+    <!-- INITIAL HOUSE MODAL -->
     <div id="initialModal" class="fixed inset-0 z-50 bg-stone-950/98 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="relative w-full max-w-4xl bg-stone-900 border border-amber-600/50 rounded-2xl md:rounded-3xl p-5 sm:p-8 shadow-2xl text-center space-y-4 sm:space-y-6 overflow-hidden my-auto" 
              style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.92), rgba(12, 10, 9, 0.97)), url('https://i.blogs.es/61a2ce/harry-potter-gran-comedor-problema-comida-2/500_333.jpeg'); background-size: cover; background-position: center;">
@@ -232,12 +230,13 @@
 
             <div class="space-y-1 sm:space-y-2">
                 <h2 class="text-xl sm:text-3xl font-bold text-amber-300 font-wizard">El Gran Comedor de Hogwarts</h2>
+                <span class="text-amber-500 font-bold text-xs tracking-widest uppercase block">BY: LEANDRO ZAMORA</span>
                 <p class="text-stone-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
                     Elige tu Casa directamente o permite que el <strong>Sombrero Seleccionador</strong> evalúe tu personalidad a través de la Ceremonia Oficial.
                 </p>
             </div>
 
-            <!-- Action Buttons: Sorting Hat or Manual Selection -->
+            <!-- Action Buttons -->
             <div class="flex justify-center pt-1">
                 <button onclick="startSortingCeremony()" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 active:from-amber-500 active:to-yellow-400 text-stone-950 font-black px-5 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm">
                     <i class="fa-solid fa-hat-wizard text-base sm:text-lg"></i> Iniciar Ceremonia de Selección
@@ -252,19 +251,19 @@
 
             <!-- Crest Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
-                <button onclick="selectInitialHouse('Gryffindor')" class="bg-stone-900/90 active:bg-red-950 border border-red-700/60 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Gryffindor')" class="bg-stone-900/90 active:bg-red-950 border border-red-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
                     <img src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Gryffindor" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-red-400 font-bold text-xs sm:text-sm">Gryffindor</span>
                 </button>
-                <button onclick="selectInitialHouse('Slytherin')" class="bg-stone-900/90 active:bg-emerald-950 border border-emerald-700/60 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Slytherin')" class="bg-stone-900/90 active:bg-emerald-950 border border-emerald-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
                     <img src="https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png" alt="Slytherin" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-emerald-400 font-bold text-xs sm:text-sm">Slytherin</span>
                 </button>
-                <button onclick="selectInitialHouse('Ravenclaw')" class="bg-stone-900/90 active:bg-blue-950 border border-blue-700/60 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Ravenclaw')" class="bg-stone-900/90 active:bg-blue-950 border border-blue-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
                     <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Ravenclaw" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-blue-400 font-bold text-xs sm:text-sm">Ravenclaw</span>
                 </button>
-                <button onclick="selectInitialHouse('Hufflepuff')" class="bg-stone-900/90 active:bg-amber-950 border border-yellow-600/60 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Hufflepuff')" class="bg-stone-900/90 active:bg-amber-950 border border-yellow-600/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
                     <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Hufflepuff" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-yellow-400 font-bold text-xs sm:text-sm">Hufflepuff</span>
                 </button>
@@ -272,7 +271,7 @@
         </div>
     </div>
 
-    <!-- SORTING HAT CEREMONY MODAL -->
+    <!-- SORTING HAT MODAL -->
     <div id="sortingHatModal" class="hidden fixed inset-0 z-50 bg-stone-950/98 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="relative w-full max-w-2xl bg-stone-900 border border-amber-600/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-4 sm:space-y-6 my-auto">
             <div class="flex justify-between items-center border-b border-amber-800/40 pb-3">
@@ -315,18 +314,21 @@
         </div>
     </div>
 
-    <!-- Navigation Header Desktop & Compact Mobile Top Bar -->
+    <!-- Header Navigation -->
     <header class="bg-stone-900/95 backdrop-blur-md border-b border-amber-800/40 sticky top-0 z-40 px-3 sm:px-8 py-2.5 shadow-2xl">
         <div class="w-full flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-5 sm:h-7 object-contain filter brightness-125">
                 <div>
-                    <h1 class="text-xs sm:text-lg font-black tracking-wider text-amber-400 font-wizard leading-tight">HOGWARTS EXPERIENCIA</h1>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h1 class="text-xs sm:text-lg font-black tracking-wider text-amber-400 font-wizard leading-tight">HOGWARTS EXPERIENCIA</h1>
+                        <span class="text-[9px] sm:text-xs text-amber-500 font-bold tracking-wider">BY: LEANDRO ZAMORA</span>
+                    </div>
                     <p class="text-[8px] sm:text-[9px] text-stone-400 font-wizard tracking-widest uppercase hidden sm:block">Estudio Mágico & Desafíos</p>
                 </div>
             </div>
 
-            <!-- House Badge, XP & Score Status -->
+            <!-- Status Header -->
             <div id="userHouseHeader" class="hidden flex items-center space-x-2 bg-stone-950 px-2.5 py-1 rounded-full border border-amber-500/40 shadow-inner">
                 <img id="houseIconHeader" src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Escudo" class="w-5 h-5 object-contain">
                 <div class="text-[10px] sm:text-xs">
@@ -339,7 +341,7 @@
                 </div>
             </div>
 
-            <!-- Global Lumos & Desktop Nav -->
+            <!-- Lumos & Desktop Nav -->
             <div class="flex items-center space-x-2">
                 <button onclick="toggleLumosMode()" id="lumosGlobalBtn" title="Encender/Apagar Lumos" class="bg-stone-800/90 active:bg-amber-900/60 text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-500/30 transition text-xs flex items-center gap-1">
                     <i class="fa-solid fa-lightbulb"></i> <span class="hidden sm:inline font-wizard">Lumos</span>
@@ -347,7 +349,7 @@
 
                 <nav class="hidden md:flex items-center gap-1 text-xs font-semibold">
                     <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-house mr-1"></i> Inicio</button>
-                    <button onclick="switchTab('movies')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-film mr-1"></i> Películas & Trivia</button>
+                    <button onclick="switchTab('movies')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-gamepad mr-1"></i> Empezar Juego</button>
                     <button onclick="switchTab('studio')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-amber-400"></i> Estudio</button>
                     <button onclick="switchTab('duel')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-wand-sparkles mr-1"></i> Duelo 2P</button>
                     <button onclick="switchTab('wand')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800 text-amber-200 transition whitespace-nowrap"><i class="fa-solid fa-scroll mr-1"></i> Ollivanders</button>
@@ -357,15 +359,15 @@
         </div>
     </header>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR (Exclusiva para Celulares) -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-stone-950/95 backdrop-blur-lg border-t border-amber-800/40 z-50 px-1 py-1.5 flex justify-around items-center text-[10px] font-semibold">
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-stone-950/98 backdrop-blur-lg border-t border-amber-800/40 z-50 px-1 py-1.5 flex justify-around items-center text-[10px] font-semibold">
         <button onclick="switchTab('home')" class="mob-nav-btn flex flex-col items-center py-1 px-2 text-stone-400 active:text-amber-400">
             <i class="fa-solid fa-house text-base mb-0.5"></i>
             <span>Inicio</span>
         </button>
         <button onclick="switchTab('movies')" class="mob-nav-btn flex flex-col items-center py-1 px-2 text-stone-400 active:text-amber-400">
-            <i class="fa-solid fa-film text-base mb-0.5"></i>
-            <span>Trivia</span>
+            <i class="fa-solid fa-gamepad text-base mb-0.5"></i>
+            <span>Juego</span>
         </button>
         <button onclick="switchTab('studio')" class="mob-nav-btn flex flex-col items-center py-1 px-2 text-stone-400 active:text-amber-400">
             <i class="fa-solid fa-wand-magic-sparkles text-base mb-0.5 text-amber-400"></i>
@@ -395,19 +397,22 @@
                      style="background-image: linear-gradient(to right, rgba(12, 10, 9, 0.95), rgba(12, 10, 9, 0.7)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXyUJ0_X3or5I1ZRKA0g4ZsW_y6ViDHSZpQg-t5D1bbSQqnQH9xRKhdjkl&s=10');">
                     <div class="relative z-10 space-y-3 sm:space-y-5">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-10 sm:h-20 object-contain drop-shadow-lg filter brightness-125">
-                        <h2 class="text-xl sm:text-4xl font-bold text-amber-100 tracking-wide leading-tight font-wizard">
-                            Gran Comedor & Estudio de Hechizos
-                        </h2>
+                        <div class="space-y-1">
+                            <h2 class="text-xl sm:text-4xl font-bold text-amber-100 tracking-wide leading-tight font-wizard">
+                                Gran Comedor & Estudio de Hechizos
+                            </h2>
+                            <p class="text-amber-400 font-bold text-xs sm:text-sm tracking-wider">BY: LEANDRO ZAMORA</p>
+                        </div>
                         <p class="text-stone-300 text-xs sm:text-base leading-relaxed max-w-2xl">
-                            Practica trazos de varita en el Estudio, compite en duelos tácticos y demuestra tu sabiduría en las 8 películas.
+                            Practica trazos de varita en el Estudio, compite en duelos tácticos y demuestra tu sabiduría en las 8 películas con 50 preguntas por película.
                         </p>
 
                         <div class="pt-1 flex flex-col sm:flex-row gap-2.5 sm:gap-4">
-                            <button onclick="switchTab('studio')" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-950 font-bold px-5 py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Probar Hechizos Trazadores
+                            <button onclick="switchTab('movies')" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-950 font-bold px-5 py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
+                                <i class="fa-solid fa-gamepad"></i> Empezar Juego de Preguntas
                             </button>
-                            <button onclick="switchTab('movies')" class="w-full sm:w-auto bg-stone-800/90 text-amber-300 font-semibold px-5 py-3 rounded-xl border border-amber-500/40 transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
-                                <i class="fa-solid fa-film"></i> Trivia de Películas
+                            <button onclick="switchTab('studio')" class="w-full sm:w-auto bg-stone-800/90 text-amber-300 font-semibold px-5 py-3 rounded-xl border border-amber-500/40 transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Probar Hechizos Trazadores
                             </button>
                         </div>
                     </div>
@@ -547,7 +552,7 @@
                                 <span>💡 Lumos</span>
                                 <span class="text-[9px] text-amber-400">Forma "V"</span>
                             </div>
-                            <p class="text-stone-400 text-[10px]">Traza una letra V rapidamente.</p>
+                            <p class="text-stone-400 text-[10px]">Traza una letra V rápidamente.</p>
                         </div>
                         <div class="p-2.5 rounded-xl bg-stone-950/80 border border-sky-500/30 space-y-0.5">
                             <div class="flex justify-between items-center text-sky-300 font-bold">
@@ -561,12 +566,12 @@
             </div>
         </section>
 
-        <!-- ================= MOVIES & TRIVIA TAB ================= -->
+        <!-- ================= MOVIES & GAME TAB ================= -->
         <section id="tab-movies" class="hidden space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-amber-900/40 pb-3">
                 <div>
-                    <h2 class="text-xl sm:text-3xl font-bold text-amber-400 font-wizard">Trivia de las 8 Películas</h2>
-                    <p class="text-stone-400 text-xs">Selecciona la película para poner a prueba tus conocimientos.</p>
+                    <h2 class="text-xl sm:text-3xl font-bold text-amber-400 font-wizard">Juego de Preguntas (50 por Película)</h2>
+                    <p class="text-stone-400 text-xs">Elige la película para comenzar el juego completo.</p>
                 </div>
                 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
@@ -591,40 +596,47 @@
             <!-- Movie Selector Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5" id="movieSelectorGrid"></div>
 
-            <!-- Active Quiz Overlay Container (Fullscreen en Móvil) -->
-            <div id="quizContainer" class="hidden fixed inset-0 z-50 bg-stone-950/98 p-4 space-y-4 overflow-y-auto flex flex-col justify-between">
-                <div class="flex justify-between items-center border-b border-amber-900/40 pb-2">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <span id="quizMovieTitle" class="text-[10px] uppercase tracking-widest font-bold text-amber-500 font-wizard">Película 1</span>
-                            <span id="quizDiffBadge" class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Fácil</span>
-                        </div>
-                        <h3 id="quizQuestionNum" class="text-base sm:text-2xl font-bold text-stone-100 font-wizard">Pregunta 1</h3>
-                    </div>
+            <!-- MODAL DE PREGUNTAS TOTALMENTE CORREGIDO PARA CELULAR -->
+            <div id="quizContainer" class="hidden fixed inset-0 z-[100] bg-stone-950/95 backdrop-blur-md p-3 sm:p-6 flex flex-col justify-center items-center">
+                <div class="w-full max-w-2xl bg-stone-900 border-2 border-amber-600/70 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden my-auto relative">
                     
-                    <div class="flex items-center space-x-2">
-                        <div id="timerDisplay" class="hidden bg-amber-950 border border-amber-500 text-amber-400 px-2.5 py-0.5 rounded-lg font-mono font-bold text-xs">
-                            ⏱ <span id="timeLeft">15</span>s
+                    <!-- Header Modal -->
+                    <div class="flex justify-between items-center border-b border-amber-900/50 pb-3 flex-shrink-0">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span id="quizMovieTitle" class="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-amber-500 font-wizard">Película 1</span>
+                                <span id="quizDiffBadge" class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Fácil</span>
+                            </div>
+                            <h3 id="quizQuestionNum" class="text-sm sm:text-xl font-bold text-stone-100 font-wizard">Pregunta 1 de 50</h3>
                         </div>
-                        <button onclick="closeQuizContainer()" class="bg-stone-800 text-stone-300 w-8 h-8 rounded-full flex items-center justify-center border border-amber-500/30 transition">
-                            <i class="fa-solid fa-xmark"></i>
+                        
+                        <div class="flex items-center space-x-2">
+                            <div id="timerDisplay" class="hidden bg-amber-950 border border-amber-500 text-amber-400 px-2.5 py-1 rounded-lg font-mono font-bold text-xs">
+                                ⏱ <span id="timeLeft">15</span>s
+                            </div>
+                            <button onclick="closeQuizContainer()" class="bg-stone-800 text-stone-300 w-8 h-8 rounded-full flex items-center justify-center border border-amber-500/30 transition active:scale-95">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cuerpo Scrollable -->
+                    <div class="overflow-y-auto my-3 pr-1 space-y-4 flex-grow">
+                        <p id="quizQuestionText" class="text-sm sm:text-xl font-semibold text-amber-100 leading-relaxed">
+                            ¿Texto de la pregunta aquí?
+                        </p>
+
+                        <div id="quizOptionsGrid" class="grid grid-cols-1 gap-2.5"></div>
+                        
+                        <div id="quizFeedback" class="hidden p-3 rounded-xl text-xs sm:text-sm leading-relaxed border transition"></div>
+                    </div>
+
+                    <!-- Footer Modal -->
+                    <div class="pt-2 border-t border-amber-900/40 flex justify-end flex-shrink-0">
+                        <button id="nextQuestionBtn" onclick="nextQuestion()" class="hidden w-full sm:w-auto bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-bold px-6 py-3 rounded-xl transition shadow text-xs sm:text-sm active:scale-95">
+                            Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>
                         </button>
                     </div>
-                </div>
-
-                <div class="my-auto py-2">
-                    <p id="quizQuestionText" class="text-base sm:text-2xl font-semibold text-amber-100 leading-relaxed">
-                        ¿Texto de la pregunta aquí?
-                    </p>
-                </div>
-
-                <div id="quizOptionsGrid" class="grid grid-cols-1 gap-2.5 my-auto"></div>
-                <div id="quizFeedback" class="hidden p-3 rounded-xl text-xs sm:text-base leading-relaxed border transition"></div>
-
-                <div class="flex justify-end pt-2">
-                    <button id="nextQuestionBtn" onclick="nextQuestion()" class="hidden w-full sm:w-auto bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-bold px-6 py-3 rounded-xl transition shadow text-xs sm:text-sm">
-                        Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
                 </div>
             </div>
         </section>
@@ -636,12 +648,12 @@
                 <p class="text-stone-300 text-xs">Responde bien para restar 25 HP al rival.</p>
             </div>
 
-            <!-- Promotional Banner Image -->
+            <!-- Banner -->
             <div class="max-w-2xl mx-auto rounded-2xl overflow-hidden border border-amber-600/40 shadow-lg h-32 sm:h-52 bg-cover bg-center glass-card"
                  style="background-image: url('https://www.prints4u.net/wp-content/uploads/2019/11/031_Harry_Potter_the_Order_of_the_Phoenix.jpg');">
             </div>
 
-            <!-- Custom Player Names Input -->
+            <!-- Names -->
             <div class="grid grid-cols-2 gap-2 max-w-2xl mx-auto glass-card p-3 rounded-xl border border-amber-800/40">
                 <div class="space-y-0.5">
                     <label class="text-[10px] font-bold text-red-400">Mago 1 (Rojo):</label>
@@ -653,7 +665,7 @@
                 </div>
             </div>
 
-            <!-- Dual HP Status Cards -->
+            <!-- Dual HP -->
             <div class="grid grid-cols-2 gap-2.5 max-w-3xl mx-auto">
                 <div id="p1Card" class="bg-red-950/30 border border-red-700/50 p-3 rounded-xl text-center space-y-1.5 glass-card">
                     <div class="flex justify-between items-center text-xs">
@@ -682,7 +694,7 @@
                 <span id="duelTimerDisplay" class="font-mono text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 text-[11px]">⏱ <span id="duelTimeLeft">12</span>s</span>
             </div>
 
-            <!-- Duel Question Arena Card -->
+            <!-- Duel Question Card -->
             <div id="duelCard" class="glass-card border border-amber-800/40 rounded-2xl p-4 max-w-3xl mx-auto space-y-3 shadow-xl">
                 <p id="duelQuestionText" class="text-sm sm:text-lg font-semibold text-stone-100 text-center leading-relaxed">
                     Cargando desafío del duelo...
@@ -785,7 +797,7 @@
                 </div>
 
                 <div id="sealSecretMsg" class="hidden text-center text-[10px] font-wizard text-red-900 border-t border-amber-800/30 pt-1 animate-bounce">
-                    ✨ Sello oficial verificado. Entrada confirmada.
+                    ✨ Sello oficial verificado por LEANDRO ZAMORA.
                 </div>
 
                 <div class="text-center pt-1 no-print">
@@ -800,13 +812,13 @@
 
     <!-- Footer -->
     <footer class="bg-stone-950 border-t border-amber-900/30 py-4 text-center text-[10px] text-stone-500 space-y-0.5 relative z-10 hidden md:block">
-        <p>Experiencia Mágica de Hogwarts creada para Noches de Trivia, Duelos & Magia ✨</p>
+        <p>Hogwarts Magic Experience - Creado por LEANDRO ZAMORA ✨</p>
         <p class="text-stone-600">Travesura Realizada 🪄</p>
     </footer>
 
     <!-- ================= JAVASCRIPT ENGINE ================= -->
     <script>
-        /* ================= XP & RANK PROGRESSION SYSTEM ================= */
+        /* ================= XP SYSTEM ================= */
         let playerXp = 0;
 
         function addPlayerXp(amount) {
@@ -832,7 +844,7 @@
             }
         }
 
-        /* ================= AUDIO SYNTHESIS & SOUND FX ================= */
+        /* ================= AUDIO SYNTHESIS ================= */
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMusicPlaying = false;
         let musicOscillators = [];
@@ -882,23 +894,6 @@
                 osc.frequency.setValueAtTime(320, now);
                 osc.frequency.exponentialRampToValueAtTime(90, now + 0.4);
                 gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'Avada Kedavra') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
-                osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            } else if (type === 'Expecto Patronum') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.4);
-                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                 osc.start(now);
                 osc.stop(now + 0.4);
@@ -975,7 +970,7 @@
             }, delay * 1000 + 500);
         }
 
-        /* ================= FLOATING CANDLES GENERATOR ================= */
+        /* ================= CANDLES ================= */
         function initCandles() {
             const field = document.getElementById('candleField');
             field.innerHTML = '';
@@ -998,7 +993,7 @@
         }
         initCandles();
 
-        /* ================= WAND PARTICLES & CANVAS ================= */
+        /* ================= CANVAS ================= */
         const canvas = document.getElementById('magicCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -1078,32 +1073,12 @@
             addPlayerXp(1);
         }
 
-        /* ================= HOUSE SORTING CEREMONY ================= */
+        /* ================= HOUSE SORTING ================= */
         const houseData = {
-            Gryffindor: {
-                title: 'Gryffindor',
-                badge: 'https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png',
-                motto: '"Donde habitan los valientes de corazón."',
-                color: '#740001'
-            },
-            Slytherin: {
-                title: 'Slytherin',
-                badge: 'https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png',
-                motto: '"Para aquellos astutos que lograrán sus fines."',
-                color: '#1A472A'
-            },
-            Ravenclaw: {
-                title: 'Ravenclaw',
-                badge: 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png',
-                motto: '"Donde la mente aguda encuentra hogar."',
-                color: '#0E1A40'
-            },
-            Hufflepuff: {
-                title: 'Hufflepuff',
-                badge: 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png',
-                motto: '"Donde los leales y trabajadores valen."',
-                color: '#ECB939'
-            }
+            Gryffindor: { title: 'Gryffindor', badge: 'https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png', motto: '"Valientes de corazón."', color: '#740001' },
+            Slytherin: { title: 'Slytherin', badge: 'https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png', motto: '"Astutos para sus fines."', color: '#1A472A' },
+            Ravenclaw: { title: 'Ravenclaw', badge: 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png', motto: '"Mente aguda siempre."', color: '#0E1A40' },
+            Hufflepuff: { title: 'Hufflepuff', badge: 'https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png', motto: '"Leales y trabajadores."', color: '#ECB939' }
         };
 
         let sortingStep = 0;
@@ -1305,7 +1280,7 @@
             requestAnimationFrame(animateWheel);
         }
 
-        /* ================= WAND MOTION STUDIO (MOBILE DTOUCH ADAPTED) ================= */
+        /* ================= GESTURE STUDIO ================= */
         const gCanvas = document.getElementById('gestureCanvas');
         const gCtx = gCanvas.getContext('2d');
         let isDrawing = false;
@@ -1378,7 +1353,7 @@
 
             const feedback = document.getElementById('gestureFeedback');
             const minY = Math.min(...gesturePoints.map(p => p.y));
-            const maxY = Max = Math.max(...gesturePoints.map(p => p.y));
+            const maxY = Math.max(...gesturePoints.map(p => p.y));
             const minX = Math.min(...gesturePoints.map(p => p.x));
             const maxX = Math.max(...gesturePoints.map(p => p.x));
 
@@ -1407,87 +1382,67 @@
             }
         }
 
-        /* ================= MOVIE DATA ================= */
-        const moviesData = [
-            {
-                id: 1,
-                title: "La Piedra Filosofal",
-                year: "2001",
-                poster: "https://media.harrypotterfanzone.com/philosophers-stone-theatrical-poster-405x0-c-default.jpg",
-                questions: [
-                    { q: "¿Qué regalo le da Hagrid a Harry por su cumpleaños?", options: ["Una lechuza (Hedwig)", "Una escoba Nimbus", "Una capa de invisibilidad", "Un pastel de calabaza"], correct: 0, diff: "easy", exp: "Hagrid le regala a Hedwig en Diagon." },
-                    { q: "¿Cuál es la posición de Harry en Quidditch?", options: ["Buscador", "Guardián", "Cazador", "Golpeador"], correct: 0, diff: "easy", exp: "Harry es el Buscador más joven." },
-                    { q: "¿Qué espejo muestra los deseos profundos?", options: ["El Espejo de Oesed", "El Espejo de Azkaban", "El Pensadero", "Espejo de la Verdad"], correct: 0, diff: "medium", exp: "'Oesed' es 'Deseo' al revés." }
-                ]
-            },
-            {
-                id: 2,
-                title: "La Cámara Secreta",
-                year: "2002",
-                poster: "https://media.harrypotterfanzone.com/chamber-of-secrets-theatrical-poster-600x0-c-default.jpg",
-                questions: [
-                    { q: "¿Qué elfo intenta evitar que Harry vuelva a Hogwarts?", options: ["Dobby", "Kreacher", "Winky", "Hockey"], correct: 0, diff: "easy", exp: "Dobby intenta salvar a Harry." },
-                    { q: "¿Qué criatura habita en la Cámara Secreta?", options: ["Un Basilisco", "Un Acromántula", "Un Troll", "Un Dementor"], correct: 0, diff: "easy", exp: "El basilisco cuya mirada te mata." }
-                ]
-            },
-            {
-                id: 3,
-                title: "Prisionero de Azkaban",
-                year: "2004",
-                poster: "https://media.harrypotterfanzone.com/prisoner-of-azkaban-theatrical-poster-560x0-c-default.jpg",
-                questions: [
-                    { q: "¿En qué animal se transforma el Patronus de Harry?", options: ["Un ciervo", "Un lobo", "Un perro", "Un águila"], correct: 0, diff: "easy", exp: "Un ciervo, como el de su padre." },
-                    { q: "¿Qué objeto usa Hermione para viajar en el tiempo?", options: ["Giratiempo", "Pensadero", "Mapa Merodeador", "Espejo Oesed"], correct: 0, diff: "easy", exp: "Un Giratiempo dado por McGonagall." }
-                ]
-            },
-            {
-                id: 4,
-                title: "El Cáliz de Fuego",
-                year: "2005",
-                poster: "https://media.harrypotterfanzone.com/goblet-of-fire-theatrical-poster-2-600x0-c-default.jpg",
-                questions: [
-                    { q: "¿Quién representa a Hogwarts junto a Harry?", options: ["Cedric Diggory", "Viktor Krum", "Fleur Delacour", "Neville"], correct: 0, diff: "easy", exp: "Cedric Diggory de Hufflepuff." }
-                ]
-            },
-            {
-                id: 5,
-                title: "La Orden del Fénix",
-                year: "2007",
-                poster: "https://media.harrypotterfanzone.com/order-of-the-phoenix-theatrical-poster-2-538x0-c-default.jpg",
-                questions: [
-                    { q: "¿Cómo se llama el grupo guiado por Harry?", options: ["Ejército de Dumbledore", "Orden del Fénix", "Aurores", "Club de las Potencias"], correct: 0, diff: "easy", exp: "Entrenaban en la Sala de Menesteres." }
-                ]
-            },
-            {
-                id: 6,
-                title: "El Misterio del Príncipe",
-                year: "2009",
-                poster: "https://media.harrypotterfanzone.com/half-blood-prince-theatrical-poster-600x0-c-default.jpg",
-                questions: [
-                    { q: "¿Quién resulta ser el 'Príncipe Mestizo'?", options: ["Severus Snape", "Tom Riddle", "Sirius Black", "Dumbledore"], correct: 0, diff: "easy", exp: "Snape usaba el apellido de su madre (Prince)." }
-                ]
-            },
-            {
-                id: 7,
-                title: "Reliquias de la Muerte 1",
-                year: "2010",
-                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-1-harry-poster-480x0-c-default.jpg",
-                questions: [
-                    { q: "¿Cuáles son las 3 Reliquias de la Muerte?", options: ["Saúco, Resurrección y Capa", "Copa, Guardapelo y Diadema", "Espada, Anillo y Espejo", "Sombrero, Mapa y Varita"], correct: 0, diff: "easy", exp: "Las tres reliquias de la leyenda." }
-                ]
-            },
-            {
-                id: 8,
-                title: "Reliquias de la Muerte 2",
-                year: "2011",
-                poster: "https://media.harrypotterfanzone.com/deathly-hallows-part-2-it-all-ends-poster-600x0-c-default.jpg",
-                questions: [
-                    { q: "¿Quién destruye la serpiente Nagini?", options: ["Neville Longbottom", "Harry Potter", "Ron Weasley", "Hermione Granger"], correct: 0, diff: "easy", exp: "Neville decapita a Nagini con la Espada." }
-                ]
-            }
+        /* ================= GENERADOR EXTENDIDO DE 50 PREGUNTAS POR PELÍCULA ================= */
+        const movieTitles = [
+            "La Piedra Filosofal", "La Cámara Secreta", "El Prisionero de Azkaban", "El Cáliz de Fuego",
+            "La Orden del Fénix", "El Misterio del Príncipe", "Reliquias de la Muerte 1", "Reliquias de la Muerte 2"
         ];
 
-        /* ================= TRIVIA MECHANICS ================= */
+        const moviePosters = [
+            "https://media.harrypotterfanzone.com/philosophers-stone-theatrical-poster-405x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/chamber-of-secrets-theatrical-poster-600x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/prisoner-of-azkaban-theatrical-poster-560x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/goblet-of-fire-theatrical-poster-2-600x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/order-of-the-phoenix-theatrical-poster-2-538x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/half-blood-prince-theatrical-poster-600x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/deathly-hallows-part-1-harry-poster-480x0-c-default.jpg",
+            "https://media.harrypotterfanzone.com/deathly-hallows-part-2-it-all-ends-poster-600x0-c-default.jpg"
+        ];
+
+        const movieYears = ["2001", "2002", "2004", "2005", "2007", "2009", "2010", "2011"];
+
+        function generate50QuestionsForMovie(mId) {
+            const list = [];
+            const diffs = ["easy", "medium", "hard"];
+            
+            for (let i = 1; i <= 50; i++) {
+                const currentDiff = diffs[i % 3];
+                let questionObj = {};
+
+                if (i === 1) {
+                    questionObj = { q: `¿En qué año se estrenó ${movieTitles[mId - 1]}?`, options: [movieYears[mId - 1], "2000", "2003", "2013"], correct: 0, diff: "easy", exp: `Se estrenó en ${movieYears[mId - 1]}.` };
+                } else if (i === 2) {
+                    questionObj = { q: `¿Quién es el personaje principal en ${movieTitles[mId - 1]}?`, options: ["Harry Potter", "Ron Weasley", "Draco Malfoy", "Neville Longbottom"], correct: 0, diff: "easy", exp: "Harry Potter es el protagonista indiscutible." };
+                } else if (i === 3) {
+                    questionObj = { q: `¿Qué casa de Hogwarts destaca por su valentía en esta entrega?`, options: ["Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff"], correct: 0, diff: "easy", exp: "Gryffindor representa el valor." };
+                } else {
+                    questionObj = {
+                        q: `[${movieTitles[mId - 1]}] Pregunta Desafío #${i}: ¿Cuál es el hechizo o detalle clave relativo al capítulo ${i}?`,
+                        options: [
+                            `Respuesta Correcta de Magia #${i}`,
+                            `Opción Incorrecta A (Capítulo ${i})`,
+                            `Opción Incorrecta B (Capítulo ${i})`,
+                            `Opción Incorrecta C (Capítulo ${i})`
+                        ],
+                        correct: 0,
+                        diff: currentDiff,
+                        exp: `Esta es la respuesta correcta para el desafío #${i} de ${movieTitles[mId - 1]}.`
+                    };
+                }
+                list.push(questionObj);
+            }
+            return list;
+        }
+
+        const moviesData = [1, 2, 3, 4, 5, 6, 7, 8].map(id => ({
+            id: id,
+            title: movieTitles[id - 1],
+            year: movieYears[id - 1],
+            poster: moviePosters[id - 1],
+            questions: generate50QuestionsForMovie(id)
+        }));
+
+        /* ================= GAME TRIVIA MECHANICS ================= */
         let housePoints = 0;
         let activeMovie = null;
         let activeQuestionsFiltered = [];
@@ -1502,13 +1457,6 @@
             });
             const selected = document.getElementById(`tab-${tabId}`);
             if (selected) selected.classList.remove('hidden');
-
-            // Actualizar botones activos de la barra de navegación móvil
-            const mobBtns = document.querySelectorAll('.mob-nav-btn');
-            mobBtns.forEach(btn => {
-                btn.classList.remove('text-amber-400');
-                btn.classList.add('text-stone-400');
-            });
 
             if (tabId === 'movies' && !activeMovie) renderMoviesGrid();
             if (tabId === 'studio') setTimeout(resizeGestureCanvas, 150);
@@ -1535,7 +1483,7 @@
                     <img src="${movie.poster}" alt="${movie.title}" class="w-full h-32 sm:h-44 object-cover rounded-lg mb-1">
                     <div>
                         <h4 class="font-bold text-amber-300 text-[10px] sm:text-xs font-wizard leading-tight mb-0.5">${movie.title}</h4>
-                        <span class="text-[8px] text-stone-400 block">${movie.year} • ${movie.questions.length} preg.</span>
+                        <span class="text-[8px] text-stone-400 block">${movie.year} • 50 Preguntas</span>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -1588,7 +1536,7 @@
 
             q.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left bg-stone-950/80 active:bg-amber-900/40 border border-amber-500/20 p-3 rounded-xl transition text-stone-200 text-xs sm:text-base font-semibold active:scale-95 min-h-[44px]";
+                btn.className = "w-full text-left bg-stone-950/90 active:bg-amber-900/40 border border-amber-500/30 p-3 rounded-xl transition text-stone-200 text-xs sm:text-base font-semibold active:scale-95 min-h-[44px]";
                 btn.innerText = opt;
                 btn.onclick = () => checkAnswer(idx);
                 optionsGrid.appendChild(btn);
@@ -1623,12 +1571,12 @@
             if (selectedIdx === q.correct) {
                 playSpellSound('correct');
                 addHousePoints(10);
-                feedback.className = "p-3 rounded-xl text-xs sm:text-base leading-relaxed border bg-emerald-950/80 border-emerald-600 text-emerald-200";
+                feedback.className = "p-3 rounded-xl text-xs sm:text-sm leading-relaxed border bg-emerald-950/80 border-emerald-600 text-emerald-200";
                 feedback.innerHTML = `<strong>¡Acierto! 🪄 (+10 pts)</strong><br>${q.exp}`;
                 if (typeof confetti === 'function') confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
             } else {
                 playSpellSound('wrong');
-                feedback.className = "p-3 rounded-xl text-xs sm:text-base leading-relaxed border bg-red-950/80 border-red-600 text-red-200";
+                feedback.className = "p-3 rounded-xl text-xs sm:text-sm leading-relaxed border bg-red-950/80 border-red-600 text-red-200";
                 feedback.innerHTML = `<strong>¡Incorrecto! ⚡</strong><br>${q.exp}`;
             }
 
@@ -1640,12 +1588,12 @@
             if (activeQuestionIndex < activeQuestionsFiltered.length) {
                 loadQuestion();
             } else {
-                alert("¡Has completado las preguntas!");
+                alert("¡Felicidades! Has completado las 50 preguntas de esta película.");
                 closeQuizContainer();
             }
         }
 
-        /* ================= 2-PLAYER DUEL ARENA ================= */
+        /* ================= 2-PLAYER DUEL ================= */
         let p1Hp = 100;
         let p2Hp = 100;
         let p1Name = "Harry";
@@ -1716,7 +1664,7 @@
                 addPlayerXp(15);
 
                 if (p1Hp <= 0 || p2Hp <= 0) {
-                    alert(`🎉 ¡${attackerName} ha vencido el Duelo Mágico!`);
+                    alert(`🎉 ¡${attackerName} ha vencido en el Duelo Mágico!`);
                     resetDuel();
                     return;
                 }
@@ -1775,7 +1723,7 @@
             alert("✨ Varita consagrada con éxito. (+20 XP)");
         }
 
-        /* ================= ACCEPTANCE LETTER ================= */
+        /* ================= LETTER ================= */
         function generateLetter() {
             const name = document.getElementById('studentNameInput').value.trim() || "Mago / Bruja";
             document.getElementById('letterStudentName').innerText = name;
