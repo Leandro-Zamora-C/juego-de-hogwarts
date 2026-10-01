@@ -47,6 +47,11 @@
             color: #f3f4f6;
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            transition: filter 0.5s ease, background-color 0.5s ease;
+        }
+        body.lumos-active {
+            background-color: #120e0a;
+            box-shadow: inset 0 0 100px rgba(251, 191, 36, 0.15);
         }
         h1, h2, h3, h4, .font-wizard {
             font-family: 'Cinzel', serif;
@@ -146,8 +151,31 @@
             pointer-events: none;
         }
 
+        /* Spell Lightning Beam Animation */
+        .spell-beam {
+            position: fixed;
+            top: 50%;
+            height: 8px;
+            background: linear-gradient(90deg, transparent, #ffea00, #ef4444, transparent);
+            box-shadow: 0 0 20px #ffea00, 0 0 40px #ef4444;
+            z-index: 60;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s ease-out;
+        }
+
         .hp-bar-fill {
             transition: width 0.5s ease-in-out, background-color 0.3s ease;
+        }
+
+        /* Seal animation */
+        .wax-seal {
+            transition: transform 0.3s ease, filter 0.3s ease;
+            cursor: pointer;
+        }
+        .wax-seal:hover {
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 0 10px rgba(185, 28, 28, 0.8));
         }
 
         @media print {
@@ -180,6 +208,9 @@
 
     <!-- Spell Impact Screen Flash Overlay -->
     <div id="spellImpactFlash" class="fixed inset-0 z-50 opacity-0 pointer-events-none bg-amber-500/20"></div>
+
+    <!-- Spell Beam Effect Layer -->
+    <div id="spellBeam" class="spell-beam left-0 w-full"></div>
 
     <!-- Interactive Wand Trail & Magic Sparkle Canvas -->
     <canvas id="magicCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-40"></canvas>
@@ -290,24 +321,34 @@
                 </div>
             </div>
 
-            <!-- House Badge & Score Status -->
-            <div id="userHouseHeader" class="hidden flex items-center space-x-2.5 bg-stone-950/90 px-4 py-1.5 rounded-full border border-amber-500/40 shadow-inner">
+            <!-- House Badge, XP & Score Status -->
+            <div id="userHouseHeader" class="hidden flex items-center space-x-3 bg-stone-950/90 px-4 py-1.5 rounded-full border border-amber-500/40 shadow-inner">
                 <img id="houseIconHeader" src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Escudo" class="w-6 h-6 object-contain">
                 <div class="text-xs">
                     <span id="houseNameHeader" class="font-bold text-amber-300">Casa</span>
-                    <div class="text-amber-400/90"><i class="fa-solid fa-trophy mr-1 text-[10px]"></i><span id="houseScoreHeader">0</span> pts</div>
+                    <div class="flex items-center space-x-2 text-[10px]">
+                        <span class="text-amber-400/90"><i class="fa-solid fa-trophy mr-0.5 text-[9px]"></i><span id="houseScoreHeader">0</span> pts</span>
+                        <span class="text-sky-400"><i class="fa-solid fa-star mr-0.5 text-[9px]"></i><span id="playerXpHeader">0</span> XP</span>
+                        <span id="playerRankBadge" class="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded font-bold border border-amber-500/30 text-[9px]">Novato</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Navigation Bar -->
-            <nav class="flex items-center gap-1 md:gap-2 text-xs font-semibold overflow-x-auto w-full md:w-auto py-1 md:py-0 scrollbar-none">
-                <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-house mr-1"></i> Inicio</button>
-                <button onclick="switchTab('movies')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-film mr-1"></i> Películas & Trivia</button>
-                <button onclick="switchTab('studio')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-amber-400"></i> Estudio Trazador</button>
-                <button onclick="switchTab('duel')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-sparkles mr-1"></i> Duelo 2P</button>
-                <button onclick="switchTab('wand')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-scroll mr-1"></i> Ollivanders</button>
-                <button onclick="switchTab('letter')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1"></i> Carta</button>
-            </nav>
+            <!-- Global Lumos Toggle & Navigation Bar -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleLumosMode()" id="lumosGlobalBtn" title="Encender/Apagar Lumos" class="bg-stone-800/90 hover:bg-amber-900/60 text-amber-300 p-2 rounded-xl border border-amber-500/30 transition text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-lightbulb"></i> <span class="hidden sm:inline font-wizard">Lumos</span>
+                </button>
+
+                <nav class="flex items-center gap-1 md:gap-2 text-xs font-semibold overflow-x-auto w-full md:w-auto py-1 md:py-0 scrollbar-none">
+                    <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-house mr-1"></i> Inicio</button>
+                    <button onclick="switchTab('movies')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-film mr-1"></i> Películas & Trivia</button>
+                    <button onclick="switchTab('studio')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-amber-400"></i> Estudio Trazador</button>
+                    <button onclick="switchTab('duel')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-wand-sparkles mr-1"></i> Duelo 2P</button>
+                    <button onclick="switchTab('wand')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-scroll mr-1"></i> Ollivanders</button>
+                    <button onclick="switchTab('letter')" class="nav-btn px-3 py-1.5 rounded-xl hover:bg-stone-800/90 text-amber-200 transition border border-transparent hover:border-amber-500/20 whitespace-nowrap"><i class="fa-solid fa-envelope-open-text mr-1"></i> Carta</button>
+                </nav>
+            </div>
         </div>
     </header>
 
@@ -364,6 +405,14 @@
                             <h3 class="text-xl font-bold text-amber-300 font-wizard">Oráculo de Cine Mágico</h3>
                         </div>
                         <p class="text-stone-400 text-xs md:text-sm">Gira la ruleta mágica para seleccionar la película que verán hoy junto a un snack temático.</p>
+                    </div>
+
+                    <!-- Custom Snack Input -->
+                    <div class="flex gap-2 text-xs">
+                        <input type="text" id="customSnackInput" placeholder="Añadir tu propio snack (ej. Empanadas de Calabaza)" class="flex-grow bg-stone-950 border border-amber-800/40 rounded-xl px-3 py-1.5 text-stone-200 focus:outline-none">
+                        <button onclick="addCustomSnack()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold px-3 py-1.5 rounded-xl transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
 
                     <div class="relative w-48 h-48 md:w-56 md:h-56 mx-auto my-2 flex items-center justify-center">
@@ -606,9 +655,10 @@
                 </div>
             </div>
 
-            <!-- Turn Banner -->
-            <div id="duelTurnBanner" class="text-center bg-stone-900/90 border border-amber-600/40 p-3 rounded-2xl max-w-md mx-auto font-bold text-amber-300 text-xs md:text-sm font-wizard">
-                Turno de Lanzamiento: <span id="currentDuelPlayer" class="text-red-400">Mago 1</span>
+            <!-- Turn & Timer Banner -->
+            <div id="duelTurnBanner" class="text-center bg-stone-900/90 border border-amber-600/40 p-3 rounded-2xl max-w-md mx-auto font-bold text-amber-300 text-xs md:text-sm font-wizard flex justify-between items-center px-6">
+                <span>Turno: <span id="currentDuelPlayer" class="text-red-400">Mago 1</span></span>
+                <span id="duelTimerDisplay" class="font-mono text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40">⏱ <span id="duelTimeLeft">12</span>s</span>
             </div>
 
             <!-- Duel Question Arena Card -->
@@ -713,8 +763,13 @@
                     <p class="font-wizard text-sm md:text-base font-bold">Minerva McGonagall<br><span class="text-xs font-normal">Directora Adjunta</span></p>
                 </div>
 
+                <!-- Interactive Wax Seal -->
                 <div class="flex justify-end pt-2">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlI_xpt0gdIKd18TwvFTH8C3ty11rBHF0-OEb1d3XCUg&s=10" alt="Sello Cera" class="w-14 h-14 object-contain">
+                    <img onclick="toggleWaxSealMsg()" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlI_xpt0gdIKd18TwvFTH8C3ty11rBHF0-OEb1d3XCUg&s=10" alt="Sello Cera" class="w-14 h-14 object-contain wax-seal" title="Haz clic en el sello para abrir el sobre">
+                </div>
+
+                <div id="sealSecretMsg" class="hidden text-center text-xs font-wizard text-red-900 border-t border-amber-800/30 pt-2 animate-bounce">
+                    ✨ ¡El sello oficial ha verificado tu entrada como estudiante de Hogwarts!
                 </div>
 
                 <div class="text-center pt-2 no-print">
@@ -735,7 +790,33 @@
 
     <!-- ================= JAVASCRIPT ENGINE ================= -->
     <script>
-        /* ================= AUDIO SYNTHESIS & SOUND FX ================= */
+        /* ================= XP & RANK PROGRESSION SYSTEM ================= */
+        let playerXp = 0;
+
+        function addPlayerXp(amount) {
+            playerXp += amount;
+            document.getElementById('playerXpHeader').innerText = playerXp;
+            updateRankBadge();
+        }
+
+        function updateRankBadge() {
+            const badge = document.getElementById('playerRankBadge');
+            if (playerXp < 30) {
+                badge.innerText = "Novato";
+                badge.className = "bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded font-bold border border-amber-500/30 text-[9px]";
+            } else if (playerXp < 70) {
+                badge.innerText = "Aprendiz";
+                badge.className = "bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded font-bold border border-sky-500/30 text-[9px]";
+            } else if (playerXp < 120) {
+                badge.innerText = "Auror";
+                badge.className = "bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded font-bold border border-emerald-500/30 text-[9px]";
+            } else {
+                badge.innerText = "Gran Mago";
+                badge.className = "bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded font-bold border border-purple-500/30 text-[9px]";
+            }
+        }
+
+        /* ================= AUDIO SYNTHESIS & ENHANCED SOUND FX ================= */
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMusicPlaying = false;
         let musicOscillators = [];
@@ -750,6 +831,16 @@
                 flash.style.opacity = '0';
                 document.body.classList.remove('animate-shake');
             }, 300);
+        }
+
+        function triggerSpellBeam() {
+            const beam = document.getElementById('spellBeam');
+            beam.style.opacity = '1';
+            beam.style.transform = 'scaleY(2)';
+            setTimeout(() => {
+                beam.style.opacity = '0';
+                beam.style.transform = 'scaleY(1)';
+            }, 350);
         }
 
         function playSpellSound(type) {
@@ -775,6 +866,23 @@
                 osc.frequency.setValueAtTime(320, now);
                 osc.frequency.exponentialRampToValueAtTime(90, now + 0.4);
                 gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'Avada Kedavra') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'Expecto Patronum') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.4);
+                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                 osc.start(now);
                 osc.stop(now + 0.4);
@@ -932,11 +1040,19 @@
             document.getElementById('activeWandColorBadge').innerText = name;
             document.getElementById('activeWandColorBadge').style.backgroundColor = colorHex;
             playSpellSound(name);
-            triggerSpellImpactFlash(name === 'Expelliarmus' ? 'bg-red-500/30' : 'bg-amber-400/30');
+            triggerSpellImpactFlash(name === 'Expelliarmus' ? 'bg-red-500/30' : (name === 'Avada Kedavra' ? 'bg-emerald-500/30' : 'bg-amber-400/30'));
+
+            addPlayerXp(2);
 
             if (typeof confetti === 'function') {
                 confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
             }
+        }
+
+        function toggleLumosMode() {
+            document.body.classList.toggle('lumos-active');
+            playSpellSound('Lumos');
+            addPlayerXp(1);
         }
 
         /* ================= INITIAL HOUSE & SORTING CEREMONY ================= */
@@ -1056,6 +1172,7 @@
             document.getElementById('assignedHouseMotto').innerText = info.motto;
 
             playSpellSound('correct');
+            addPlayerXp(15);
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 80 });
         }
 
@@ -1076,14 +1193,26 @@
             playSpellSound('correct');
         }
 
-        /* ================= MOVIE ORACLE WHEEL ================= */
+        /* ================= MOVIE ORACLE WHEEL & CUSTOM SNACKS ================= */
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wheelCtx = wheelCanvas.getContext('2d');
         const wheelMovies = ["Piedra Filosofal", "Cámara Secreta", "Prisionero Azkaban", "Cáliz de Fuego", "Orden del Fénix", "Misterio Príncipe", "Reliquias 1", "Reliquias 2"];
         const wheelColors = ['#740001', '#1A472A', '#0E1A40', '#ECB939', '#8b5cf6', '#d97706', '#0284c7', '#059669'];
+        let customSnacksList = ["Cerveza de Mantequilla 🍺", "Ranas de Chocolate 🍫", "Grageas Bertie Bott 🍬", "Pasteles de Caldero 🥧"];
 
         let currentAngle = 0;
         let isSpinning = false;
+
+        function addCustomSnack() {
+            const input = document.getElementById('customSnackInput');
+            const val = input.value.trim();
+            if (val) {
+                customSnacksList.push(val + " 🍿");
+                input.value = '';
+                playSpellSound('tick');
+                alert(`Snack "${val}" añadido al oráculo.`);
+            }
+        }
 
         function drawWheel() {
             const numSlices = wheelMovies.length;
@@ -1140,20 +1269,20 @@
                     isSpinning = false;
                     const finalIndex = Math.floor((wheelMovies.length - (currentAngle % (2 * Math.PI)) / ((2 * Math.PI) / wheelMovies.length)) % wheelMovies.length);
                     const selectedMovie = wheelMovies[finalIndex];
-                    const snacks = ["Cerveza de Mantequilla 🍺", "Ranas de Chocolate 🍫", "Grageas Bertie Bott 🍬", "Pasteles de Caldero 🥧"];
-                    const randomSnack = snacks[Math.floor(Math.random() * snacks.length)];
+                    const randomSnack = customSnacksList[Math.floor(Math.random() * customSnacksList.length)];
 
                     document.getElementById('oracleResult').innerHTML = `
                         <h4 class="font-bold text-base md:text-lg text-amber-950 font-wizard">${selectedMovie}</h4>
                         <p class="text-xs text-amber-900"><strong>Snack ideal:</strong> ${randomSnack}</p>
                     `;
                     playSpellSound('correct');
+                    addPlayerXp(5);
                 }
             }
             requestAnimationFrame(animateWheel);
         }
 
-        /* ================= WAND MOTION GESTURE STUDIO ================= */
+        /* ================= WAND MOTION GESTURE STUDIO (ENHANCED PATTERN MATCHING) ================= */
         const gCanvas = document.getElementById('gestureCanvas');
         const gCtx = gCanvas.getContext('2d');
         let isDrawing = false;
@@ -1192,7 +1321,7 @@
             gCtx.strokeStyle = activeWandColor;
             gCtx.lineWidth = 4;
             gCtx.lineCap = 'round';
-            gCtx.shadowBlur = 10;
+            gCtx.shadowBlur = 12;
             gCtx.shadowColor = activeWandColor;
 
             if (gesturePoints.length > 1) {
@@ -1201,6 +1330,19 @@
                 gCtx.moveTo(prev.x, prev.y);
                 gCtx.lineTo(pt.x, pt.y);
                 gCtx.stroke();
+            }
+
+            // Particle spark on gesture draw
+            if (Math.random() < 0.3) {
+                particles.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    radius: Math.random() * 4 + 1,
+                    alpha: 1,
+                    color: activeWandColor
+                });
             }
         });
 
@@ -1211,7 +1353,7 @@
         });
 
         function analyzeGesture() {
-            if (gesturePoints.length < 10) return;
+            if (gesturePoints.length < 8) return;
 
             const feedback = document.getElementById('gestureFeedback');
             const minY = Math.min(...gesturePoints.map(p => p.y));
@@ -1222,12 +1364,28 @@
             const width = maxX - minX;
             const height = maxY - minY;
 
-            if (height > 50 && width > 40) {
-                feedback.innerHTML = `<span class="text-amber-300 font-bold">✨ ¡Encantamiento Lanzado con Éxito!</span><br>Has canalizado la energía mágica de la varita.`;
+            const firstPt = gesturePoints[0];
+            const lastPt = gesturePoints[gesturePoints.length - 1];
+            const distStartEnd = Math.hypot(lastPt.x - firstPt.x, lastPt.y - firstPt.y);
+
+            let detectedSpell = null;
+
+            // Wingardium Leviosa: Closed loop / Circle
+            if (distStartEnd < width * 0.4 && width > 40 && height > 40) {
+                detectedSpell = "Wingardium Leviosa 🪶";
+            } 
+            // Lumos / Expelliarmus based on dimensions
+            else if (height > 50 && width > 30) {
+                detectedSpell = "Lumos / Expelliarmus ⚡";
+            }
+
+            if (detectedSpell) {
+                feedback.innerHTML = `<span class="text-amber-300 font-bold">✨ ¡Hechizo Reconocido: ${detectedSpell}!</span><br>Has canalizado la energía mágica con maestría. (+10 XP)`;
                 playSpellSound('correct');
-                if (typeof confetti === 'function') confetti({ particleCount: 40, spread: 60 });
+                addPlayerXp(10);
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 70 });
             } else {
-                feedback.innerHTML = `<span class="text-stone-400">Trazo débil. Intenta realizar un dibujo más amplio en pantalla.</span>`;
+                feedback.innerHTML = `<span class="text-stone-400">Trazo ambiguo. Intenta formar un bucle para Leviosa o una 'V' más amplia.</span>`;
             }
         }
 
@@ -1335,6 +1493,7 @@
         function addHousePoints(pts) {
             housePoints += pts;
             document.getElementById('houseScoreHeader').innerText = housePoints;
+            addPlayerXp(pts);
         }
 
         function renderMoviesGrid() {
@@ -1459,13 +1618,14 @@
             }
         }
 
-        /* ================= 2-PLAYER WIZARD DUEL ARENA WITH HP ================= */
+        /* ================= 2-PLAYER WIZARD DUEL ARENA WITH HP & TIMED TURNS ================= */
         let p1Hp = 100;
         let p2Hp = 100;
         let p1Name = "Harry";
         let p2Name = "Draco";
         let currentDuelPlayer = 1;
         let currentDuelQuestion = null;
+        let duelTimerInterval = null;
 
         function updatePlayerNames() {
             p1Name = document.getElementById('p1NameInput').value.trim() || "Mago 1";
@@ -1477,6 +1637,7 @@
         }
 
         function initDuelQuestion() {
+            clearInterval(duelTimerInterval);
             const allQuestions = moviesData.flatMap(m => m.questions);
             currentDuelQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
 
@@ -1492,15 +1653,29 @@
                 btn.onclick = () => answerDuel(idx);
                 grid.appendChild(btn);
             });
+
+            // Turn Timer for Duel (12 Seconds)
+            let dTimeLeft = 12;
+            document.getElementById('duelTimeLeft').innerText = dTimeLeft;
+            duelTimerInterval = setInterval(() => {
+                dTimeLeft--;
+                document.getElementById('duelTimeLeft').innerText = dTimeLeft;
+                if (dTimeLeft <= 0) {
+                    clearInterval(duelTimerInterval);
+                    answerDuel(-1); // Timeout penalty
+                }
+            }, 1000);
         }
 
         function answerDuel(selectedIdx) {
+            clearInterval(duelTimerInterval);
             const attackerName = currentDuelPlayer === 1 ? p1Name : p2Name;
             const defenderName = currentDuelPlayer === 1 ? p2Name : p1Name;
 
             if (selectedIdx === currentDuelQuestion.correct) {
                 playSpellSound('correct');
                 triggerSpellImpactFlash(currentDuelPlayer === 1 ? 'bg-red-500/40' : 'bg-emerald-500/40');
+                triggerSpellBeam();
 
                 if (currentDuelPlayer === 1) {
                     p2Hp = Math.max(0, p2Hp - 25);
@@ -1511,6 +1686,8 @@
                     document.getElementById('p1HpBar').style.width = `${p1Hp}%`;
                     document.getElementById('p1HpText').innerText = `${p1Hp} / 100 HP`;
                 }
+
+                addPlayerXp(15);
 
                 if (p1Hp <= 0 || p2Hp <= 0) {
                     alert(`🎉 ¡${attackerName} ha vencido en el Duelo Mágico a ${defenderName}!`);
@@ -1530,6 +1707,7 @@
         }
 
         function resetDuel() {
+            clearInterval(duelTimerInterval);
             p1Hp = 100;
             p2Hp = 100;
             currentDuelPlayer = 1;
@@ -1566,15 +1744,24 @@
 
         function craftWandFinal() {
             playSpellSound('correct');
+            addPlayerXp(20);
             if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 70 });
-            alert("✨ Tu varita ha sido consagrada en Ollivanders con éxito.");
+            alert("✨ Tu varita ha sido consagrada en Ollivanders con éxito. (+20 XP)");
         }
 
-        /* ================= ACCEPTANCE LETTER ================= */
+        /* ================= ACCEPTANCE LETTER & WAX SEAL ================= */
         function generateLetter() {
             const name = document.getElementById('studentNameInput').value.trim() || "Mago / Bruja";
             document.getElementById('letterStudentName').innerText = name;
             playSpellSound('correct');
+            addPlayerXp(5);
+        }
+
+        function toggleWaxSealMsg() {
+            const msg = document.getElementById('sealSecretMsg');
+            msg.classList.toggle('hidden');
+            playSpellSound('tick');
+            if (typeof confetti === 'function') confetti({ particleCount: 25, spread: 40 });
         }
     </script>
 </body>
