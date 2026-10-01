@@ -69,6 +69,16 @@
             font-family: 'Caveat', cursive;
         }
 
+        /* Texto Mágico Harry Potter con Resplandor Dorado */
+        .hp-text-logo {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(180deg, #fffbeb 0%, #fde047 30%, #d97706 70%, #78350f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.6));
+            letter-spacing: 0.1em;
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -81,18 +91,19 @@
             border-radius: 6px;
         }
 
-        /* Glassmorphism Cards */
+        /* Glassmorphism Cards con Pulso */
         .glass-card {
-            background: rgba(18, 15, 13, 0.90);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(217, 119, 6, 0.3);
-            transition: all 0.25s ease-out;
+            background: rgba(18, 15, 13, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(217, 119, 6, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.8);
         }
         .glass-card:active, .glass-card:hover {
-            border-color: rgba(245, 158, 11, 0.6);
-            box-shadow: 0 10px 28px -5px rgba(217, 119, 6, 0.25);
+            border-color: rgba(245, 158, 11, 0.8);
+            box-shadow: 0 10px 30px -5px rgba(217, 119, 6, 0.4), 0 0 15px rgba(251, 191, 36, 0.2);
+            transform: translateY(-2px);
         }
 
         /* Parchment Styling */
@@ -181,6 +192,15 @@
             filter: drop-shadow(0 0 10px rgba(185, 28, 28, 0.8));
         }
 
+        /* Entrada Suave de Modales */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-modal {
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         @media print {
             header, footer, nav, canvas, .no-print, #tab-letter > div:not(#letterParchment), #initialModal, #sortingHatModal {
                 display: none !important;
@@ -222,48 +242,48 @@
     <div id="candleField" class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-80"></div>
 
     <!-- INITIAL HOUSE MODAL -->
-    <div id="initialModal" class="fixed inset-0 z-50 bg-stone-950/98 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div class="relative w-full max-w-4xl bg-stone-900 border border-amber-600/50 rounded-2xl md:rounded-3xl p-5 sm:p-8 shadow-2xl text-center space-y-4 sm:space-y-6 overflow-hidden my-auto" 
-             style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.92), rgba(12, 10, 9, 0.97)), url('https://i.blogs.es/61a2ce/harry-potter-gran-comedor-problema-comida-2/500_333.jpeg'); background-size: cover; background-position: center;">
+    <div id="initialModal" class="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="relative w-full max-w-4xl bg-stone-900 border-2 border-amber-500/70 rounded-2xl md:rounded-3xl p-5 sm:p-8 shadow-[0_0_50px_rgba(217,119,6,0.3)] text-center space-y-4 sm:space-y-6 overflow-hidden my-auto animate-modal" 
+             style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.45), rgba(12, 10, 9, 0.75)), url('https://i.blogs.es/61a2ce/harry-potter-gran-comedor-problema-comida-2/500_333.jpeg'); background-size: cover; background-position: center;">
             
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter Logo" class="h-16 sm:h-24 mx-auto object-contain filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)] brightness-110">
-
-            <div class="space-y-1 sm:space-y-2">
-                <h2 class="text-xl sm:text-3xl font-bold text-amber-300 font-wizard">El Gran Comedor de Hogwarts</h2>
-                <span class="text-amber-500 font-bold text-xs tracking-widest uppercase block">BY: LEANDRO ZAMORA</span>
-                <p class="text-stone-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-                    Elige tu Casa directamente o permite que el <strong>Sombrero Seleccionador</strong> evalúe tu personalidad a través de la Ceremonia Oficial.
-                </p>
+            <div class="space-y-1">
+                <h1 class="text-3xl sm:text-5xl font-black hp-text-logo uppercase tracking-widest">HARRY POTTER</h1>
+                <h2 class="text-xl sm:text-3xl font-bold text-amber-200 font-wizard drop-shadow-md">El Gran Comedor de Hogwarts</h2>
+                <span class="text-amber-400 font-bold text-xs tracking-widest uppercase block drop-shadow">BY: LEANDRO ZAMORA</span>
             </div>
+
+            <p class="text-stone-200 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed drop-shadow font-medium">
+                Elige tu Casa directamente o permite que el <strong>Sombrero Seleccionador</strong> evalúe tu personalidad a través de la Ceremonia Oficial.
+            </p>
 
             <!-- Action Buttons -->
             <div class="flex justify-center pt-1">
-                <button onclick="startSortingCeremony()" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 active:from-amber-500 active:to-yellow-400 text-stone-950 font-black px-5 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <button onclick="startSortingCeremony()" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 active:from-amber-500 active:to-yellow-400 text-stone-950 font-black px-6 py-3.5 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm">
                     <i class="fa-solid fa-hat-wizard text-base sm:text-lg"></i> Iniciar Ceremonia de Selección
                 </button>
             </div>
 
             <div class="relative flex py-1 sm:py-2 items-center">
-                <div class="flex-grow border-t border-amber-800/40"></div>
-                <span class="flex-shrink mx-3 text-[10px] sm:text-xs font-wizard text-stone-400 uppercase tracking-widest">O Elige Tu Casa Manualmente</span>
-                <div class="flex-grow border-t border-amber-800/40"></div>
+                <div class="flex-grow border-t border-amber-500/60"></div>
+                <span class="flex-shrink mx-3 text-[10px] sm:text-xs font-wizard text-amber-300 uppercase tracking-widest font-bold">O Elige Tu Casa Manualmente</span>
+                <div class="flex-grow border-t border-amber-500/60"></div>
             </div>
 
             <!-- Crest Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
-                <button onclick="selectInitialHouse('Gryffindor')" class="bg-stone-900/90 active:bg-red-950 border border-red-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Gryffindor')" class="bg-stone-900/85 active:bg-red-950 border border-red-600 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg backdrop-blur">
                     <img src="https://w7.pngwing.com/pngs/768/912/png-transparent-gryffindor-thumbnail.png" alt="Gryffindor" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-red-400 font-bold text-xs sm:text-sm">Gryffindor</span>
                 </button>
-                <button onclick="selectInitialHouse('Slytherin')" class="bg-stone-900/90 active:bg-emerald-950 border border-emerald-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Slytherin')" class="bg-stone-900/85 active:bg-emerald-950 border border-emerald-600 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg backdrop-blur">
                     <img src="https://w7.pngwing.com/pngs/913/944/png-transparent-gray-and-green-snake-and-shield-logo-harry-potter-and-the-philosopher-s-stone-sorting-hat-slytherin-house-hogwarts-harry-potter-harry-potter-and-the-philosopher-s-stone-sorting-thumbnail.png" alt="Slytherin" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-emerald-400 font-bold text-xs sm:text-sm">Slytherin</span>
                 </button>
-                <button onclick="selectInitialHouse('Ravenclaw')" class="bg-stone-900/90 active:bg-blue-950 border border-blue-700/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Ravenclaw')" class="bg-stone-900/85 active:bg-blue-950 border border-blue-600 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg backdrop-blur">
                     <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Ravenclaw" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-blue-400 font-bold text-xs sm:text-sm">Ravenclaw</span>
                 </button>
-                <button onclick="selectInitialHouse('Hufflepuff')" class="bg-stone-900/90 active:bg-amber-950 border border-yellow-600/60 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg">
+                <button onclick="selectInitialHouse('Hufflepuff')" class="bg-stone-900/85 active:bg-amber-950 border border-yellow-500 p-3 sm:p-4 rounded-xl flex flex-col items-center space-y-1.5 transition transform active:scale-95 shadow-lg backdrop-blur">
                     <img src="https://w7.pngwing.com/pngs/563/589/png-transparent-ravenclaw-logo-ravenclaw-house-fictional-universe-of-harry-potter-common-room-hogwarts-gryffindor-harry-potter-ravenclaw-logo-helga-hufflepuff-slytherin-house-thumbnail.png" alt="Hufflepuff" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                     <span class="font-wizard text-yellow-400 font-bold text-xs sm:text-sm">Hufflepuff</span>
                 </button>
@@ -272,8 +292,8 @@
     </div>
 
     <!-- SORTING HAT MODAL -->
-    <div id="sortingHatModal" class="hidden fixed inset-0 z-50 bg-stone-950/98 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div class="relative w-full max-w-2xl bg-stone-900 border border-amber-600/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-4 sm:space-y-6 my-auto">
+    <div id="sortingHatModal" class="hidden fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="relative w-full max-w-2xl bg-stone-900 border border-amber-600/60 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-4 sm:space-y-6 my-auto animate-modal">
             <div class="flex justify-between items-center border-b border-amber-800/40 pb-3">
                 <div class="flex items-center space-x-2.5">
                     <i class="fa-solid fa-hat-wizard text-xl sm:text-3xl text-amber-400"></i>
@@ -318,13 +338,10 @@
     <header class="bg-stone-900/95 backdrop-blur-md border-b border-amber-800/40 sticky top-0 z-40 px-3 sm:px-8 py-2.5 shadow-2xl">
         <div class="w-full flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-5 sm:h-7 object-contain filter brightness-125">
-                <div>
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <h1 class="text-xs sm:text-lg font-black tracking-wider text-amber-400 font-wizard leading-tight">HOGWARTS EXPERIENCIA</h1>
-                        <span class="text-[9px] sm:text-xs text-amber-500 font-bold tracking-wider">BY: LEANDRO ZAMORA</span>
-                    </div>
-                    <p class="text-[8px] sm:text-[9px] text-stone-400 font-wizard tracking-widest uppercase hidden sm:block">Estudio Mágico & Desafíos</p>
+                <span class="hp-text-logo text-base sm:text-xl font-black">HARRY POTTER</span>
+                <div class="hidden sm:block">
+                    <h1 class="text-xs sm:text-base font-black tracking-wider text-amber-400 font-wizard leading-tight">EXPERIENCIA</h1>
+                    <span class="text-[9px] text-amber-500 font-bold tracking-wider">BY: LEANDRO ZAMORA</span>
                 </div>
             </div>
 
@@ -393,25 +410,28 @@
         <!-- ================= HOME TAB ================= -->
         <section id="tab-home" class="space-y-4 sm:space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
-                <div class="lg:col-span-8 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-cover bg-center p-5 sm:p-12 border border-amber-600/30 flex flex-col justify-center glass-card"
-                     style="background-image: linear-gradient(to right, rgba(12, 10, 9, 0.95), rgba(12, 10, 9, 0.7)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXyUJ0_X3or5I1ZRKA0g4ZsW_y6ViDHSZpQg-t5D1bbSQqnQH9xRKhdjkl&s=10');">
+                <!-- BANNER CON IMAGEN MAS CLARA -->
+                <div class="lg:col-span-8 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-cover bg-center p-5 sm:p-12 border-2 border-amber-500/50 flex flex-col justify-center glass-card shadow-[0_0_30px_rgba(217,119,6,0.25)]"
+                     style="background-image: linear-gradient(to right, rgba(12, 10, 9, 0.45), rgba(12, 10, 9, 0.65)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXyUJ0_X3or5I1ZRKA0g4ZsW_y6ViDHSZpQg-t5D1bbSQqnQH9xRKhdjkl&s=10'); bg-size: cover;">
                     <div class="relative z-10 space-y-3 sm:space-y-5">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Harry_Potter_wordmark.svg" alt="Harry Potter" class="h-10 sm:h-20 object-contain drop-shadow-lg filter brightness-125">
-                        <div class="space-y-1">
-                            <h2 class="text-xl sm:text-4xl font-bold text-amber-100 tracking-wide leading-tight font-wizard">
+                        
+                        <div class="space-y-0.5">
+                            <h1 class="text-3xl sm:text-6xl font-black hp-text-logo tracking-widest uppercase">HARRY POTTER</h1>
+                            <h2 class="text-xl sm:text-4xl font-bold text-amber-200 tracking-wide leading-tight font-wizard drop-shadow">
                                 Gran Comedor & Estudio de Hechizos
                             </h2>
-                            <p class="text-amber-400 font-bold text-xs sm:text-sm tracking-wider">BY: LEANDRO ZAMORA</p>
+                            <p class="text-amber-400 font-bold text-xs sm:text-sm tracking-wider drop-shadow">BY: LEANDRO ZAMORA</p>
                         </div>
-                        <p class="text-stone-300 text-xs sm:text-base leading-relaxed max-w-2xl">
+
+                        <p class="text-stone-100 text-xs sm:text-base leading-relaxed max-w-2xl drop-shadow-md font-medium">
                             Practica trazos de varita en el Estudio, compite en duelos tácticos y demuestra tu sabiduría en las 8 películas con 50 preguntas por película.
                         </p>
 
                         <div class="pt-1 flex flex-col sm:flex-row gap-2.5 sm:gap-4">
-                            <button onclick="switchTab('movies')" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-950 font-bold px-5 py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
+                            <button onclick="switchTab('movies')" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-950 font-black px-6 py-3.5 rounded-xl transition shadow-xl flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
                                 <i class="fa-solid fa-gamepad"></i> Empezar Juego de Preguntas
                             </button>
-                            <button onclick="switchTab('studio')" class="w-full sm:w-auto bg-stone-800/90 text-amber-300 font-semibold px-5 py-3 rounded-xl border border-amber-500/40 transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm">
+                            <button onclick="switchTab('studio')" class="w-full sm:w-auto bg-stone-900/90 text-amber-300 font-bold px-6 py-3.5 rounded-xl border border-amber-500/50 transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm backdrop-blur">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Probar Hechizos Trazadores
                             </button>
                         </div>
@@ -596,9 +616,9 @@
             <!-- Movie Selector Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5" id="movieSelectorGrid"></div>
 
-            <!-- MODAL DE PREGUNTAS TOTALMENTE CORREGIDO PARA CELULAR -->
+            <!-- MODAL DE PREGUNTAS EN PANTALLA COMPLETA -->
             <div id="quizContainer" class="hidden fixed inset-0 z-[100] bg-stone-950/95 backdrop-blur-md p-3 sm:p-6 flex flex-col justify-center items-center">
-                <div class="w-full max-w-2xl bg-stone-900 border-2 border-amber-600/70 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden my-auto relative">
+                <div class="w-full max-w-2xl bg-stone-900 border-2 border-amber-500/70 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden my-auto relative animate-modal">
                     
                     <!-- Header Modal -->
                     <div class="flex justify-between items-center border-b border-amber-900/50 pb-3 flex-shrink-0">
@@ -648,9 +668,9 @@
                 <p class="text-stone-300 text-xs">Responde bien para restar 25 HP al rival.</p>
             </div>
 
-            <!-- Banner -->
-            <div class="max-w-2xl mx-auto rounded-2xl overflow-hidden border border-amber-600/40 shadow-lg h-32 sm:h-52 bg-cover bg-center glass-card"
-                 style="background-image: url('https://www.prints4u.net/wp-content/uploads/2019/11/031_Harry_Potter_the_Order_of_the_Phoenix.jpg');">
+            <!-- Banner con Imagen Mas Cara -->
+            <div class="max-w-2xl mx-auto rounded-2xl overflow-hidden border-2 border-amber-500/60 shadow-[0_0_25px_rgba(217,119,6,0.3)] h-36 sm:h-56 bg-cover bg-center glass-card"
+                 style="background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.2), rgba(12, 10, 9, 0.5)), url('https://www.prints4u.net/wp-content/uploads/2019/11/031_Harry_Potter_the_Order_of_the_Phoenix.jpg');">
             </div>
 
             <!-- Names -->
