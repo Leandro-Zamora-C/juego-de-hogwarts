@@ -1342,13 +1342,47 @@ function stopHatMusic(resumeBackground) {
   if (a && !a.paused) fadeAudio(a, 0, 800, () => a.pause());
   if (resumeBackground && S.musicOn !== false) playMusic();
 }
+/* ===================================================================
+   AUDIO DE CADA CASA
+   Pon junto a index.html: gryffindor.mp3, slytherin.mp3,
+   ravenclaw.mp3 y hufflepuff.mp3 (audios de pocos segundos).
+   Suena al elegir la casa a mano o cuando el sombrero la anuncia.
+=================================================================== */
+const houseClip = { el: null, playing: false, after: null };
+function finishHouseClip() {
+  houseClip.playing = false;
+  const f = houseClip.after; houseClip.after = null;
+  if (f) f();
+}
+function playHouseClip(house, after) {
+  if (houseClip.el) { houseClip.el.onended = houseClip.el.onerror = null; houseClip.el.pause(); }
+  houseClip.after = after || null;
+  if (!S.sound && S.musicOn === false) { finishHouseClip(); return; }
+  if (music.el && !music.el.paused) { clearInterval(music.fadeTimer); fadeTo(0, 300, () => music.el.pause()); }
+  const a = new Audio(house.toLowerCase() + '.mp3');
+  a.volume = Math.max(.2, (S.musicVol ?? 60) / 100);
+  a.onended = finishHouseClip;
+  a.onerror = () => {
+    // Prueba también con mayúscula inicial (Gryffindor.mp3); si no existe, sigue sin audio
+    if (!a._alt) { a._alt = true; a.src = house + '.mp3'; a.play().catch(() => {}); }
+    else finishHouseClip();
+  };
+  houseClip.el = a; houseClip.playing = true;
+  a.play().catch(err => { if (err && err.name === 'NotAllowedError') finishHouseClip(); });
+  // Seguridad: si el audio nunca llega a sonar, no deja la música de fondo esperando
+  setTimeout(() => { if (houseClip.el === a && houseClip.playing && a.paused) finishHouseClip(); }, 6000);
+}
+function afterHouseClip(fn) { if (houseClip.playing) houseClip.after = fn; else fn(); }
+function resumeBackgroundMusic() {
+  if (S.musicOn !== false && !hatMusic.on && (!music.el || music.el.paused)) playMusic();
+}
 function initMusic() {
   if (S.musicOn === undefined) S.musicOn = true;
   music.idx = Math.min(S.musicIdx || 0, PLAYLIST.length - 1);
   syncVolumeInputs(); renderMusicUi();
   // Respaldo: si el usuario no pasa por el botón de entrada, arranca con su primer clic
   const kick = () => {
-    if (!S.house || hatMusic.on) return; // primero elige su casa; la música empieza después
+    if (!S.house || hatMusic.on || houseClip.playing) return; // primero elige su casa; la música empieza después
     if (S.musicOn && (!music.el || music.el.paused) && !music.missing) playMusic();
     ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.removeEventListener(ev, kick, true));
   };
@@ -1515,6 +1549,8 @@ function finishSortingCeremony() {
     <div class="bg-stone-950 rounded-lg p-1.5 border border-amber-900/40"><div>${HOUSES[h].emoji}</div><div class="font-bold text-amber-200">${Math.round(sortingScores[h] / SORTING.length * 100)}%</div></div>`).join('');
   sfx('levelup');
   fireConfetti({ particleCount: 90, spread: 80, colors: [HOUSES[house].c1, HOUSES[house].c2, '#ffffff'] });
+  stopHatMusic(false);
+  playHouseClip(house);
 }
 function confirmSortedHouse() {
   $('sortingHatModal').classList.add('hidden');
@@ -1530,9 +1566,10 @@ function selectInitialHouse(house, viaHat = false) {
   if (first) { addXp(viaHat ? 20 : 10); unlock('sorted'); }
   toast(changed ? `Ahora perteneces a <b>${house}</b>.` : `¡Bienvenido/a a <b>${house}</b>!`, HOUSES[house].emoji);
   renderAll();
-  // Al elegir casa empieza (o sigue) la música de fondo
+  // Suena el audio de la casa y después empieza (o sigue) la música de fondo
   audio();
-  if (S.musicOn !== false && (!music.el || music.el.paused)) playMusic();
+  if (viaHat) afterHouseClip(resumeBackgroundMusic);
+  else playHouseClip(house, resumeBackgroundMusic);
 }
 
 /* ===================================================================
