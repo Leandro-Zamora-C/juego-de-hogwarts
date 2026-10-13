@@ -1,10 +1,11 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v3';
+const VERSION = 'hogwarts-v4';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
-const OPTIONAL = ['./musica1.mp3', './musica2.mp3', './musica3.mp3', './musica.mp3', './dueloimagen.jpg',
-  './pelicula1.jpg', './pelicula2.jpg', './pelicula3.jpg', './pelicula4.jpg', './pelicula5.jpg', './pelicula6.jpg', './pelicula7.jpg', './pelicula8.jpg'];
+const OPTIONAL = ['./musica1.mp3', './musica2.mp3', './musica3.mp3', './musica.mp3', './sombrero.mp3',
+  ...['dueloimagen', 'frases', 'maraton', 'pelicula1', 'pelicula2', 'pelicula3', 'pelicula4', 'pelicula5', 'pelicula6', 'pelicula7', 'pelicula8']
+    .flatMap(n => [`./${n}.jpg`, `./${n}.webp`, `./${n}.png`])];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
