@@ -1264,6 +1264,7 @@ function duckMusic(on) {
 function setMusicVolume(v) {
   S.musicVol = +v; save();
   if (music.el && !music.el.paused) { clearInterval(music.fadeTimer); music.el.volume = targetVolume(); }
+  if (hatMusic.on && hatMusic.el && !hatMusic.el.paused) { clearInterval(hatMusic.el._fade); hatMusic.el.volume = (S.musicVol ?? 60) / 100; }
   syncVolumeInputs();
 }
 function toggleBackgroundMusic() {
@@ -1302,12 +1303,52 @@ function renderMusicUi() {
     hb.title = playing ? `Sonando: ${PLAYLIST[music.idx].name} (clic para pausar)` : 'Reproducir música';
   }
 }
+/* ===================================================================
+   MÚSICA DEL SOMBRERO SELECCIONADOR
+   Pon el archivo sombrero.mp3 junto a index.html. Suena en bucle
+   durante la ceremonia y luego vuelve la música de fondo.
+=================================================================== */
+const hatMusic = { el: null, on: false, missing: false };
+function hatEl() {
+  if (!hatMusic.el) {
+    const a = new Audio('sombrero.mp3');
+    a.loop = true; a.preload = 'auto'; a.volume = 0;
+    a.addEventListener('error', () => { hatMusic.missing = true; });
+    hatMusic.el = a;
+  }
+  return hatMusic.el;
+}
+function fadeAudio(a, vol, ms, then) {
+  clearInterval(a._fade);
+  const start = a.volume, steps = 20; let i = 0;
+  a._fade = setInterval(() => {
+    i++; a.volume = Math.max(0, Math.min(1, start + (vol - start) * (i / steps)));
+    if (i >= steps) { clearInterval(a._fade); if (then) then(); }
+  }, ms / steps);
+}
+function startHatMusic() {
+  if (S.musicOn === false) return;
+  hatMusic.on = true;
+  if (music.el && !music.el.paused) { clearInterval(music.fadeTimer); fadeTo(0, 400, () => music.el.pause()); }
+  const a = hatEl(); if (hatMusic.missing) return;
+  try { a.currentTime = 0; } catch (e) {}
+  const p = a.play();
+  if (p && p.then) p.then(() => fadeAudio(a, (S.musicVol ?? 60) / 100, 900)).catch(() => {});
+}
+function stopHatMusic(resumeBackground) {
+  if (!hatMusic.on) return;
+  hatMusic.on = false;
+  const a = hatMusic.el;
+  if (a && !a.paused) fadeAudio(a, 0, 800, () => a.pause());
+  if (resumeBackground && S.musicOn !== false) playMusic();
+}
 function initMusic() {
   if (S.musicOn === undefined) S.musicOn = true;
   music.idx = Math.min(S.musicIdx || 0, PLAYLIST.length - 1);
   syncVolumeInputs(); renderMusicUi();
   // Respaldo: si el usuario no pasa por el botón de entrada, arranca con su primer clic
   const kick = () => {
+    if (!S.house || hatMusic.on) return; // primero elige su casa; la música empieza después
     if (S.musicOn && (!music.el || music.el.paused) && !music.missing) playMusic();
     ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.removeEventListener(ev, kick, true));
   };
@@ -1429,11 +1470,13 @@ function startSortingCeremony() {
   $('sortingQuestionBox').classList.remove('hidden');
   $('sortingThinking').classList.add('hidden');
   $('sortingResultBox').classList.add('hidden');
+  audio(); startHatMusic();
   sfx('hat');
   renderSortingQuestion();
 }
 function cancelSortingCeremony() {
   $('sortingHatModal').classList.add('hidden');
+  stopHatMusic(!!S.house);
   if (!S.house) openHouseSelection();
 }
 function renderSortingQuestion() {
@@ -1475,6 +1518,7 @@ function finishSortingCeremony() {
 }
 function confirmSortedHouse() {
   $('sortingHatModal').classList.add('hidden');
+  stopHatMusic(false);
   selectInitialHouse($('assignedHouseTitle').dataset.house, true);
 }
 function selectInitialHouse(house, viaHat = false) {
@@ -1486,6 +1530,9 @@ function selectInitialHouse(house, viaHat = false) {
   if (first) { addXp(viaHat ? 20 : 10); unlock('sorted'); }
   toast(changed ? `Ahora perteneces a <b>${house}</b>.` : `¡Bienvenido/a a <b>${house}</b>!`, HOUSES[house].emoji);
   renderAll();
+  // Al elegir casa empieza (o sigue) la música de fondo
+  audio();
+  if (S.musicOn !== false && (!music.el || music.el.paused)) playMusic();
 }
 
 /* ===================================================================
@@ -2770,7 +2817,8 @@ function init() {
   initExtras();
   const start = (location.hash || '').slice(1);
   switchTab(TABS.includes(start) ? start : 'home');
-  showLoader();
+  if (S.house) showLoader();
+  else { const l = $('loader'); l.classList.add('gone'); l.style.display = 'none'; openHouseSelection(); }
   let rt;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { sizeFx(); if (currentTab === 'studio') sizeGestureCanvas(); }, 150); });
   // Pausa la música si cambias de pestaña del navegador y la retoma al volver
