@@ -1,0 +1,86 @@
+/* Service worker de Hogwarts Magic Experience
+   Permite instalar la página como app y usarla sin internet.
+   Si cambias index.html y no ves los cambios, sube el número de VERSION. */
+const VERSION = 'hogwarts-v3';
+const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const OPTIONAL = ['./musica1.mp3', './musica2.mp3', './musica3.mp3', './musica.mp3', './dueloimagen.jpg',
+  './pelicula1.jpg', './pelicula2.jpg', './pelicula3.jpg', './pelicula4.jpg', './pelicula5.jpg', './pelicula6.jpg', './pelicula7.jpg', './pelicula8.jpg'];
+
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(VERSION);
+    await cache.addAll(CORE);
+    // Los opcionales se guardan si existen; si alguno falta no pasa nada
+    await Promise.all(OPTIONAL.map(u => cache.add(u).catch(() => {})));
+    self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+// Responde pedidos de audio por rangos (necesario para reproducir mp3 desde caché)
+async function rangeResponse(request, cached) {
+  const range = request.headers.get('range');
+  const buf = await cached.arrayBuffer();
+  const m = /bytes=(\d*)-(\d*)/.exec(range || '');
+  const start = m && m[1] ? +m[1] : 0;
+  const end = m && m[2] ? +m[2] : buf.byteLength - 1;
+  return new Response(buf.slice(start, end + 1), {
+    status: 206,
+    headers: {
+      'Content-Type': cached.headers.get('Content-Type') || 'audio/mpeg',
+      'Content-Range': `bytes ${start}-${end}/${buf.byteLength}`,
+      'Content-Length': String(end - start + 1),
+      'Accept-Ranges': 'bytes'
+    }
+  });
+}
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.hostname.endsWith('supabase.co') || url.protocol === 'chrome-extension:') return;
+
+  // Audio: primero caché (con soporte de rangos), si no, red
+  if (req.headers.get('range')) {
+    event.respondWith((async () => {
+      const cached = await caches.match(url.href, { ignoreSearch: true });
+      if (cached) return rangeResponse(req, cached);
+      return fetch(req);
+    })());
+    return;
+  }
+
+  // Páginas: red primero (para ver cambios), caché si no hay internet
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        const cache = await caches.open(VERSION);
+        cache.put('./index.html', fresh.clone());
+        return fresh;
+      } catch (e) {
+        return (await caches.match('./index.html')) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // Lo demás (imágenes, fuentes, librerías): caché y se actualiza en segundo plano
+  event.respondWith((async () => {
+    const cache = await caches.open(VERSION);
+    const cached = await cache.match(req);
+    const network = fetch(req).then(res => {
+      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone()).catch(() => {});
+      return res;
+    }).catch(() => cached);
+    return cached || network;
+  })());
+});
