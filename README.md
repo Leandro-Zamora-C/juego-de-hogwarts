@@ -4,9 +4,9 @@
 
 # 🪄 Hogwarts Magic Experience
 
-**Trivia, juegos, duelos en línea y magia de Harry Potter en una sola página web.**
+**Trivia, juegos, duelos en línea, trivia en vivo y comunidad de magos de Harry Potter en una sola página web.**
 
-[🌐 Ver demo](https://TU-PAGINA.vercel.app) · [📖 Manual de usuario](Manual_de_Usuario_Hogwarts.docx) · [🐛 Reportar un problema](../../issues)
+[🌐 Jugar ahora](https://juego-de-hogwarts.vercel.app) · [📖 Manual de usuario](Manual_de_Usuario_Hogwarts.docx) · [🔒 Privacidad](privacidad.html) · [🐛 Reportar un problema](../../issues)
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
@@ -14,84 +14,164 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
+![Versión](https://img.shields.io/badge/versión-4.0-7c3aed)
 
 </div>
 
 ---
 
-## ✨ Características
+## ✨ Novedades de la versión 4
+
+- 📡 **Trivia en vivo:** un anfitrión crea una sala, los demás entran con un código desde el celular y todos responden a la vez. Al final hay un podio.
+- 🏰 **Copa de las Casas global:** cada punto que gana un jugador suma para su casa en un marcador compartido.
+- 🏆 **Torneo semanal:** se reinicia cada lunes. Los 3 primeros ganan galeones y el título «Campeón del Torneo».
+- ⚔️ **Buscar rival:** emparejamiento automático para duelos en línea con desconocidos.
+- 🤝 **Amigos y perfil público:** un código de amigo para agregar a otros, retarlos y ver su perfil.
+- 🗳️ **Encuestas de la comunidad** con resultados en tiempo real.
+- 📰 **El Profeta:** un periódico que se genera solo con lo que pasa en la comunidad.
+- 🗣️ **Hechizos por voz:** di *Lumos*, *Expecto Patronum*, *Wingardium Leviosa*, *Riddikulus*, *Alohomora* o *Accio*.
+- 🔦 **Lumos real:** la linterna del celular se enciende y se apaga con el hechizo.
+- 📱 **Celular como varita:** agítalo para lanzar hechizos.
+- 📸 **Foto con tu casa:** la cámara te pone la bufanda, el escudo y el marco de tu casa.
+- 🎓 **Modo Año Escolar:** 7 cursos y la Batalla de Hogwarts, con certificado descargable al graduarte.
+- 🧹 **Juegos nuevos:** Carrera de Escobas, Ajedrez Mágico contra la máquina y Escape de la Cámara Secreta.
+- 🦉 **Mascota mágica:** lechuza, gato, sapo o kneazle, a la que tienes que alimentar y cuidar.
+- 🛍️ **Callejón Diagon:** Ollivanders, Sortilegios Weasley, Madame Malkin y Gringotts, que da intereses diarios.
+- 🎃 **Eventos de temporada:** Halloween, Navidad y el cumpleaños de Harry, con preguntas y títulos exclusivos.
+- 🔔 **Recordatorio diario** del desafío.
+- 🛡️ **Panel de administrador** con estadísticas de jugadores y de las preguntas más falladas.
+
+## 🎮 Todo lo que incluye
 
 | | |
 |---|---|
-| 🎩 **Ceremonia de Selección** | El Sombrero Seleccionador te asigna una casa con 7 preguntas, y toda la página toma sus colores. |
-| 🎬 **Trivia de las 8 películas** | 220 preguntas: 25 por película más frases célebres y el Modo Maratón. Tiene dificultades, contrarreloj, comodín 50/50 y lectura en voz alta. |
-| 🎲 **7 juegos** | Mapa del Merodeador, Clase de Pociones, Atrapa la Snitch, Adivina el Personaje, Ahorcado, Memoria y Quidditch. |
-| ⚔️ **Duelos de magos** | Dos jugadores en el mismo dispositivo, contra una IA con 3 niveles o **en línea en tiempo real** con código de sala. |
-| 🖌️ **Estudio de hechizos** | Dibuja hechizos con el dedo o el mouse; la página reconoce 5 trazos. |
-| 🪄 **Ollivanders** | Crea tu varita eligiendo madera, núcleo, longitud y flexibilidad. |
-| 📜 **Carta de Hogwarts** | Tu carta de aceptación personalizada, lista para imprimir o guardar en PDF. |
-| 📚 **Biblioteca** | 25 personajes, 18 criaturas y la línea de tiempo de la saga, con buscador. |
-| 🏆 **Ranking en línea** | Top 50 de jugadores guardado en Supabase. |
-| 🛍️ **Tienda y progreso** | XP, 5 rangos, 28 logros, galeones, Copa de las Casas y desafío diario. |
-| 🪪 **Tarjeta de mago** | Imagen PNG descargable con tus datos, para compartir en redes. |
-| 🎵 **Música de fondo** | Lista de reproducción con controles y volumen que baja solo durante los duelos. |
-| 📱 **App instalable (PWA)** | Se instala en el celular o la PC y funciona sin internet. |
-| ♿ **Accesibilidad** | Letra grande, alto contraste, menos animaciones y teclado completo. |
+| 🎩 **Ceremonia de Selección** | El Sombrero Seleccionador te asigna una casa, con música y el audio de cada casa, y toda la página toma sus colores. |
+| 🎬 **Trivia** | **440 preguntas**: 45 por película, más las categorías Hechizos, Criaturas y Personajes, frases célebres, Modo Maratón y preguntas de evento. Cada partida usa 20 preguntas al azar. |
+| 📡 **Trivia en vivo** | Partidas multijugador en tiempo real, estilo concurso, con puntaje por velocidad y rachas. |
+| 🎲 **11 juegos** | Mapa del Merodeador, Pociones, Atrapa la Snitch, Adivina el Personaje, Ahorcado, Memoria, Quidditch, Año Escolar, Carrera de Escobas, Ajedrez Mágico y Escape de la Cámara Secreta. |
+| ⚔️ **Duelos** | En el mismo dispositivo, contra una IA con 3 niveles, en línea con código de sala o con un rival al azar. |
+| 🌍 **Comunidad** | Copa global, torneo semanal, amigos, perfiles públicos, encuestas y El Profeta. |
+| 👤 **Cuentas con Google** | Inicia sesión con Google y tu progreso se guarda en la nube, para seguir en cualquier dispositivo. |
+| 🪄 **Magia del dispositivo** | Hechizos por voz, linterna real, celular como varita y fotos con la cámara. |
+| 🖌️ **Estudio de hechizos** | Dibuja hechizos con el dedo o el mouse. |
+| 🛍️ **Callejón Diagon** | Tienda de chispas, marcos y títulos, Ollivanders, mascotas y el banco Gringotts. |
+| 📜 **Carta de Hogwarts y tarjeta de mago** | Tu carta personalizada y una tarjeta PNG para compartir. |
+| 📚 **Biblioteca** | Personajes, criaturas y la línea de tiempo de la saga, con buscador. |
+| 📈 **Progreso** | XP, rangos, logros, galeones, títulos exclusivos y desafío diario. |
+| 🎵 **Música** | Lista de reproducción de 3 canciones con controles. |
+| 📱 **App instalable (PWA)** | Se instala en el celular o en la PC y funciona sin internet. |
+| ♿ **Accesibilidad** | Letra grande, alto contraste, menos animaciones y control completo con el teclado. |
 
 ## 🛠️ Tecnologías
 
-- **HTML5 + JavaScript** sin frameworks: toda la página es un único `index.html`.
-- **Tailwind CSS** para los estilos y **Font Awesome** para los íconos.
-- **Canvas 2D** para los efectos, el cielo nocturno, la ruleta, la snitch y la tarjeta de mago.
-- **SVG** animado para el Mapa del Merodeador, el caldero y los pósters.
-- **Web Audio API**, **Speech Synthesis API** y **Media Session API** para el sonido, la voz y la música.
-- **Supabase** (PostgreSQL con Row Level Security y Realtime) para el ranking y el duelo en línea.
-- **Service Worker + Web App Manifest** para la PWA.
-- **localStorage** para guardar el progreso de cada jugador.
+- **HTML5 + JavaScript** sin frameworks: toda la aplicación vive en un único `index.html`.
+- **Tailwind CSS** y **Font Awesome**.
+- **Canvas 2D**, que se usa para:
+  - los juegos (escoba, ajedrez, snitch, quidditch);
+  - el cielo nocturno;
+  - el certificado, la tarjeta y el fotomatón.
+- **APIs del navegador:**
+  - Web Audio, Speech Synthesis y Speech Recognition para el sonido, la lectura en voz alta y los hechizos por voz;
+  - MediaDevices para la cámara y la linterna;
+  - DeviceMotion para usar el celular como varita;
+  - Media Session para los controles de la música.
+- **Supabase:**
+  - PostgreSQL con Row Level Security;
+  - funciones RPC;
+  - Realtime (broadcast y presence) para la trivia en vivo, los duelos y el emparejamiento;
+  - Auth con Google.
+- **Service Worker + Web App Manifest** para la PWA, la caché sin internet y las notificaciones.
+- **Vercel** para el hosting y Vercel Analytics para las visitas.
 
 ## 📁 Estructura
 
 ```
-├── index.html          # La aplicación completa
-├── manifest.json       # Configuración de la PWA
-├── sw.js               # Service worker (modo sin internet)
-├── icon-192.png        # Íconos de la app
-├── icon-512.png
-├── og-image.jpg        # Vista previa al compartir el enlace
-├── supabase.sql        # Script para crear el ranking en Supabase
-├── musica1.mp3         # Música de fondo (agregar)
-├── musica2.mp3
-├── musica3.mp3
-├── pelicula1-8.jpg     # Pósters propios (opcional)
-└── dueloimagen.jpg     # Imagen del duelo (opcional)
+├── index.html               # La aplicación completa
+├── sw.js                    # Service worker (sin internet + notificaciones)
+├── manifest.json            # Configuración de la PWA
+├── privacidad.html          # Política de privacidad
+├── icon-192.png / icon-512.png
+├── og-image.jpg             # Vista previa al compartir el enlace
+├── supabase.sql             # 1) Ranking y duelo en línea
+├── supabase-cuentas.sql     # 2) Cuentas y progreso en la nube
+├── supabase-comunidad.sql   # 3) Copa global, torneo, amigos, encuestas y admin
+│
+├── musica1.mp3 … musica3.mp3            # Música de fondo
+├── sombrero.mp3                         # Música de la Ceremonia de Selección
+├── gryffindor.mp3 / slytherin.mp3 /
+│   ravenclaw.mp3 / hufflepuff.mp3       # Audio de cada casa
+│
+├── pelicula1 … pelicula8                # Portadas de cada película (.jpg/.webp/.png)
+├── dueloimagen, frases, maraton         # Portadas de modos especiales
+└── hechizos, criaturas, personajes,
+    halloween, navidad                   # Portadas de las categorías nuevas (opcionales)
 ```
 
-## 🚀 Cómo usarlo
+> Las imágenes y los audios son opcionales: si alguno falta, la página usa una ilustración o un sonido generado.
 
-### Probarlo en tu computadora
-Descarga el repositorio y abre `index.html` con doble clic. No hace falta instalar nada.
+## 🚀 Instalación
 
-### Publicarlo en Vercel
-1. Haz un fork o sube estos archivos a tu repositorio de GitHub.
-2. En [vercel.com](https://vercel.com) elige **Add New → Project** e importa el repositorio.
-3. Deja la configuración por defecto (es un sitio estático) y presiona **Deploy**.
-4. En `index.html`, reemplaza `TU-PAGINA.vercel.app` por tu dirección real (líneas 22 y 23) y completa `SITE_URL` en `CONFIG`.
+### 1. Publicar en Vercel
+1. Sube estos archivos a un repositorio de GitHub.
+2. En [vercel.com](https://vercel.com) elige **Add New → Project**, importa el repositorio y presiona **Deploy**. No necesita configuración porque es un sitio estático.
+3. En el objeto `CONFIG` de `index.html`, pon tu dirección en `SITE_URL`.
 
-### Activar el ranking y el duelo en línea (opcional)
+### 2. Configurar Supabase
 1. Crea un proyecto en [supabase.com](https://supabase.com).
-2. En **SQL Editor**, ejecuta el contenido de [`supabase.sql`](supabase.sql).
-3. En **Project Settings → API**, copia la *Project URL* y la clave *anon public*.
-4. Pégalas en el objeto `CONFIG` de `index.html`:
+2. En **SQL Editor** ejecuta, **en este orden**:
+   1. [`supabase.sql`](supabase.sql)
+   2. [`supabase-cuentas.sql`](supabase-cuentas.sql)
+   3. [`supabase-comunidad.sql`](supabase-comunidad.sql)
+3. Copia la *Project URL* y la *Publishable key* desde **Project Settings → API** y pégalas en `CONFIG`:
 
 ```js
 const CONFIG = {
   SUPABASE_URL: 'https://xxxx.supabase.co',
-  SUPABASE_ANON_KEY: 'tu-clave-anon-public',
-  SITE_URL: 'https://tu-pagina.vercel.app'
+  SUPABASE_ANON_KEY: 'tu-clave-publica',
+  SITE_URL: 'https://tu-pagina.vercel.app/',
+  AUTH_PROVIDERS: ['google']
 };
 ```
 
-> 🔒 La clave *anon* es pública por diseño. La tabla está protegida con **Row Level Security**: nadie puede escribir directamente en ella, y la función `enviar_puntaje` solo deja que cada jugador actualice su propia fila. **Nunca** uses la clave `service_role` en el código.
+### 3. Activar el inicio de sesión con Google
+1. En [Google Cloud Console](https://console.cloud.google.com) crea un **ID de cliente OAuth** de tipo *Aplicación web*.
+2. En *URI de redireccionamiento autorizados* agrega `https://xxxx.supabase.co/auth/v1/callback`.
+3. En Supabase ve a **Authentication → Providers → Google**, actívalo y pega el *Client ID* y el *Client Secret*.
+4. En **Authentication → URL Configuration** pon tu dirección de Vercel en *Site URL* y en *Redirect URLs*.
+
+### 4. Hacerte administrador
+En el **SQL Editor** de Supabase ejecuta esto con tu Gmail:
+
+```sql
+insert into public.admins (email) values ('tucorreo@gmail.com');
+```
+
+Al iniciar sesión verás la pestaña **Admin**.
+
+### 5. Activar las estadísticas
+En Vercel, abre tu proyecto, ve a **Analytics** y presiona **Enable**.
+
+> 🔒 La clave pública de Supabase puede estar en el código. Las tablas están protegidas con **Row Level Security**, y las funciones solo permiten a cada jugador modificar sus propios datos. **Nunca** pongas la clave `service_role` en el código.
+
+## 🎃 Probar los eventos
+
+Los eventos se activan solos según la fecha. Para verlos en cualquier momento, usa estas direcciones:
+
+| Evento | Dirección |
+|---|---|
+| Halloween | `?evento=halloween` |
+| Navidad | `?evento=navidad` |
+| Cumpleaños de Harry | `?evento=cumple` |
+
+## 📋 Compatibilidad
+
+| Función | Dónde funciona |
+|---|---|
+| Hechizos por voz | Chrome y Safari, con permiso de micrófono |
+| Linterna con *Lumos* | Chrome en Android (iPhone no permite encender la linterna desde la web) |
+| Celular como varita | Android e iPhone (en iPhone pide permiso la primera vez) |
+| Recordatorio diario | App instalada en Chrome para Android |
+| Amigos, perfil y nube | Requieren iniciar sesión con Google |
 
 ## ⌨️ Atajos de teclado
 
@@ -100,18 +180,18 @@ const CONFIG = {
 | `1` – `4` | Responder en la trivia, los duelos y el quidditch |
 | `Enter` | Siguiente pregunta / entrar al castillo |
 | `L` | Leer la pregunta en voz alta |
-| `F` | Usar el comodín 50/50 |
+| `F` | Comodín 50/50 |
 | `A` – `Z` | Letras en el Ahorcado |
 | `Esc` | Cerrar ventanas |
 
 ## 📸 Créditos
 
-- Fotografías de locaciones de rodaje: [Geograph Britain and Ireland](https://www.geograph.org.uk), con licencia [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/). El crédito de cada fotógrafo está dentro de la app, en **Perfil → Créditos de las fotografías**.
-- Ilustraciones de los pósters, íconos y efectos: creados para este proyecto.
+- Fotografías de locaciones de rodaje: [Geograph Britain and Ireland](https://www.geograph.org.uk), con licencia [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/). El crédito de cada fotógrafo está dentro de la app, en **Perfil → Créditos**.
+- Ilustraciones, íconos, efectos y juegos: creados para este proyecto.
 
 ## ⚠️ Aviso
 
-Proyecto de fans **sin fines comerciales**, creado con fines educativos. *Harry Potter* y todos sus nombres y personajes son marcas registradas de sus respectivos propietarios. Este proyecto no tiene relación con ellos ni cuenta con su respaldo.
+Proyecto de fans **sin fines comerciales**, hecho con fines educativos. *Harry Potter* y todos sus nombres y personajes son marcas registradas de sus respectivos propietarios. Este proyecto no tiene relación con ellos ni cuenta con su respaldo.
 
 ---
 
