@@ -404,7 +404,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <p class="text-xs text-stone-300">Inicia sesión y tu casa, XP, logros y compras quedarán guardados en tu cuenta. Podrás seguir jugando desde cualquier celular o computadora.</p>
     </div>
     <div id="authInAppHint" class="hidden text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-100 rounded-xl p-2.5">
-      📱 Estás dentro de la app de Facebook o Instagram. Google no permite iniciar sesión aquí: usa <b>Facebook</b> o <b>correo</b>, o abre la página en Chrome o Safari (menú ⋯ → «Abrir en el navegador»).
+      📱 Estás dentro de la app de Facebook o Instagram, y Google no permite iniciar sesión aquí. Toca el menú <b>⋯</b> de arriba y elige <b>«Abrir en el navegador»</b> (Chrome o Safari). Tu progreso de este dispositivo no se pierde.
     </div>
     <div id="authButtons" class="space-y-2"></div>
     <div id="authEmailBox" class="space-y-2">
@@ -2911,7 +2911,7 @@ const CONFIG = {
   // Formas de iniciar sesión que se muestran (activa cada una en Supabase → Authentication → Providers).
   // Opciones: 'google', 'facebook', 'github', 'discord', 'email'. Deja [] para ocultar las cuentas.
   // 'email' necesita un servidor de correo propio (SMTP) en Supabase; el gratuito solo envía a tu equipo.
-  AUTH_PROVIDERS: ['google', 'facebook']
+  AUTH_PROVIDERS: ['google']
 };
 const siteUrl = () => CONFIG.SITE_URL || (location.protocol.startsWith('http') ? location.origin + location.pathname : '');
 
