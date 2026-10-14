@@ -394,6 +394,30 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   </div>
 </div>
 
+<!-- ================= INICIAR SESIÓN ================= -->
+<div id="authModal" class="hidden fixed inset-0 z-[170] bg-stone-950/85 backdrop-blur flex items-center justify-center p-3" onclick="if(event.target===this)closeAuthModal()">
+  <div class="w-full max-w-sm bg-stone-900 border-2 border-amber-500/60 rounded-2xl shadow-2xl animate-modal p-5 space-y-4 relative">
+    <button onclick="closeAuthModal()" aria-label="Cerrar" class="absolute top-3 right-3 text-stone-400 hover:text-stone-200 p-2"><i class="fa-solid fa-xmark"></i></button>
+    <div class="text-center space-y-1">
+      <div class="text-4xl">☁️</div>
+      <h3 class="font-wizard text-xl font-bold text-amber-300">Guarda tu progreso</h3>
+      <p class="text-xs text-stone-300">Inicia sesión y tu casa, XP, logros y compras quedarán guardados en tu cuenta. Podrás seguir jugando desde cualquier celular o computadora.</p>
+    </div>
+    <div id="authInAppHint" class="hidden text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-100 rounded-xl p-2.5">
+      📱 Estás dentro de la app de Facebook o Instagram. Google no permite iniciar sesión aquí: usa <b>Facebook</b> o <b>correo</b>, o abre la página en Chrome o Safari (menú ⋯ → «Abrir en el navegador»).
+    </div>
+    <div id="authButtons" class="space-y-2"></div>
+    <div id="authEmailBox" class="space-y-2">
+      <div class="flex items-center gap-2 text-[10px] text-stone-500 uppercase tracking-widest"><span class="flex-grow h-px bg-stone-700"></span>o con tu correo<span class="flex-grow h-px bg-stone-700"></span></div>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl px-3 py-2.5 text-sm text-amber-100 focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter')signInEmail()">
+      <button onclick="signInEmail()" class="btn-ghost w-full"><i class="fa-solid fa-envelope"></i> Enviarme un enlace mágico</button>
+      <p class="text-[10px] text-stone-500">Te llegará un enlace para entrar sin contraseña. Ábrelo en este mismo navegador.</p>
+    </div>
+    <p id="authMsg" class="text-xs text-center min-h-[1rem]"></p>
+    <p class="text-[10px] text-stone-500 text-center">Al continuar aceptas la <a href="privacidad.html" target="_blank" rel="noopener" class="underline">política de privacidad</a>. Solo guardamos tu nombre, correo y progreso del juego.</p>
+  </div>
+</div>
+
 <!-- ================= AJUSTES ================= -->
 <div id="settingsModal" class="hidden fixed inset-0 z-[160] bg-stone-950/85 backdrop-blur flex items-center justify-center p-3" onclick="if(event.target===this)closeSettings()">
   <div class="w-full max-w-lg bg-stone-900 border-2 border-amber-500/60 rounded-2xl shadow-2xl animate-modal max-h-[90vh] overflow-y-auto">
@@ -448,6 +472,9 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     </p>
     <div class="relative flex justify-center">
       <button onclick="startSortingCeremony()" class="btn-gold w-full sm:w-auto text-sm"><i class="fa-solid fa-hat-wizard text-lg"></i> Iniciar Ceremonia de Selección</button>
+    </div>
+    <div id="houseLoginHint" class="relative hidden">
+      <button onclick="openAuthModal()" class="text-xs text-amber-200 underline underline-offset-4 hover:text-amber-100"><i class="fa-solid fa-cloud"></i> ¿Ya jugaste antes? Inicia sesión para recuperar tu progreso</button>
     </div>
     <div class="relative flex items-center">
       <div class="flex-grow border-t border-amber-500/50"></div>
@@ -535,6 +562,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <button onclick="toggleLumosMode()" id="lumosGlobalBtn" title="Lumos / Nox" class="bg-stone-800/90 text-amber-300 h-9 px-2.5 rounded-xl border border-amber-500/30 text-xs flex items-center gap-1">
         <i class="fa-solid fa-lightbulb"></i> <span id="lumosLabel" class="hidden sm:inline font-wizard">Lumos</span>
       </button>
+      <button id="accountBtn" onclick="openAccount()" title="Mi cuenta" aria-label="Mi cuenta" class="bg-stone-800/90 text-amber-300 w-9 h-9 rounded-xl border border-amber-500/30 text-xs flex items-center justify-center overflow-hidden"><i class="fa-solid fa-user"></i></button>
       <button onclick="openSettings()" title="Ajustes" aria-label="Abrir ajustes" class="bg-stone-800/90 text-amber-300 w-9 h-9 rounded-xl border border-amber-500/30 text-xs"><i class="fa-solid fa-gear"></i></button>
       <nav class="hidden md:flex items-center gap-0.5 text-xs font-semibold ml-1" id="desktopNav"></nav>
     </div>
@@ -1031,6 +1059,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
         <button onclick="confirmReset()" class="btn-ghost !text-red-300 !border-red-500/40"><i class="fa-solid fa-trash"></i> Reiniciar progreso</button>
       </div>
     </div>
+    <div id="accountCard" class="hidden glass-card rounded-3xl p-5"></div>
     <div id="profileStats" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
     <div class="glass-card rounded-3xl p-5 grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
       <div class="space-y-3">
@@ -2806,7 +2835,7 @@ function renderProfile() {
 function confirmReset() {
   showDialog({
     icon: '⚠️', title: '¿Reiniciar todo tu progreso?',
-    body: 'Se borrarán tu casa, XP, puntos, récords, logros, varita y carta de este dispositivo. No se puede deshacer.',
+    body: 'Se borrarán tu casa, XP, puntos, récords, logros, varita y carta de este dispositivo' + (typeof cloud !== 'undefined' && cloud.user ? ' y de tu cuenta' : '') + '. No se puede deshacer.',
     actions: [{ label: 'Sí, reiniciar', primary: true, onClick: () => {
       try { localStorage.removeItem(STORE_KEY); } catch (e) {}
       S = DEFAULT_STATE(); ensureCup(); save();
@@ -2878,7 +2907,11 @@ const CONFIG = {
   SUPABASE_ANON_KEY: 'sb_publishable_FwUSRG33ph9tS0fHSsslNw_rU5abmha',
   // Dirección pública de tu página, para los botones de compartir.
   // Ejemplo: 'https://hogwarts-leandro.vercel.app'
-  SITE_URL: 'https://juego-de-hogwarts.vercel.app/'
+  SITE_URL: 'https://juego-de-hogwarts.vercel.app/',
+  // Formas de iniciar sesión que se muestran (activa cada una en Supabase → Authentication → Providers).
+  // Opciones: 'google', 'facebook', 'github', 'discord', 'email'. Deja [] para ocultar las cuentas.
+  // 'email' necesita un servidor de correo propio (SMTP) en Supabase; el gratuito solo envía a tu equipo.
+  AUTH_PROVIDERS: ['google', 'facebook']
 };
 const siteUrl = () => CONFIG.SITE_URL || (location.protocol.startsWith('http') ? location.origin + location.pathname : '');
 
@@ -3365,7 +3398,7 @@ function loadSupabase() {
   if (!sbLoading) {
     sbLoading = loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js')
       .catch(() => loadScript('https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'))
-      .then(() => { sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY); return sb; })
+      .then(() => { sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, { auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }); return sb; })
       .catch(e => { sbLoading = null; throw e; });
   }
   return sbLoading;
@@ -4462,7 +4495,206 @@ function initExtras() {
   if (S.rainbow) setSparkColor('#c084fc', 'Arcoíris');
   updateWallet();
   registerSW();
+  initAuth();
+  cloud.booting = false;
 }
+/* ===================================================================
+   CUENTAS DE USUARIO Y PROGRESO EN LA NUBE (Supabase Auth)
+   Requiere ejecutar supabase-cuentas.sql y activar los proveedores
+   (Google, Facebook, correo) en Supabase → Authentication → Providers.
+=================================================================== */
+const PROVIDERS = {
+  google: { label: 'Continuar con Google', cls: 'bg-white text-stone-800 hover:bg-stone-100',
+    icon: '<svg viewBox="0 0 48 48" class="w-5 h-5"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>' },
+  facebook: { label: 'Continuar con Facebook', cls: 'bg-[#1877F2] text-white hover:brightness-110',
+    icon: '<svg viewBox="0 0 24 24" class="w-5 h-5" fill="#fff"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.96h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>' },
+  github: { label: 'Continuar con GitHub', cls: 'bg-stone-800 text-white hover:bg-stone-700', icon: '<i class="fa-brands fa-github text-lg"></i>' },
+  discord: { label: 'Continuar con Discord', cls: 'bg-[#5865F2] text-white hover:brightness-110', icon: '<i class="fa-brands fa-discord text-lg"></i>' }
+};
+const cloud = { user: null, booting: true, timer: null, lastSync: 0, status: '', merging: false };
+const inAppBrowser = () => /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Line\//i.test(navigator.userAgent);
+const authEnabled = () => supaReady() && (CONFIG.AUTH_PROVIDERS || []).length > 0;
+
+/* Cada vez que el juego guarda, también se programa la copia en la nube */
+const _origSaveLocal = save;
+save = function () {
+  if (!cloud.booting && !cloud.merging) S._savedAt = Date.now();
+  _origSaveLocal();
+  if (cloud.user && !cloud.booting && !cloud.merging) scheduleCloudPush();
+};
+function scheduleCloudPush() { if (cloud.timer) return; cloud.timer = setTimeout(() => { cloud.timer = null; cloudPush(); }, 2500); setCloudStatus('Guardando…'); }
+async function cloudPush() {
+  if (!cloud.user || !sb) return;
+  clearTimeout(cloud.timer); cloud.timer = null;
+  S._owner = cloud.user.id;
+  try {
+    const { error } = await sb.from('progreso').upsert({ user_id: cloud.user.id, datos: S, xp: S.xp || 0, casa: S.house || null, updated_at: new Date().toISOString() });
+    if (error) throw error;
+    cloud.lastSync = Date.now(); setCloudStatus('Guardado en la nube ✓');
+  } catch (e) { setCloudStatus('No se pudo guardar en la nube. Se reintentará.'); cloud.timer = setTimeout(() => { cloud.timer = null; cloudPush(); }, 15000); }
+}
+function setCloudStatus(t) { cloud.status = t; const el = $('cloudStatus'); if (el) el.textContent = t; }
+
+/* Usar los datos de la cuenta en este dispositivo */
+function adoptRemote(remote) {
+  cloud.merging = true;
+  S = Object.assign(DEFAULT_STATE(), remote);
+  S.stats = Object.assign(DEFAULT_STATE().stats, remote.stats || {});
+  ensureExtraState();
+  S._owner = cloud.user.id;
+  _origSaveLocal();
+  cloud.merging = false;
+  fillWandSelects(); updateWandPreview(); renderAll();
+  if (S.rainbow) setSparkColor('#c084fc', 'Arcoíris');
+  if (S.house) { $('initialModal').classList.add('hidden'); $('sortingHatModal').classList.add('hidden'); stopHatMusic(false); resumeBackgroundMusic(); }
+  switchTab(currentTab);
+}
+const hasProgress = st => !!(st && (st.house || (st.xp || 0) > 0));
+async function onSignedIn(user) {
+  const first = !cloud.user || cloud.user.id !== user.id;
+  cloud.user = user;
+  renderAccount();
+  if (!first) return;
+  const meta = user.user_metadata || {};
+  try {
+    const { data, error } = await sb.from('progreso').select('datos, updated_at').eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    const remote = data && data.datos;
+    if (!remote || !hasProgress(remote)) {
+      if (!S.student && meta.full_name) S.student = meta.full_name;
+      if (!S.rankName && (meta.full_name || meta.name)) S.rankName = String(meta.full_name || meta.name).slice(0, 20);
+      S._owner = user.id; _origSaveLocal(); await cloudPush();
+      toast('¡Listo! Tu progreso se guardará en tu cuenta.', '☁️');
+    } else if (!hasProgress(S) || S._owner === user.id) {
+      // Este dispositivo no tiene progreso, o ya era de esta cuenta: gana el más reciente
+      const remoteTime = Date.parse(data.updated_at) || 0;
+      if (!hasProgress(S) || remoteTime >= (S._savedAt || 0)) { adoptRemote(remote); toast(`¡Bienvenido/a de vuelta${remote.student ? ', ' + esc(remote.student) : ''}!`, '☁️'); }
+      else await cloudPush();
+      cloud.lastSync = Date.now(); setCloudStatus('Sincronizado ✓');
+    } else {
+      // Hay progreso distinto en el dispositivo y en la cuenta: que el jugador elija
+      showDialog({
+        icon: '☁️', title: '¿Qué progreso quieres conservar?',
+        body: `<div class="grid grid-cols-2 gap-2 text-xs text-left">
+          <div class="bg-stone-950 rounded-xl p-3 border border-sky-700/50"><p class="font-bold text-sky-300 mb-1">☁️ Tu cuenta</p>${esc(remote.house || 'Sin casa')}<br>${remote.xp || 0} XP · ${remote.points || 0} pts</div>
+          <div class="bg-stone-950 rounded-xl p-3 border border-amber-700/50"><p class="font-bold text-amber-300 mb-1">📱 Este dispositivo</p>${esc(S.house || 'Sin casa')}<br>${S.xp || 0} XP · ${S.points || 0} pts</div></div>
+          <p class="text-[11px] text-stone-400 mt-2">El que no elijas se reemplazará.</p>`,
+        actions: [
+          { label: `Usar el de mi cuenta (${remote.xp || 0} XP)`, primary: true, onClick: () => { adoptRemote(remote); setCloudStatus('Sincronizado ✓'); } },
+          { label: `Usar el de este dispositivo (${S.xp || 0} XP)`, onClick: () => { S._owner = user.id; _origSaveLocal(); cloudPush(); } }
+        ]
+      });
+    }
+  } catch (e) {
+    setCloudStatus('No se pudo leer tu progreso de la nube.');
+    toast('Iniciaste sesión, pero no se pudo cargar tu progreso. Revisa que ejecutaste supabase-cuentas.sql.', '⚠️');
+  }
+  renderAccount();
+}
+async function initAuth() {
+  renderAccount();
+  if (!authEnabled()) return;
+  $('houseLoginHint').classList.remove('hidden');
+  try {
+    const client = await loadSupabase();
+    client.auth.onAuthStateChange((event, session) => {
+      setTimeout(() => {
+        if (session && session.user) onSignedIn(session.user);
+        else if (event === 'SIGNED_OUT') { cloud.user = null; renderAccount(); }
+      }, 0);
+    });
+    const { data } = await client.auth.getSession();
+    if (data && data.session) onSignedIn(data.session.user);
+    // Limpia el ?code= de la dirección después de iniciar sesión
+    if (/[?&](code|error)=/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash);
+    const err = new URLSearchParams(location.search).get('error_description');
+    if (err) toast('No se pudo iniciar sesión: ' + esc(err), '⚠️');
+  } catch (e) { /* sin conexión o sin configurar */ }
+}
+function openAuthModal() {
+  if (!authEnabled()) { showDialog({ icon: '☁️', title: 'Cuentas sin configurar', body: 'Para guardar el progreso en la nube hay que conectar Supabase y activar los inicios de sesión. Revisa la guía de cuentas.' }); return; }
+  const provs = (CONFIG.AUTH_PROVIDERS || []).filter(p => PROVIDERS[p]);
+  const inApp = inAppBrowser();
+  $('authInAppHint').classList.toggle('hidden', !(inApp && provs.includes('google')));
+  $('authButtons').innerHTML = provs.map(p => {
+    const d = PROVIDERS[p], off = inApp && p === 'google';
+    return `<button onclick="signInWith('${p}')" ${off ? 'disabled' : ''} class="w-full flex items-center justify-center gap-3 rounded-xl py-2.5 px-4 font-bold text-sm transition ${d.cls} ${off ? 'opacity-40 pointer-events-none' : ''}">${d.icon}<span>${d.label}</span></button>`;
+  }).join('');
+  $('authEmailBox').classList.toggle('hidden', !(CONFIG.AUTH_PROVIDERS || []).includes('email'));
+  $('authMsg').textContent = '';
+  $('authModal').classList.remove('hidden');
+}
+function closeAuthModal() { $('authModal').classList.add('hidden'); }
+function authRedirect() { return (location.protocol.startsWith('http') ? location.origin + location.pathname : siteUrl()); }
+async function signInWith(provider) {
+  $('authMsg').innerHTML = '<span class="text-stone-300"><i class="fa-solid fa-spinner fa-spin"></i> Abriendo inicio de sesión…</span>';
+  try {
+    const client = await loadSupabase();
+    const { error } = await client.auth.signInWithOAuth({ provider, options: { redirectTo: authRedirect() } });
+    if (error) throw error;
+  } catch (e) { $('authMsg').innerHTML = `<span class="text-red-300">No se pudo abrir el inicio de sesión. ${esc(e.message || '')}</span>`; }
+}
+async function signInEmail() {
+  const email = ($('authEmail').value || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('authMsg').innerHTML = '<span class="text-red-300">Escribe un correo válido.</span>'; return; }
+  $('authMsg').innerHTML = '<span class="text-stone-300"><i class="fa-solid fa-spinner fa-spin"></i> Enviando…</span>';
+  try {
+    const client = await loadSupabase();
+    const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: authRedirect() } });
+    if (error) throw error;
+    $('authMsg').innerHTML = `<span class="text-emerald-300">📬 Revisa tu correo (${esc(email)}) y abre el enlace en este navegador.</span>`;
+  } catch (e) { $('authMsg').innerHTML = `<span class="text-red-300">No se pudo enviar el correo. ${esc(e.message || '')}</span>`; }
+}
+async function signOut() {
+  if (cloud.user) await cloudPush();
+  try { await sb.auth.signOut(); } catch (e) {}
+  cloud.user = null; renderAccount();
+  toast('Sesión cerrada. Tu progreso sigue guardado en tu cuenta.', '👋');
+}
+function confirmDeleteCloud() {
+  showDialog({
+    icon: '🗑️', title: '¿Borrar tus datos de la nube?',
+    body: 'Se eliminará el progreso guardado en tu cuenta y se cerrará la sesión. El progreso de este dispositivo no se borra.',
+    actions: [{ label: 'Sí, borrar', primary: true, onClick: async () => {
+      try { const { error } = await sb.from('progreso').delete().eq('user_id', cloud.user.id); if (error) throw error; delete S._owner; _origSaveLocal(); await sb.auth.signOut(); cloud.user = null; renderAccount(); toast('Tus datos de la nube fueron borrados.', '🗑️'); }
+      catch (e) { toast('No se pudieron borrar los datos.', '⚠️'); }
+    } }, { label: 'Cancelar' }]
+  });
+}
+function openAccount() { if (cloud.user) switchTab('profile'); else openAuthModal(); }
+function renderAccount() {
+  const btn = $('accountBtn'), card = $('accountCard');
+  if (!btn || !card) return;
+  const u = cloud.user, meta = (u && u.user_metadata) || {};
+  const avatar = meta.avatar_url || meta.picture;
+  btn.innerHTML = u ? (avatar ? `<img src="${esc(avatar)}" alt="" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user-check text-emerald-300"></i>') : '<i class="fa-solid fa-user"></i>';
+  btn.title = u ? `Conectado como ${meta.full_name || u.email || ''}` : 'Iniciar sesión';
+  btn.style.borderColor = u ? '#10b981' : '';
+  if (!authEnabled()) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  if (!u) {
+    card.innerHTML = `<div class="flex flex-col sm:flex-row items-center gap-4">
+      <div class="text-4xl">☁️</div>
+      <div class="flex-grow text-center sm:text-left"><p class="font-wizard font-bold text-amber-300">Guarda tu progreso en la nube</p><p class="text-xs text-stone-400">Ahora tu progreso solo vive en este dispositivo. Inicia sesión para no perderlo y jugar desde cualquier lugar.</p></div>
+      <button onclick="openAuthModal()" class="btn-gold"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</button></div>`;
+    return;
+  }
+  const provider = (u.app_metadata && u.app_metadata.provider) || 'email';
+  card.innerHTML = `<div class="flex flex-col sm:flex-row items-center gap-4">
+    <span class="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/70 flex items-center justify-center bg-stone-900 text-2xl flex-shrink-0">${avatar ? `<img src="${esc(avatar)}" alt="" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : '🧙'}</span>
+    <div class="flex-grow text-center sm:text-left min-w-0">
+      <p class="font-bold text-amber-100 truncate">${esc(meta.full_name || meta.name || 'Mago')}</p>
+      <p class="text-[11px] text-stone-400 truncate">${esc(u.email || '')} · con ${esc(provider.charAt(0).toUpperCase() + provider.slice(1))}</p>
+      <p id="cloudStatus" class="text-[11px] text-emerald-300">${esc(cloud.status || 'Sincronizado ✓')}</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-2">
+      <button onclick="cloudPush()" class="btn-ghost !py-2 !text-[11px]"><i class="fa-solid fa-rotate"></i> Sincronizar</button>
+      <button onclick="signOut()" class="btn-ghost !py-2 !text-[11px]"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+      <button onclick="confirmDeleteCloud()" class="btn-ghost !py-2 !text-[11px] !text-red-300 !border-red-500/40"><i class="fa-solid fa-trash"></i> Borrar mis datos</button>
+    </div></div>`;
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && cloud.user && cloud.timer) cloudPush(); });
+
 init();
 
 </script>
