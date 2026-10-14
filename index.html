@@ -357,6 +357,54 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   .tl-item::before { content: ''; position: absolute; left: -1.38rem; top: .9rem; width: 12px; height: 12px; border-radius: 50%; background: rgb(var(--amber-400)); box-shadow: 0 0 10px rgb(var(--amber-400) / .7); }
   .tl-item.film::before { background: #a78bfa; box-shadow: 0 0 10px rgba(167,139,250,.7); }
 
+
+  /* ===== Versión 4 ===== */
+  .event-banner { background: linear-gradient(120deg, rgb(var(--amber-800)), #4c1d95 60%, #0c0a09); border: 2px solid rgb(var(--amber-500) / .6); box-shadow: 0 0 30px rgb(var(--amber-500) / .25); }
+  html.event-halloween .event-banner { background: linear-gradient(120deg, #c2410c, #4c1d95 60%, #0c0a09); }
+  html.event-navidad .event-banner { background: linear-gradient(120deg, #166534, #7f1d1d 60%, #0c0a09); }
+  @keyframes eventBob { 0%,100% { transform: translateY(0) rotate(-6deg) } 50% { transform: translateY(-8px) rotate(6deg) } }
+  .event-bob { display: inline-block; animation: eventBob 2s ease-in-out infinite; }
+  .bat { position: absolute; left: -60px; font-size: 26px; animation: batFly linear infinite; filter: drop-shadow(0 0 6px rgba(249,115,22,.6)); }
+  @keyframes batFly { 0% { transform: translateX(0) translateY(0) } 25% { transform: translateX(30vw) translateY(-30px) } 50% { transform: translateX(60vw) translateY(20px) } 75% { transform: translateX(90vw) translateY(-20px) } 100% { transform: translateX(115vw) translateY(0) } }
+  body.leviosa main > section:not(.hidden) > * { animation: levitate 3s ease-in-out; }
+  @keyframes levitate { 0%,100% { transform: translateY(0) } 30%,70% { transform: translateY(-26px) rotate(-.6deg) } 50% { transform: translateY(-32px) rotate(.6deg) } }
+  body.riddikulus main { animation: riddikulus 1.5s ease-in-out; }
+  @keyframes riddikulus { 0%,100% { transform: none } 20% { transform: rotate(-3deg) scale(.96) } 40% { transform: rotate(3deg) skewX(4deg) } 60% { transform: rotate(-2deg) scaleY(1.04) } 80% { transform: rotate(1deg) } }
+  .patronus-fly { position: fixed; left: -160px; top: 38%; z-index: 205; pointer-events: none; display: flex; flex-direction: column; align-items: center; animation: patronusFly 4s ease-in-out forwards; }
+  .patronus-fly span { font-size: 110px; filter: drop-shadow(0 0 22px #bae6fd) drop-shadow(0 0 40px #7dd3fc) brightness(1.4) saturate(.3); opacity: .9; }
+  .patronus-fly small { color: #e0f2fe; font-family: 'Cinzel', serif; font-weight: 700; text-shadow: 0 0 10px #38bdf8; }
+  @keyframes patronusFly { 0% { transform: translateX(0) translateY(0); opacity: 0 } 15% { opacity: 1 } 50% { transform: translateX(55vw) translateY(-40px) } 85% { opacity: 1 } 100% { transform: translateX(115vw) translateY(10px); opacity: 0 } }
+  .chess-board { display: grid; grid-template-columns: repeat(8, 1fr); aspect-ratio: 1; width: 100%; border: 6px solid rgb(var(--amber-800)); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,.6); }
+  .chess-board .sq { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 1; }
+  .chess-board .sq.light { background: #e8d5a7; } .chess-board .sq.dark { background: #8b5a2b; }
+  .chess-board .sq.sel { box-shadow: inset 0 0 0 4px rgb(var(--amber-400)); }
+  .chess-board .sq.last { background-image: linear-gradient(rgba(250,204,21,.35), rgba(250,204,21,.35)); }
+  .chess-board .sq.check { background: radial-gradient(circle, #ef4444 0%, transparent 75%); }
+  .chess-board .pc { font-size: clamp(26px, 8.5vw, 50px); line-height: 1; user-select: none; }
+  .chess-board .pc.white { color: #fffbeb; text-shadow: 0 0 2px #000, 0 2px 4px rgba(0,0,0,.7); }
+  .chess-board .pc.black { color: #1c1917; text-shadow: 0 0 2px #fde68a, 0 2px 3px rgba(0,0,0,.5); }
+  .chess-board .pc.moved { animation: popIn .35s ease-out; }
+  .chess-board .dot { position: absolute; width: 26%; height: 26%; border-radius: 50%; background: rgba(6,78,59,.55); }
+  .chess-board .cap { position: absolute; inset: 6%; border-radius: 50%; border: 5px solid rgba(185,28,28,.6); }
+  .snake-btn { transition: transform .15s, box-shadow .15s, background .15s; }
+  .snake-btn.lit { transform: scale(1.12); background: rgba(52,211,153,.45) !important; box-shadow: 0 0 25px rgba(52,211,153,.8); }
+  button.wrong { animation: wiggle .3s; background: #fecaca !important; }
+  .diagon-street { background: linear-gradient(#1e1b4b, #312e81 50%, #3f3f46 50.5%, #27272a); border: 2px solid rgb(var(--amber-800) / .6); }
+  .shopfront { position: relative; width: 120px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; background: var(--c); border-radius: 6px 6px 0 0; box-shadow: inset 0 -10px 0 rgba(0,0,0,.25); transition: transform .2s; }
+  .shopfront:hover, .shopfront.active { transform: translateY(-6px); }
+  .shopfront.active { outline: 3px solid rgb(var(--amber-300)); }
+  .shopfront .roof { position: absolute; top: -18px; left: -6px; right: -6px; height: 22px; background: #1c1917; clip-path: polygon(0 100%, 12% 0, 88% 0, 100% 100%); }
+  .shopfront .sign { position: absolute; top: 8px; left: 6px; right: 6px; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 800; color: #fef3c7; background: rgba(0,0,0,.45); border-radius: 4px; padding: 3px 2px; line-height: 1.1; }
+  .shopfront .window { font-size: 34px; margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(253,230,138,.7)); }
+  .shopfront .door { width: 30px; height: 40px; background: #292524; border-radius: 14px 14px 0 0; border: 2px solid rgba(0,0,0,.3); }
+  .profeta { font-family: Georgia, 'Times New Roman', serif; }
+  .profeta-photo { border: 3px solid #78350f; background: radial-gradient(circle at 30% 30%, #fef3c7, #d6b98a); display: flex; align-items: center; justify-content: center; overflow: hidden; filter: sepia(.5); }
+  .profeta-photo.big { height: 160px; } .profeta-photo.small { height: 80px; margin-bottom: 4px; }
+  .profeta-photo span { font-size: 70px; animation: profetaMove 4s ease-in-out infinite; } .profeta-photo.small span { font-size: 42px; }
+  @keyframes profetaMove { 0%,100% { transform: translateX(-10px) rotate(-4deg) } 50% { transform: translateX(10px) rotate(4deg) scale(1.08) } }
+  .pet-emoji { animation: floatY 2.4s ease-in-out infinite; }
+  .pet-jump { animation: petJump .6s ease-out !important; }
+  @keyframes petJump { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-30px) rotate(-10deg) } 70% { transform: translateY(0) rotate(8deg) } }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   }
@@ -450,6 +498,8 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   </div>
 </div>
 
+<div id="eventLayer" class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index:5" aria-hidden="true"></div>
+<div id="spellPill" class="hidden fixed left-1/2 -translate-x-1/2 bottom-24 md:bottom-6 z-[210] bg-stone-900/95 border border-amber-500/60 text-amber-100 text-sm font-bold rounded-full px-4 py-2 shadow-xl pointer-events-none"></div>
 <div id="toasts" aria-live="polite"></div>
 <div id="spellImpactFlash" class="fixed inset-0 z-50 opacity-0 pointer-events-none" style="transition: opacity .35s ease-out;"></div>
 <div id="spellBeam" class="from-left"></div>
@@ -585,6 +635,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 
   <!-- ================= INICIO ================= -->
   <section id="tab-home" class="space-y-4 sm:space-y-6">
+    <div id="eventBanner"></div>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
       <div class="lg:col-span-8 relative rounded-3xl overflow-hidden p-5 sm:p-10 border-2 border-amber-500/50 flex flex-col justify-center glass-card shadow-[0_0_30px_rgba(217,119,6,0.25)]"
            style="background: radial-gradient(ellipse at 80% 0%, rgba(217,119,6,.3), transparent 55%), linear-gradient(to right, rgba(12,10,9,.92) 0%, rgba(12,10,9,.7) 50%, rgba(12,10,9,.35) 100%), url('https://s0.geograph.org.uk/geophotos/08/18/73/8187381_4f5c2895.jpg') center/cover, linear-gradient(135deg, #1c1410 0%, #0c0a09 100%);">
@@ -625,6 +676,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
         </div>
         <div id="houseCupBox" class="space-y-2.5"></div>
         <p class="text-[10px] text-stone-500">Cada punto que ganas suma a tu casa. Las demás casas también avanzan cada día.</p>
+        <div id="petCard" class="border-t border-amber-900/40 pt-3"></div>
       </div>
 
       <div class="rounded-3xl p-5 glass-card flex flex-col gap-3">
@@ -682,7 +734,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-3 border-b border-amber-900/40 pb-3">
       <div>
         <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Trivia de las 8 Películas</h2>
-        <p class="text-stone-400 text-xs">25 preguntas reales por película más frases célebres. Opciones mezcladas en cada partida; en PC usa las teclas 1-4 y la L para que se lea en voz alta.</p>
+        <p class="text-stone-400 text-xs">Más de 460 preguntas: 45 por película, frases célebres, hechizos, criaturas y personajes. Cada partida trae 20 al azar; en PC usa las teclas 1-4 y la L para leer en voz alta.</p>
       </div>
       <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
         <label class="flex items-center gap-1.5 bg-stone-950 border border-amber-800/40 px-2.5 py-1.5 rounded-xl text-xs">
@@ -789,6 +841,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
         <div id="spellBook" class="space-y-2"></div>
       </div>
     </div>
+    <div id="magicCard" class="max-w-6xl mx-auto glass-card rounded-3xl p-4 sm:p-5 space-y-3"></div>
   </section>
 
   <!-- ================= DUELO ================= -->
@@ -1034,7 +1087,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   <!-- ================= TIENDA ================= -->
   <section id="tab-shop" class="hidden space-y-4">
     <div class="text-center space-y-1 max-w-2xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Tienda de Sortilegios 🛍️</h2>
+      <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Callejón Diagon 🛍️</h2>
       <p class="text-stone-300 text-xs">Gana galeones jugando y canjéalos por chispas, marcos y títulos.</p>
     </div>
     <div class="max-w-4xl mx-auto glass-card rounded-2xl p-3 flex items-center justify-between gap-3">
@@ -1042,6 +1095,43 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <p class="text-[10px] text-stone-500 max-w-[50%] text-right">Cada punto que ganas en trivia, juegos y duelos suma un galeón.</p>
     </div>
     <div id="shopBody" class="max-w-4xl mx-auto space-y-5"></div>
+  </section>
+
+  <!-- ================= EN VIVO ================= -->
+  <section id="tab-live" class="hidden space-y-4">
+    <div class="text-center space-y-1 max-w-2xl mx-auto">
+      <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Trivia en Vivo 📡</h2>
+      <p class="text-stone-300 text-xs">Muchos jugadores a la vez, en tiempo real, con podio al final.</p>
+    </div>
+    <div id="liveBox"></div>
+  </section>
+
+  <!-- ================= COMUNIDAD ================= -->
+  <section id="tab-community" class="hidden space-y-4">
+    <div id="profetaBox" class="max-w-5xl mx-auto"></div>
+    <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="glass-card rounded-3xl p-5 space-y-2">
+        <div class="flex items-center justify-between"><h3 class="font-wizard font-bold text-amber-300">🏆 Torneo semanal</h3><span id="torneoCountdown" class="text-[10px] text-stone-400"></span></div>
+        <p class="text-[11px] text-stone-400">Se reinicia cada lunes. El top 3 gana 300, 200 y 100 galeones y el título «Campeón del Torneo».</p>
+        <p id="torneoMine" class="text-xs text-stone-200"></p>
+        <div id="torneoBox" class="divide-y divide-stone-800"></div>
+      </div>
+      <div class="glass-card rounded-3xl p-5 space-y-2">
+        <h3 class="font-wizard font-bold text-amber-300">🤝 Amigos</h3>
+        <div id="friendsBox"></div>
+      </div>
+      <div class="space-y-3">
+        <h3 class="font-wizard font-bold text-amber-300 px-1">🗳️ Encuestas</h3>
+        <div id="pollsBox" class="space-y-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section id="tab-admin" class="hidden space-y-4">
+    <div class="text-center space-y-1"><h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Panel del Director 📊</h2><p class="text-xs text-stone-400">Solo tú puedes ver esta sección.</p></div>
+    <div id="adminBox" class="max-w-5xl mx-auto"></div>
+    <div class="text-center"><button onclick="renderAdmin()" class="btn-ghost !py-2"><i class="fa-solid fa-rotate"></i> Actualizar</button></div>
   </section>
 
   <section id="tab-profile" class="hidden space-y-4">
@@ -1751,7 +1841,7 @@ function findLocalImage(base, cb) {
   img.onerror = () => { i++; if (i < LOCAL_EXTS.length) img.src = `${base}.${LOCAL_EXTS[i]}`; else done(null); };
   img.src = `${base}.${LOCAL_EXTS[0]}`;
 }
-const posterFile = id => id === 0 ? 'maraton' : id === 9 ? 'frases' : `pelicula${id}`;
+const posterFile = id => id === 0 ? 'maraton' : id === 9 ? 'frases' : id >= 10 ? ({ 10: 'hechizos', 11: 'criaturas', 12: 'personajes', 13: 'halloween', 14: 'navidad' })[id] : `pelicula${id}`;
 function movieBg(id, m) {
   const own = localImg[posterFile(id)];
   return own ? `url('${own}')` : photoBg(m.photo);
@@ -1765,7 +1855,7 @@ function applyDuelImage() {
   });
 }
 function preloadPosters() {
-  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(id => findLocalImage(posterFile(id), src => {
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].forEach(id => findLocalImage(posterFile(id), src => {
     if (!src) return;
     if (currentTab === 'movies') applyPosterToCard(id, src);
     if (currentTab === 'profile') renderProfile();
@@ -2044,9 +2134,297 @@ const QUOTES = { id: 9, title: 'Frases Célebres', year: '', num: '❝', emblem:
 QUOTES.q = QUOTES_RAW.map(([q, a, w, d, e]) => ({ q, a, w, d, e, movie: 'Frases célebres', mid: 9 }));
 EMBLEMS.quote = `<svg viewBox="0 0 100 100"><defs><linearGradient id="eg9" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f5f3ff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path d="M10 22 h80 a6 6 0 0 1 6 6 v38 a6 6 0 0 1 -6 6 h-46 l-18 16 v-16 h-16 a6 6 0 0 1 -6 -6 v-38 a6 6 0 0 1 6 -6z" fill="url(#eg9)" stroke="#fde68a" stroke-width="2"/><text x="50" y="62" text-anchor="middle" font-size="44" font-family="Georgia,serif" fill="#2e1065">❝❞</text></svg>`;
 
+/* 20 preguntas más por película (45 en total por película) */
+const EXTRA_Q2 = {
+1: [
+ ["¿En qué dirección viven los Dursley?","Número 4 de Privet Drive",["Número 12 de Grimmauld Place","La Madriguera","Valle de Godric"],"e","Allí crece Harry hasta los 11 años."],
+ ["¿Dónde duerme Harry en casa de los Dursley?","En la alacena debajo de la escalera",["En el ático","En el sótano","En el cuarto de Dudley"],"e","Hasta que llegan las cartas de Hogwarts."],
+ ["¿Qué le hace aparecer Hagrid a Dudley?","Una cola de cerdo",["Orejas de burro","Bigotes de gato","Escamas"],"e","Hagrid se enfada porque Dudley se come el pastel."],
+ ["¿Qué pub da acceso al callejón Diagon?","El Caldero Chorreante",["Las Tres Escobas","Cabeza de Puerco","Honeydukes"],"m","Los muggles no lo pueden ver."],
+ ["¿A quién conoce Harry en el compartimento del tren?","Ron Weasley",["Draco Malfoy","Neville Longbottom","Seamus Finnigan"],"e","Comparten dulces y se hacen amigos."],
+ ["¿Qué dulce se escapa saltando por la ventana del tren?","Una rana de chocolate",["Una gragea","Un caramelo explosivo","Un pastel de caldero"],"e","Solo da un salto, y suficiente."],
+ ["¿Qué cromo le toca a Harry en su rana de chocolate?","Albus Dumbledore",["Merlín","Nicolás Flamel","Morgana"],"m","Los cromos de magos famosos se mueven."],
+ ["¿Cómo se llama el fantasma de Gryffindor?","Nick Casi Decapitado",["El Fraile Gordo","El Barón Sanguinario","La Dama Gris"],"m","Su cabeza cuelga de un hilo de piel."],
+ ["¿Quién es el capitán del equipo de quidditch de Gryffindor?","Oliver Wood",["Fred Weasley","Cedric Diggory","Marcus Flint"],"m","Le explica a Harry las reglas del juego."],
+ ["¿Quién hechizaba en realidad la escoba de Harry en su primer partido?","Quirrell",["Snape","Draco Malfoy","Filch"],"m","Hermione creía que era Snape."],
+ ["¿Cómo atrapa Harry la snitch en su primer partido?","Casi se la traga",["Con la mano izquierda","Con un hechizo","Con la capa"],"e","Termina tosiéndola en su mano."],
+ ["¿Qué castigo cumplen Harry, Hermione, Neville y Draco?","Ir al Bosque Prohibido con Hagrid",["Limpiar trofeos","Copiar líneas","Pulir calderos"],"m","Buscan a un unicornio herido."],
+ ["¿Qué hechizo usa Hermione para inmovilizar a Neville?","Petrificus Totalus",["Desmaius","Expelliarmus","Obliviate"],"m","Lo hace para poder salir de la sala común."],
+ ["¿Por qué Harry consigue sacar la Piedra del espejo?","Quería encontrarla, no usarla",["Por su cicatriz","Porque es buscador","Por la capa invisible"],"h","Fue el truco de Dumbledore."],
+ ["¿Qué le pasa a Quirrell cuando Harry lo toca?","Se convierte en polvo",["Desaparece","Se vuelve de piedra","Se transforma en rata"],"m","Por la protección del amor de Lily."],
+ ["¿Qué casa gana la Copa de las Casas ese año?","Gryffindor",["Slytherin","Ravenclaw","Hufflepuff"],"e","Gracias a los puntos de último minuto."],
+ ["¿Qué regalo le da Hagrid a Harry al final del curso?","Un álbum de fotos de sus padres",["Una escoba","Una lechuza","Una varita"],"m","Harry ve a sus padres sonreír."],
+ ["¿Quién compuso la música de La Piedra Filosofal?","John Williams",["Hans Zimmer","Alexandre Desplat","Patrick Doyle"],"h","Creó el famoso «Tema de Hedwig»."],
+ ["¿Qué mascota tiene Neville?","Un sapo",["Un gato","Una rata","Una lechuza"],"e","Se llama Trevor y siempre se le escapa."],
+ ["¿A quién le gana Harry la recordadora en pleno vuelo?","Draco Malfoy",["Crabbe","Goyle","Marcus Flint"],"e","Así descubre su talento con la escoba."]
+],
+2: [
+ ["¿Qué hace Dobby con el pastel de tía Petunia?","Lo hace flotar y lo deja caer",["Se lo come","Lo convierte en sapo","Lo esconde"],"e","Los Dursley culpan a Harry."],
+ ["¿Qué ponen los Dursley en la ventana de Harry?","Barrotes",["Cortinas negras","Un candado mágico","Tablones"],"m","Para que no escape."],
+ ["¿Cómo se llama la casa de los Weasley?","La Madriguera",["Grimmauld Place","El Refugio","La Casa de los Gritos"],"e","Tiene varios pisos que se sostienen con magia."],
+ ["¿Qué escobas le regala Lucius al equipo de Slytherin?","Nimbus 2001",["Saetas de Fuego","Nimbus 2000","Barredoras 11"],"m","Así Draco consigue ser buscador."],
+ ["¿Quién hechiza la bludger que persigue a Harry?","Dobby",["Draco","Lucius Malfoy","Lockhart"],"m","Quería que Harry volviera a casa."],
+ ["¿Qué le pasa al brazo de Harry cuando Lockhart intenta curarlo?","Se le desaparecen los huesos",["Se le cae","Se vuelve de goma","Se le pone verde"],"e","Madame Pomfrey tiene que hacerlos crecer otra vez."],
+ ["¿Qué poción hace crecer los huesos de Harry?","Crecehuesos",["Multijugos","Felix Felicis","Poción para dormir"],"m","Sabe horrible."],
+ ["¿Qué gata aparece petrificada primero?","La Señora Norris",["Crookshanks","Tibbles","La gata de Arabella Figg"],"e","Colgada junto a un mensaje en la pared."],
+ ["¿Qué mensaje aparece escrito en la pared?","La Cámara de los Secretos ha sido abierta",["Voldemort ha regresado","Muerte a los muggles","El heredero no perdona"],"m","«Enemigos del heredero, temed»."],
+ ["¿Quién sospechaban Harry y Ron que era el heredero?","Draco Malfoy",["Neville","Hagrid","Snape"],"m","Por eso preparan la poción multijugos."],
+ ["¿En qué se transforma Hermione por error con la multijugos?","En una gata",["En una rata","En Millicent Bulstrode","En un búho"],"e","El pelo que usó era de un gato."],
+ ["¿A dónde envían a Hagrid acusado de abrir la Cámara?","A Azkaban",["A San Mungo","A Gringotts","Al Ministerio"],"m","Fudge se lo lleva por precaución."],
+ ["¿Qué consejo da Hagrid antes de que lo arresten?","Seguir a las arañas",["Buscar el diario","Hablar con Myrtle","Usar la capa"],"m","Así llegan hasta Aragog."],
+ ["¿Qué rescata a Harry y Ron de las acromántulas?","El Ford Anglia",["Fawkes","Hagrid","Buckbeak"],"m","El coche andaba salvaje por el bosque."],
+ ["¿Qué pista tenía Hermione en la mano al ser petrificada?","Una página sobre el basilisco",["El mapa del castillo","Una carta de Riddle","Un frasco de poción"],"h","Con la palabra «tuberías» escrita."],
+ ["¿Por dónde se mueve el basilisco dentro del castillo?","Por las tuberías",["Por los pasadizos secretos","Por el lago","Por las chimeneas"],"m","Por eso solo Harry lo oye."],
+ ["¿A quién culparon hace 50 años de abrir la Cámara?","A Hagrid",["A Dumbledore","A Myrtle","A Lucius Malfoy"],"m","Riddle lo acusó para quedar como héroe."],
+ ["¿Quién mató a Myrtle la Llorona?","El basilisco",["Tom Riddle con su varita","Un dementor","Un troll"],"h","Ella vio sus ojos en el baño."],
+ ["¿Qué recibe Harry al final por sus servicios al colegio?","Un premio especial",["Una snitch de oro","Una escoba nueva","El puesto de prefecto"],"h","Dumbledore lo entrega frente a todos."],
+ ["¿Qué hechizo usa Draco en el club de duelo?","Serpensortia",["Expelliarmus","Rictusempra","Tarantallegra"],"h","Hace aparecer una serpiente."]
+],
+3: [
+ ["¿Qué mascota tiene Hermione?","Un gato",["Una lechuza","Un sapo","Una rata"],"e","Se llama Crookshanks y odia a Scabbers."],
+ ["¿Quién empieza a enseñar Cuidado de Criaturas Mágicas?","Hagrid",["Lupin","Snape","Sprout"],"e","Su primera clase es con Buckbeak."],
+ ["¿Quién sale herido por Buckbeak?","Draco Malfoy",["Ron","Neville","Crabbe"],"e","Por no hacerle la reverencia."],
+ ["¿Qué condena recibe Buckbeak?","Ser ejecutado",["Ir a Azkaban","Ser liberado","Volver al bosque"],"m","Lucius Malfoy presiona al Ministerio."],
+ ["¿Quién es el verdugo del Ministerio?","Walden Macnair",["Cornelius Fudge","Barty Crouch","Lucius Malfoy"],"h","Llega con su hacha a la cabaña de Hagrid."],
+ ["¿Qué bebida es famosa en Las Tres Escobas?","Cerveza de mantequilla",["Zumo de calabaza","Whisky de fuego","Té de hierbas"],"e","Deja bigote de espuma."],
+ ["¿Qué necesita Harry para ir a Hogsmeade?","La autorización de sus tíos",["Ser mayor de edad","Un pase de Dumbledore","Un traslador"],"m","Tío Vernon se niega a firmarla."],
+ ["¿Qué relación tiene Sirius Black con Harry?","Es su padrino",["Es su tío","Es su abuelo","Fue su profesor"],"e","James lo eligió."],
+ ["¿Quién traicionó de verdad a los Potter?","Peter Pettigrew",["Sirius Black","Remus Lupin","Snape"],"m","Era su guardián secreto."],
+ ["¿Qué le falta a Scabbers?","Un dedo",["Una oreja","La cola","Un ojo"],"h","Pettigrew se cortó un dedo al fingir su muerte."],
+ ["¿A dónde arrastra Sirius a Ron?","A la Casa de los Gritos",["Al Bosque Prohibido","A Hogsmeade","Al lago"],"m","Por el pasadizo del Sauce Boxeador."],
+ ["¿Qué canta el coro de Hogwarts al empezar el curso?","«Algo malvado viene en camino»",["El himno de Hogwarts","Una canción de Navidad","«Un caldero de amor»"],"h","Con sapos incluidos."],
+ ["¿Qué retrato ataca Sirius al intentar entrar a la sala común?","La Dama Gorda",["Sir Cadogan","El de la madre de Sirius","Ariana"],"m","Destroza su lienzo."],
+ ["¿Cuántas vueltas le da Hermione al giratiempo?","Tres",["Una","Dos","Cinco"],"m","Retroceden tres horas."],
+ ["¿Por qué renuncia Lupin a Hogwarts?","Snape revela que es hombre lobo",["Lo despide Dumbledore","Se va con Sirius","Lo ataca un dementor"],"m","Los padres no lo aceptarían."],
+ ["¿Cómo se llama el libro de texto que muerde?","El monstruoso libro de los monstruos",["Animales fantásticos","Historia de Hogwarts","Mil hierbas mágicas"],"m","Hay que llevarlo atado."],
+ ["¿Cómo se calma ese libro?","Acariciándole el lomo",["Con Lumos","Dándole de comer","Cantándole"],"h","Hagrid lo explica en su primera clase."],
+ ["¿Cómo se llama el perro de Hagrid?","Fang",["Fluffy","Norberto","Canuto"],"e","Es grande pero muy miedoso."],
+ ["¿Qué objeto parlante viaja en el Autobús Noctámbulo?","Una cabeza reducida",["Un sombrero","Un espejo","Un libro"],"m","Comenta todo lo que pasa en el viaje."],
+ ["¿Qué ve Trelawney en la taza de Harry?","El Grim",["Una snitch","Una calavera","Un rayo"],"m","Un perro negro, presagio de muerte."]
+],
+4: [
+ ["¿Cuántos años hay que tener para entrar al torneo?","17",["15","16","18"],"m","Dumbledore traza una línea de edad."],
+ ["¿Qué intentan Fred y George para cruzar la línea de edad?","Una poción envejecedora",["Un giratiempo","Una capa invisible","Polvos flu"],"e","No funciona."],
+ ["¿Qué les pasa a Fred y George al ser rechazados?","Les crece una barba blanca",["Se vuelven bebés","Se quedan calvos","Se vuelven verdes"],"e","La línea los expulsa."],
+ ["¿Qué traslador usan para llegar al Mundial?","Una bota vieja",["Una lata","Un paraguas","Una taza"],"m","Hay que tocarla todos a la vez."],
+ ["¿Qué países juegan la final del Mundial de Quidditch?","Irlanda y Bulgaria",["Inglaterra y Francia","Escocia y Gales","Brasil y España"],"m","Krum juega para Bulgaria."],
+ ["¿Cómo consigue Harry su escoba en la prueba del dragón?","Con el hechizo Accio",["Se la lanza Ron","Se la presta Krum","La trae Hagrid"],"e","Moody le da la idea."],
+ ["¿Qué escuela llega en un carruaje tirado por caballos alados?","Beauxbatons",["Durmstrang","Ilvermorny","Uagadou"],"e","Es una escuela francesa."],
+ ["¿Cómo llega Durmstrang a Hogwarts?","En un barco que emerge del lago",["En escobas","En tren","En un dragón"],"e","Un barco fantasmal."],
+ ["¿Qué profesor convierte a Draco en hurón?","Ojoloco Moody",["Snape","McGonagall","Flitwick"],"e","Por atacar a Harry por la espalda."],
+ ["¿Quién le da a Harry la pista sobre el huevo?","Cedric Diggory",["Hermione","Hagrid","Fleur"],"m","Le devuelve el favor por lo de los dragones."],
+ ["¿Qué fantasma ayuda a Harry en el baño de prefectos?","Myrtle la Llorona",["Nick Casi Decapitado","El Fraile Gordo","Peeves"],"m","Le dice que meta el huevo bajo el agua."],
+ ["¿Cuánto tiempo tienen los campeones en la segunda prueba?","Una hora",["Diez minutos","Media hora","Dos horas"],"m","Lo dice la canción de las sirenas."],
+ ["¿Con quién baila Ron en la clase de baile de McGonagall?","Con McGonagall",["Con Hermione","Con Ginny","Con Parvati"],"m","Para su gran vergüenza."],
+ ["¿Qué banda toca en el Baile de Navidad?","Las Brujas de Macbeth",["Los Tres Escobas","Las Arpías","Celestina Warbeck"],"h","Una banda de rock mágica."],
+ ["¿Qué funcionario del Ministerio aparece muerto en Hogwarts?","Barty Crouch padre",["Ludo Bagman","Cornelius Fudge","Arthur Weasley"],"h","Su propio hijo lo asesinó."],
+ ["¿Qué ve Harry en el pensadero de Dumbledore?","Juicios contra mortífagos",["La muerte de sus padres","Un partido de quidditch","El nacimiento de Voldemort"],"m","Incluido el de Barty Crouch hijo."],
+ ["¿Qué gesto delata a Barty Crouch hijo?","Saca la lengua rápidamente",["Se rasca la oreja","Guiña un ojo","Se toca la cicatriz"],"h","Lo hace tanto en el juicio como disfrazado de Moody."],
+ ["¿Quién mata al cuidador Frank Bryce al inicio?","Voldemort",["Pettigrew","Barty Crouch hijo","Nagini"],"m","Lo descubre espiando en la mansión Riddle."],
+ ["¿Qué sacrifica Colagusano en el ritual?","Su mano",["Su varita","Un ojo","Su voz"],"m","«Carne del siervo, dada voluntariamente»."],
+ ["¿Qué le da Voldemort a Colagusano después?","Una mano de plata",["Una varita nueva","Su libertad","Una capa"],"m","Hecha con magia."]
+],
+5: [
+ ["¿Qué es la señora Figg, la vecina de Harry?","Una squib",["Una muggle","Una aurora","Una mortífaga"],"h","Declara a favor de Harry en su juicio."],
+ ["¿Quién dirige la guardia que va a buscar a Harry a Privet Drive?","Ojoloco Moody",["Sirius","Lupin","Kingsley"],"m","Llegan volando en escobas."],
+ ["¿Qué miembro de la Orden ataca la serpiente en el Ministerio?","Arthur Weasley",["Kingsley","Tonks","Sirius"],"m","Harry lo ve en un sueño."],
+ ["¿Cómo se entera Harry del ataque al señor Weasley?","Lo ve en sueños desde los ojos de la serpiente",["Por una lechuza","Por el Mapa del Merodeador","Se lo dice Dumbledore"],"m","Así descubren su conexión con Voldemort."],
+ ["¿Con quién se da Harry su primer beso?","Cho Chang",["Ginny","Hermione","Luna"],"e","En la Sala de los Menesteres."],
+ ["¿Quién propone el nombre «Ejército de Dumbledore»?","Ginny Weasley",["Hermione","Ron","Neville"],"m","A todos les gusta."],
+ ["¿Qué decora las paredes del despacho de Umbridge?","Platos con gatitos",["Retratos de ministros","Mapas","Trofeos"],"e","Todo de color rosa."],
+ ["¿Cómo se llaman las normas que Umbridge cuelga en el castillo?","Decretos de Educación",["Leyes del Ministerio","Reglas Rosas","Edictos de Fudge"],"m","Llenan una pared entera."],
+ ["¿Qué profesora despide Umbridge en público?","Trelawney",["McGonagall","Sprout","Hooch"],"m","Dumbledore deja que se quede en el castillo."],
+ ["¿Cuántos mortífagos escapan de Azkaban este año?","Diez",["Tres","Cinco","Veinte"],"h","Entre ellos Bellatrix."],
+ ["¿Qué mortífaga prima de Sirius escapa de Azkaban?","Bellatrix Lestrange",["Narcissa Malfoy","Andromeda Tonks","Alecto Carrow"],"m","Su cara aparece en todos los carteles."],
+ ["¿Qué oye Luna detrás del velo del Departamento de Misterios?","Voces",["Música","Nada","Un dragón"],"h","Harry también las escucha."],
+ ["¿Qué hechizo enseña Harry primero en el Ejército de Dumbledore?","Expelliarmus",["Expecto Patronum","Desmaius","Protego"],"m","Neville practica con todas sus fuerzas."],
+ ["¿Qué inventan Fred y George para saltarse clases?","Surtidos Saltaclases",["Grageas explosivas","Pantanos portátiles","Orejas extensibles"],"m","Dulces que te enferman a propósito."],
+ ["¿Dónde están internados los padres de Neville?","En San Mungo",["En Azkaban","En Hogwarts","En la Madriguera"],"m","Perdieron la razón tras ser torturados."],
+ ["¿Quién torturó a los padres de Neville?","Bellatrix Lestrange",["Lucius Malfoy","Voldemort","Greyback"],"m","Con la maldición Cruciatus."],
+ ["¿Qué patronus tiene Hermione?","Una nutria",["Un gato","Un cisne","Una liebre"],"m","Lo conjura en las clases del Ejército de Dumbledore."],
+ ["¿Qué grita en Grimmauld Place si alguien hace ruido?","El retrato de la madre de Sirius",["Kreacher","Un fantasma","Una banshee"],"m","Odia a los «sangre sucia»."],
+ ["¿Por qué no practican hechizos en la clase de Umbridge?","Solo enseña teoría",["Las varitas están prohibidas","No hay espacio","Snape lo impide"],"e","Dice que no hay peligro afuera."],
+ ["¿Qué auror de la Orden llega a ser Ministro de Magia?","Kingsley Shacklebolt",["Alastor Moody","Nymphadora Tonks","Arthur Weasley"],"m","Después de la caída de Voldemort."]
+],
+6: [
+ ["¿Qué puente destruyen los mortífagos al inicio?","El Puente del Milenio",["El Puente de Londres","El Tower Bridge","El viaducto de Glenfinnan"],"m","Lo retuercen hasta derribarlo."],
+ ["¿En qué se disfraza Slughorn cuando lo encuentran?","En un sillón",["En un gato","En un retrato","En una lámpara"],"m","Dumbledore lo descubre igual."],
+ ["¿Qué asignatura enseña Snape este curso?","Defensa Contra las Artes Oscuras",["Pociones","Transformaciones","Encantamientos"],"e","Por fin consigue el puesto que quería."],
+ ["¿Quién descubre a Harry espiando en el tren?","Draco Malfoy",["Pansy Parkinson","Blaise Zabini","Snape"],"m","Le rompe la nariz de un pisotón."],
+ ["¿Quién encuentra a Harry y le cura la nariz en el tren?","Luna Lovegood",["Ginny","Hermione","Neville"],"m","Lo ve gracias a sus Espectrogafas."],
+ ["¿Qué hechizo usa Draco para paralizar a Harry en el tren?","Petrificus Totalus",["Desmaius","Sectumsempra","Imperio"],"h","Y lo cubre con la capa invisible."],
+ ["¿A dónde lleva la Felix Felicis a Harry?","A la cabaña de Hagrid",["A la biblioteca","Al despacho de Dumbledore","A Hogsmeade"],"m","Allí Slughorn suelta el recuerdo."],
+ ["¿Quién muere y es enterrado por Hagrid?","Aragog",["Fang","Buckbeak","Norberto"],"e","Harry y Slughorn asisten al entierro."],
+ ["¿Quién intenta darle a Harry una poción de amor?","Romilda Vane",["Lavender Brown","Cho Chang","Pansy Parkinson"],"h","Pero Ron se come los bombones."],
+ ["¿Qué edad tenía Tom Riddle cuando Dumbledore lo conoció?","11 años",["6 años","16 años","15 años"],"m","Ya mostraba poderes inquietantes."],
+ ["¿En cuántas partes quería dividir su alma Voldemort?","Siete",["Tres","Cinco","Doce"],"m","El número más poderoso de la magia."],
+ ["¿Qué le pide Dumbledore a Harry en la torre?","Que se esconda y confíe en Snape",["Que lo defienda","Que huya a Hogsmeade","Que llame a la Orden"],"m","Harry obedece sin entender."],
+ ["¿Qué mortífaga destroza el Gran Comedor al huir?","Bellatrix Lestrange",["Narcissa Malfoy","Alecto Carrow","Umbridge"],"m","También incendia la cabaña de Hagrid."],
+ ["¿Qué le lanza Hermione a Ron por celos?","Pájaros encantados",["Un vociferador","Un hechizo de cosquillas","Su libro de pociones"],"m","Cuando lo ve con Lavender."],
+ ["¿Cómo llama Lavender a Ron?","Ro-Ro",["Ronnie","Weasley","Pelirrojo"],"m","Para el horror de Ron."],
+ ["¿A quién elige Voldemort para matar a Dumbledore?","Draco Malfoy",["Snape","Bellatrix","Greyback"],"e","Como castigo para su padre."],
+ ["¿Qué hechizo del Príncipe cuelga a alguien del tobillo?","Levicorpus",["Sectumsempra","Muffliato","Liberacorpus"],"m","Harry lo prueba con Ron."],
+ ["¿Cómo se llamaba la madre de Snape?","Eileen Prince",["Lily Evans","Merope Gaunt","Narcissa Black"],"h","De ahí viene «Príncipe Mestizo»."],
+ ["¿Qué lleva Slughorn al entierro de Aragog?","Botellas de vino",["Flores","Una poción","Un pastel"],"m","Y se interesa por el veneno de acromántula."],
+ ["¿Cómo llama El Profeta a Harry este año?","El Elegido",["El niño que vivió","El indeseable n.º 1","El campeón"],"e","Por la profecía."]
+],
+7: [
+ ["¿Quién muere en la huida de los siete Potter?","Ojoloco Moody",["Kingsley","Tonks","Arthur Weasley"],"m","Mundungus huye en el momento clave."],
+ ["¿Qué le pasa a George en esa batalla?","Pierde una oreja",["Se rompe una pierna","Queda inconsciente","Pierde su varita"],"m","Y hace un chiste sobre eso."],
+ ["¿Quién es el Ministro de Magia controlado por Voldemort?","Pius Thicknesse",["Rufus Scrimgeour","Cornelius Fudge","Barty Crouch"],"h","Está bajo la maldición Imperius."],
+ ["¿A quién asesina Voldemort en la mansión Malfoy al inicio?","Charity Burbage",["Ollivander","Bathilda Bagshot","Gregorovitch"],"h","La profesora de Estudios Muggles."],
+ ["¿A quién le pide Voldemort prestada la varita?","Lucius Malfoy",["Bellatrix","Snape","Draco"],"m","Su varita no puede vencer a la de Harry."],
+ ["¿Dónde se esconden Harry, Ron y Hermione después de la boda?","En Grimmauld Place",["En la Madriguera","En Hogsmeade","En el Valle de Godric"],"m","La antigua casa de Sirius."],
+ ["¿Quién robó el guardapelo de Grimmauld Place?","Mundungus Fletcher",["Kreacher","Umbridge","Lucius Malfoy"],"h","Se lo dio a Umbridge."],
+ ["¿Qué hace Ron después de discutir con Harry en la tienda?","Se va",["Destruye el guardapelo","Llama a la Orden","Se queda dormido"],"e","Influido por el guardapelo."],
+ ["¿Qué canción bailan Harry y Hermione en la tienda?","«O Children»",["«Hedwig's Theme»","«Do the Hippogriff»","«A Cauldron Full of Hot, Strong Love»"],"h","De Nick Cave and the Bad Seeds."],
+ ["¿Qué sale del guardapelo cuando Ron lo va a destruir?","Visiones de Harry y Hermione burlándose de él",["Voldemort en persona","Un dementor","Una serpiente"],"m","Sus peores miedos."],
+ ["¿Qué forma tiene el patronus que guía a Harry hasta la espada?","Una cierva",["Un ciervo","Un fénix","Un lobo"],"m","Como el de Lily."],
+ ["¿De quién era el patronus que guió a Harry a la espada?","Severus Snape",["Dumbledore","Lily Potter","Ron"],"m","Se revela en la película siguiente."],
+ ["¿Qué le pasa a la varita de Harry en el Valle de Godric?","Se rompe",["Se pierde","Se la roba Nagini","Se hace más fuerte"],"m","Hermione la rompe sin querer."],
+ ["¿Qué fabricante de varitas tiene prisionero Voldemort?","Ollivander",["Gregorovitch","Griphook","Xenophilius"],"m","En el sótano de la mansión Malfoy."],
+ ["¿Qué duende está prisionero en la mansión Malfoy?","Griphook",["Bogrod","Ragnok","Gornuk"],"m","Escapa con Dobby."],
+ ["¿A quién le quita Harry la varita en la mansión Malfoy?","Draco Malfoy",["Bellatrix","Lucius","Pettigrew"],"m","Un detalle muy importante después."],
+ ["¿Qué cuento animado explica las Reliquias de la Muerte?","El cuento de los tres hermanos",["La fuente de la buena fortuna","El mago y el cazo saltarín","El corazón peludo del brujo"],"e","Lo lee Hermione."],
+ ["¿Qué pidió el hermano mayor del cuento?","Una varita invencible",["Una capa","Una piedra","Oro"],"m","Fue asesinado por ella."],
+ ["¿Qué pidió el hermano menor del cuento?","La capa de invisibilidad",["La varita","La piedra","La inmortalidad"],"m","El único que recibió a la Muerte como amiga."],
+ ["¿Dónde entierran a Dobby?","En la playa, junto al Refugio",["En Hogwarts","En la Madriguera","En el Valle de Godric"],"m","Harry cava la tumba sin magia."]
+],
+8: [
+ ["¿De quién era la cámara de Gringotts que roban?","De Bellatrix Lestrange",["De los Malfoy","De Voldemort","De los Black"],"e","Allí estaba la copa de Hufflepuff."],
+ ["¿Qué maldición tienen los tesoros de esa cámara?","Se multiplican al tocarlos",["Queman como fuego","Gritan","Se vuelven invisibles"],"m","Casi los entierran en oro."],
+ ["¿Por dónde entran a Hogwarts desde Cabeza de Puerco?","Por un pasadizo tras el retrato de Ariana",["Por el Sauce Boxeador","Por Honeydukes","Por el lago"],"m","Neville los recibe al otro lado."],
+ ["¿Quién es Ariana?","La hermana de Albus y Aberforth",["La madre de Dumbledore","Una alumna de Ravenclaw","La Dama Gris"],"m","Murió muy joven."],
+ ["¿Quién es el director de Hogwarts antes de la batalla?","Severus Snape",["McGonagall","Slughorn","Umbridge"],"e","Huye cuando McGonagall lo enfrenta."],
+ ["¿Qué levantan los profesores alrededor del castillo?","Un escudo protector",["Una muralla de piedra","Un foso de fuego","Una niebla"],"m","Los mortífagos lo destruyen."],
+ ["¿Quién lidera a los alumnos rebeldes en Hogwarts?","Neville Longbottom",["Ginny","Luna","Seamus"],"m","Desde la Sala de los Menesteres."],
+ ["¿Qué criaturas enormes se unen al ataque de Voldemort?","Gigantes",["Dragones","Trolls","Hipogrifos"],"e","Y también acromántulas."],
+ ["¿Cómo entra Ron a la Cámara de los Secretos?","Imitando el pársel de Harry",["Con la espada","Con un hechizo","Con el diario"],"m","Recordó cómo sonaba cuando Harry lo hablaba."],
+ ["¿Qué pasa entre Ron y Hermione en la Cámara de los Secretos?","Se dan su primer beso",["Pelean","Se pierden","Encuentran a Myrtle"],"e","Después de destruir la copa."],
+ ["¿Quién carga el cuerpo de Harry, que creen muerto?","Hagrid",["Neville","Narcissa","Voldemort"],"e","Obligado por los mortífagos."],
+ ["¿Qué saca Neville del Sombrero Seleccionador?","La espada de Gryffindor",["Una snitch","Una varita","Un diario"],"m","Como Harry en segundo año."],
+ ["¿A quién ve Harry con la Piedra de la Resurrección?","A sus padres, Sirius y Lupin",["A Dumbledore y Snape","A Cedric y Dobby","A Fred y Moody"],"m","Lo acompañan hasta Voldemort."],
+ ["¿Qué hechizo usa Harry en el duelo final?","Expelliarmus",["Avada Kedavra","Sectumsempra","Desmaius"],"m","Su hechizo característico."],
+ ["¿Por qué falla la maldición de Voldemort en el duelo final?","La varita de saúco obedecía a Harry",["Por la espada","Por Nagini","Por un escudo de McGonagall"],"h","Harry era su verdadero dueño."],
+ ["¿Qué le pasa al cuerpo de Voldemort al morir en la película?","Se deshace en pedazos",["Se convierte en serpiente","Desaparece en humo verde","Queda petrificado"],"m","Como papel quemado."],
+ ["¿Cómo se llama el hijo de Lupin y Tonks?","Teddy",["Albus","James","Remus"],"m","Harry es su padrino."],
+ ["¿Con quién se casa Harry?","Con Ginny Weasley",["Con Hermione","Con Luna","Con Cho Chang"],"e","Tienen tres hijos."],
+ ["¿Cómo se llama la hija de Ron y Hermione en el epílogo?","Rose",["Lily","Victoire","Molly"],"h","Va a empezar en Hogwarts."],
+ ["¿Qué le dice Harry a Albus sobre su nombre?","Que lleva los nombres de dos directores de Hogwarts",["Que es nombre de rey","Que lo eligió el Sombrero","Que viene de Merlín"],"m","Uno de ellos fue Slytherin y muy valiente."]
+]};
+Object.keys(EXTRA_Q2).forEach(k => RAW_Q[k].push(...EXTRA_Q2[k]));
+
+/* Categorías temáticas nuevas */
+const CAT_RAW = {
+ 10: [
+  ["¿Qué hechizo desarma al oponente?","Expelliarmus",["Desmaius","Protego","Accio"],"e","El favorito de Harry."],
+  ["¿Qué hechizo abre cerraduras?","Alohomora",["Accio","Reparo","Lumos"],"e","Hermione lo usa en primer año."],
+  ["¿Qué hechizo atrae objetos hacia ti?","Accio",["Expelliarmus","Alohomora","Wingardium Leviosa"],"e","Harry lo usa con su escoba."],
+  ["¿Qué hechizo enciende la punta de la varita?","Lumos",["Incendio","Nox","Lumos Maxima"],"e","Muy útil de noche."],
+  ["¿Qué hechizo apaga la luz de la varita?","Nox",["Lumos","Finite","Obscuro"],"e","El contrario de Lumos."],
+  ["¿Qué maldición imperdonable controla la mente?","Imperio",["Crucio","Avada Kedavra","Obliviate"],"m","La víctima obedece sin querer."],
+  ["¿Qué maldición imperdonable causa un dolor terrible?","Crucio",["Imperio","Sectumsempra","Avada Kedavra"],"m","La usan los mortífagos."],
+  ["¿Qué hechizo borra la memoria?","Obliviate",["Imperio","Confundo","Silencio"],"m","A Lockhart le sale mal."],
+  ["¿Qué hechizo aturde al oponente?","Desmaius",["Expelliarmus","Petrificus Totalus","Rictusempra"],"m","Un rayo rojo."],
+  ["¿Qué hechizo crea un escudo?","Protego",["Expelliarmus","Lumos","Repello"],"e","Bloquea muchos hechizos."],
+  ["¿Qué hechizo hace levitar objetos?","Wingardium Leviosa",["Accio","Levicorpus","Ascendio"],"e","Leviósa, no leviosá."],
+  ["¿Qué hechizo repara objetos rotos?","Reparo",["Episkey","Accio","Finite"],"m","Hermione repara los lentes de Harry."],
+  ["¿Qué hechizo hace que la varita apunte al norte?","Oriéntame",["Accio Norte","Lumos","Brújula"],"h","Harry lo usa en el laberinto, en el libro."],
+  ["¿Qué hechizo conjura la Marca Tenebrosa?","Morsmordre",["Avada Kedavra","Crucio","Serpensortia"],"h","Se ve tras el Mundial de Quidditch."],
+  ["¿Qué hechizo muestra el último hechizo de una varita?","Prior Incantato",["Finite Incantatem","Revelio","Specialis Revelio"],"h","Lo usan con la varita de Harry tras el Mundial."],
+  ["¿Qué hechizo amplifica la voz?","Sonorus",["Silencio","Muffliato","Quietus"],"h","Dumbledore lo usa para hablar a todos."],
+  ["¿Qué hechizo deja a alguien rígido como una tabla?","Petrificus Totalus",["Desmaius","Impedimenta","Locomotor Mortis"],"e","Hermione se lo lanza a Neville."],
+  ["¿Qué hechizo hace crecer los dientes?","Densaugeo",["Engorgio","Furnunculus","Tarantallegra"],"h","Le cae a Hermione en cuarto año, en el libro."],
+  ["¿Qué encantamiento esconde un secreto dentro de una persona?","Encantamiento Fidelio",["Protego Maxima","Obliviate","Imperio"],"h","Así se escondió a los Potter."],
+  ["¿Qué hechizo usa McGonagall para animar las estatuas?","Piertotum Locomotor",["Wingardium Leviosa","Mobilicorpus","Engorgio"],"m","«Siempre quise usar ese hechizo»."]
+ ],
+ 11: [
+  ["¿Qué criatura custodia las cámaras más profundas de Gringotts?","Un dragón",["Un troll","Una esfinge","Un basilisco"],"e","Ciego y encadenado."],
+  ["¿Qué criaturas dirigen el banco Gringotts?","Duendes",["Elfos","Gigantes","Centauros"],"e","Expertos en metales y oro."],
+  ["¿Qué ave renace de sus cenizas?","El fénix",["El hipogrifo","La lechuza","El cuervo"],"e","Fawkes lo hace frente a Harry."],
+  ["¿De qué criatura es la sangre que bebe Voldemort en el bosque?","Unicornio",["Dragón","Thestral","Fénix"],"e","Mantiene con vida a quien la bebe."],
+  ["¿Qué criatura es mitad águila y mitad caballo?","El hipogrifo",["El thestral","El grifo","El abraxan"],"e","Como Buckbeak."],
+  ["¿Qué criatura solo ve quien ha presenciado una muerte?","El thestral",["El dementor","El boggart","El fénix"],"m","Tiran de los carruajes de Hogwarts."],
+  ["¿Qué criatura se alimenta de la felicidad?","El dementor",["El boggart","El inferius","El grindylow"],"e","Custodian Azkaban."],
+  ["¿Qué mascota tiene Ron al principio?","Una rata",["Un sapo","Una lechuza","Un gato"],"e","Scabbers, que no era lo que parecía."],
+  ["¿Qué clase de animal es Fang?","Un perro",["Un lobo","Un hipogrifo","Un gato"],"e","El fiel compañero de Hagrid."],
+  ["¿Qué criatura enorme vive en el Lago Negro?","Un calamar gigante",["Un basilisco","Un dragón de agua","Una ballena"],"m","A veces saluda a los alumnos."],
+  ["¿Cómo se llama la pequeña lechuza que Sirius le regala a Ron?","Pigwidgeon",["Errol","Hermes","Hedwig"],"h","Ron la llama Pig."],
+  ["¿Qué criatura tiene una mirada mortal?","El basilisco",["La acromántula","El dragón","El thestral"],"e","El rey de las serpientes."],
+  ["¿Qué criatura adopta la forma de tu peor miedo?","El boggart",["El dementor","El poltergeist","El metamorfomago"],"e","Se vence riendo."],
+  ["¿Qué planta grita cuando la arrancan?","La mandrágora",["El lazo del diablo","La tentácula venenosa","El bubotubérculo"],"e","Hay que usar orejeras."],
+  ["¿Qué tipo de criatura es Aragog?","Una acromántula",["Un basilisco","Un escreguto","Una esfinge"],"m","Una araña gigante que habla."],
+  ["¿Qué forma tiene el patronus de Snape?","Una cierva",["Una serpiente","Un murciélago","Un cuervo"],"m","Igual que el de Lily."],
+  ["¿Qué criatura es Grawp?","Un gigante",["Un troll","Un ogro","Un centauro"],"m","El medio hermano de Hagrid."],
+  ["¿Qué criatura es Griphook?","Un duende",["Un elfo doméstico","Un gnomo","Un enano"],"e","Trabaja en Gringotts."],
+  ["¿Qué tiran del carruaje de Beauxbatons?","Caballos alados",["Thestrals","Hipogrifos","Dragones"],"h","Enormes caballos dorados."],
+  ["¿Cómo se llama la vieja lechuza de los Weasley que siempre se estrella?","Errol",["Pig","Hermes","Hedwig"],"m","Ya está muy anciana."]
+ ],
+ 12: [
+  ["¿Cuál es el segundo nombre de Harry?","James",["Sirius","Albus","Arthur"],"m","Como su padre."],
+  ["¿Cuál es el segundo nombre de Hermione?","Jean",["Jane","Rose","Ann"],"h","Hermione Jean Granger."],
+  ["¿Cuántos hermanos tiene Ron?","Seis",["Cuatro","Cinco","Siete"],"m","Bill, Charlie, Percy, Fred, George y Ginny."],
+  ["¿Quién es el mayor de los hermanos Weasley?","Bill",["Charlie","Percy","Fred"],"m","Trabaja en Gringotts."],
+  ["¿Qué Weasley trabaja con dragones en Rumania?","Charlie",["Bill","Percy","George"],"m","Se lleva a Norberto."],
+  ["¿Qué Weasley trabaja en el Ministerio y se aleja de su familia?","Percy",["Bill","Charlie","Arthur"],"m","Vuelve en la batalla final."],
+  ["¿Cómo se llaman los padres de Harry?","James y Lily",["Arthur y Molly","Frank y Alice","Ted y Andromeda"],"e","Murieron protegiéndolo."],
+  ["¿Cuál era el apellido de soltera de Lily?","Evans",["Granger","Prince","Black"],"m","Lily Evans, de familia muggle."],
+  ["¿Cómo se llama el primo de Harry?","Dudley",["Draco","Neville","Seamus"],"e","Dudley Dursley."],
+  ["¿Quién es la hermana de Lily Potter?","Petunia",["Marge","Molly","Narcissa"],"e","La tía de Harry."],
+  ["¿Cómo se llama el padre de Luna?","Xenophilius Lovegood",["Ted Lovegood","Amos Lovegood","Elphias Lovegood"],"m","Dirige El Quisquilloso."],
+  ["¿Quién es la esposa de Lucius Malfoy?","Narcissa",["Bellatrix","Andromeda","Pansy"],"e","La madre de Draco."],
+  ["¿Quién es el conserje de Hogwarts?","Argus Filch",["Hagrid","Peeves","Ollivander"],"e","Siempre con la Señora Norris."],
+  ["¿Quién es la enfermera de Hogwarts?","Madame Pomfrey",["Madame Hooch","Madame Pince","Madame Rosmerta"],"m","Cura casi todo."],
+  ["¿Quién enseña Herbología?","Pomona Sprout",["Filius Flitwick","Minerva McGonagall","Horace Slughorn"],"m","Jefa de Hufflepuff."],
+  ["¿Quién enseña a volar en escoba a los de primer año?","Madame Hooch",["Madame Pomfrey","Oliver Wood","McGonagall"],"m","«¡Arriba!»"],
+  ["¿Quién es el guardián de las llaves y los terrenos de Hogwarts?","Hagrid",["Filch","Dumbledore","Flitwick"],"e","Lo dice al presentarse."],
+  ["¿Cómo se llama el hermano de Albus Dumbledore?","Aberforth",["Ariana","Percival","Elphias"],"m","Atiende el pub Cabeza de Puerco."],
+  ["¿Cómo se llaman los inseparables compañeros de Draco?","Crabbe y Goyle",["Fred y George","Dean y Seamus","Zabini y Nott"],"e","Siempre detrás de él."],
+  ["¿Cómo se llama la abuela de Neville?","Augusta",["Molly","Minerva","Alice"],"h","Siempre lleva un sombrero con un buitre."]
+ ],
+ 13: [
+  ["¿Qué día atacó Voldemort a los Potter?","El 31 de octubre",["El 31 de julio","El 25 de diciembre","El 1 de septiembre"],"m","Noche de Halloween de 1981."],
+  ["¿Qué criatura entra al castillo en el Halloween de primer año?","Un troll",["Un dementor","Un hombre lobo","Un basilisco"],"e","Termina en el baño de chicas."],
+  ["¿Quién avisa del troll en pleno banquete?","El profesor Quirrell",["Hagrid","Filch","Snape"],"m","Y luego se desmaya."],
+  ["¿Qué fiesta se celebra en el Gran Comedor cada 31 de octubre?","El banquete de Halloween",["El Baile de Navidad","La Selección","La Copa de las Casas"],"e","Con calabazas flotando."],
+  ["¿Qué cultiva Hagrid en su huerto para Halloween?","Calabazas gigantes",["Mandrágoras","Tomates mágicos","Coles"],"e","Enormes, gracias a algo de magia."],
+  ["¿Qué hace Sirius Black en el Halloween de tercer año?","Ataca el retrato de la Dama Gorda",["Roba la Saeta de Fuego","Entra al Gran Comedor","Se esconde en Hogsmeade"],"m","Todos duermen esa noche en el Gran Comedor."],
+  ["¿Qué sale del Cáliz de Fuego en el Halloween de cuarto año?","Los nombres de los campeones",["Una profecía","Un dragón","Fuego verde y nada más"],"m","Incluido uno inesperado."],
+  ["¿Qué nombre inesperado sale del Cáliz esa noche?","Harry Potter",["Ron Weasley","Neville Longbottom","Draco Malfoy"],"e","Un cuarto campeón."],
+  ["¿Qué dulce tiene sabores como cera de oídos y vómito?","Grageas de todos los sabores",["Ranas de chocolate","Meigas fritas","Plumas de azúcar"],"e","Hay que tener valor."],
+  ["¿Qué animales vuelan sobre el Gran Comedor en Halloween?","Murciélagos",["Lechuzas","Fénix","Mariposas"],"e","Junto con calabazas encendidas."],
+  ["¿Qué hechizo usarías para encender una calabaza?","Lumos",["Nox","Accio","Reparo"],"e","¡O Incendio, con cuidado!"],
+  ["¿Qué poltergeist hace travesuras en Hogwarts según los libros?","Peeves",["Myrtle","El Barón Sanguinario","Nick Casi Decapitado"],"m","Ni Filch puede con él."]
+ ],
+ 14: [
+  ["¿Qué regalo misterioso recibe Harry en su primera Navidad en Hogwarts?","La capa de invisibilidad",["Una escoba","Una snitch","Un mapa"],"e","Era de su padre."],
+  ["¿Qué le teje la señora Weasley a Harry?","Un suéter con una H",["Una bufanda de Gryffindor","Unos guantes","Un gorro"],"e","Como a todos sus hijos."],
+  ["¿Qué evento se celebra en Navidad durante el Torneo de los Tres Magos?","El Baile de Navidad",["Una cena en Hogsmeade","Un partido de quidditch","Una obra de teatro"],"e","Los campeones abren el baile."],
+  ["¿Qué ve Harry en el Espejo de Oesed esa primera Navidad?","A sus padres",["A Voldemort","Su casa futura","A Dumbledore"],"e","Vuelve noche tras noche."],
+  ["¿Qué juegan Harry y Ron la mañana de Navidad de primer año?","Ajedrez mágico",["Snap explosivo","Gobstones","Quidditch"],"e","Ron gana casi siempre."],
+  ["¿Dónde pasan los Weasley parte de la Navidad de quinto año?","En San Mungo",["En Hogwarts","En Rumania","En Grimmauld Place"],"m","Visitando al señor Weasley."],
+  ["¿Qué trae Hagrid al Gran Comedor para Navidad?","Árboles enormes",["Un dragón","Regalos para todos","Nieve"],"m","Abetos gigantes decorados."],
+  ["¿Qué cae del techo del Gran Comedor en Navidad?","Nieve encantada",["Confeti","Estrellas","Plumas"],"m","Que no moja."],
+  ["¿Dónde pasan Harry y Hermione la Nochebuena del séptimo año?","En el Valle de Godric",["En la Madriguera","En Hogwarts","En el Refugio"],"m","Visitan la tumba de los Potter."],
+  ["¿Qué casa atacan los mortífagos en la Navidad del sexto año?","La Madriguera",["Grimmauld Place","Privet Drive","El Refugio"],"m","Bellatrix y Greyback la incendian."]
+ ]
+};
+const CATEGORIES = [
+ { id: 10, title: 'Hechizos y Encantamientos', num: '✦', icon: '🪄', photo: 'cloister2', g: ['#1e3a8a', '#0c0a09'], tint: '#1e3a8a', glow: '#60a5fa' },
+ { id: 11, title: 'Criaturas Mágicas', num: '✦', icon: '🐉', photo: 'steall', g: ['#14532d', '#0c0a09'], tint: '#14532d', glow: '#4ade80' },
+ { id: 12, title: 'Personajes', num: '✦', icon: '🧙', photo: 'christchurch', g: ['#7c2d12', '#0c0a09'], tint: '#7c2d12', glow: '#fb923c' },
+ { id: 13, title: 'Especial de Halloween', num: '🎃', icon: '🎃', photo: 'alnwick', g: ['#c2410c', '#2e1065'], tint: '#9a3412', glow: '#f97316', event: 'halloween' },
+ { id: 14, title: 'Especial de Navidad', num: '🎄', icon: '🎄', photo: 'glenfinnan', g: ['#14532d', '#7f1d1d'], tint: '#166534', glow: '#fde68a', event: 'navidad' }
+];
+CATEGORIES.forEach(c => {
+  c.emblem = 'cat' + c.id;
+  EMBLEMS[c.emblem] = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="${c.glow}" opacity=".18"/><text x="50" y="66" font-size="52" text-anchor="middle">${c.icon}</text></svg>`;
+  c.q = CAT_RAW[c.id].map(([q, a, w, d, e]) => ({ q, a, w, d, e, movie: c.title, mid: c.id }));
+});
+
 MOVIES.forEach((m, i) => { m.id = i + 1; m.q = RAW_Q[i + 1].map(([q, a, w, d, e]) => ({ q, a, w, d, e, movie: m.title, mid: i + 1 })); });
-const ALL_Q = MOVIES.flatMap(m => m.q).concat(QUOTES.q);
-const movieById = id => id === 0 ? MARATHON : id === 9 ? QUOTES : MOVIES[id - 1];
+const ALL_Q = MOVIES.flatMap(m => m.q).concat(QUOTES.q, ...CATEGORIES.filter(c => !c.event).map(c => c.q));
+const movieById = id => id === 0 ? MARATHON : id === 9 ? QUOTES : id >= 10 ? CATEGORIES.find(c => c.id === id) : MOVIES[id - 1];
 const DIFF_LABEL = { e: ['🟢 Fácil', 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'], m: ['🟡 Medio', 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'], h: ['🔴 Difícil', 'bg-red-500/20 text-red-300 border border-red-500/30'] };
 const DIFF_POINTS = { e: 10, m: 15, h: 20 };
 
@@ -2263,6 +2641,7 @@ function renderMoviesGrid() {
   };
   grid.innerHTML = MOVIES.map(m => card(m.id, m, `${m.year} · ${m.q.length} preguntas`, S.best[m.id], S.done.includes(m.id))).join('')
     + card(9, QUOTES, `${QUOTES.q.length} frases de las películas`, S.best[9], S.done.includes(9))
+    + CATEGORIES.filter(c => !c.event || (typeof activeEvent === 'function' && activeEvent() === c.event)).map(c => card(c.id, c, `${c.q.length} preguntas${c.event ? ' · ¡evento!' : ''}`, S.best[c.id], false)).join('')
     + card(0, MARATHON, '30 preguntas de toda la saga', S.best[0], S.ach.includes('marathon'));
   $('difficultyFilter').value = S.diff;
   $('timeAttackToggle').checked = S.timer;
@@ -2273,7 +2652,7 @@ function startQuiz(movieId) {
   let list = diff === 'all' ? pool : pool.filter(q => q.d === diff);
   if (!list.length) list = pool;
   list = shuffle(list);
-  if (movieId === 0) list = list.slice(0, 30);
+  list = list.slice(0, movieId === 0 ? 30 : 20); // 20 preguntas al azar por partida
   quiz = { movieId, diff, list: list.map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) })), i: 0, score: 0, correct: 0, streak: 0, best: 0, wrong: [], fifty: true, answered: false };
   $('quizMovieTitle').textContent = movieById(movieId).title;
   setQuizBanner(movieById(movieId), movieId);
@@ -4497,6 +4876,7 @@ function initExtras() {
   registerSW();
   initAuth();
   cloud.booting = false;
+  initV4();
 }
 /* ===================================================================
    CUENTAS DE USUARIO Y PROGRESO EN LA NUBE (Supabase Auth)
@@ -4694,6 +5074,1418 @@ function renderAccount() {
     </div></div>`;
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && cloud.user && cloud.timer) cloudPush(); });
+
+/* =====================================================================
+   VERSIÓN 4 — comunidad, multijugador, magia real, juegos y eventos
+   Requiere supabase-comunidad.sql para las funciones en línea.
+===================================================================== */
+CONFIG.ANALYTICS = CONFIG.ANALYTICS !== false; // estadísticas de visitas de Vercel
+
+function ensureV4State() {
+  S.friends = S.friends || [];
+  S.votes = S.votes || {};
+  S.school = Object.assign({ passed: [], classes: {}, graduated: false }, S.school || {});
+  S.games = Object.assign({ broom: 0, chess: 0, escape: 0 }, S.games || {});
+  S.vault = Object.assign({ amount: 0, last: Date.now() }, S.vault || {});
+  S.claimed = S.claimed || {};
+  if (!S.week || S.week.id !== weekId()) S.week = { id: weekId(), pts: 0, prev: S.week && S.week.id !== weekId() ? S.week : (S.week && S.week.prev) || null };
+}
+Object.assign(ACH, {
+  live:      ['📡', 'Presentador mágico', 'Juega o crea una trivia en vivo'],
+  school:    ['🎓', 'Graduado de Hogwarts', 'Completa los 7 años y la batalla final'],
+  year1:     ['📗', 'Primer año aprobado', 'Aprueba el examen de primer año'],
+  broom:     ['🧹', 'Piloto de escoba', 'Recorre 100 metros en escoba'],
+  chess:     ['♟️', 'Gran maestro', 'Gana una partida de ajedrez mágico'],
+  escape:    ['🗝️', 'Heredero valiente', 'Escapa de la Cámara de los Secretos'],
+  pet:       ['🦉', 'Amigo de las criaturas', 'Adopta una mascota mágica'],
+  friend:    ['🤝', 'Amistad mágica', 'Agrega a un amigo'],
+  vote:      ['🗳️', 'Voz del pueblo mágico', 'Vota en una encuesta'],
+  voice:     ['🎙️', 'Mago parlante', 'Lanza un hechizo con tu voz'],
+  photo:     ['📸', 'Foto de casa', 'Tómate una foto con los colores de tu casa'],
+  torch:     ['🔦', 'Lumos real', 'Enciende la linterna con Lumos'],
+  matched:   ['🔎', 'Duelo al azar', 'Encuentra un rival con «Buscar rival»'],
+  champion:  ['👑', 'Campeón del torneo', 'Queda en el top 3 del torneo semanal'],
+  halloween: ['🎃', 'Noche de Brujas', 'Completa la trivia especial de Halloween'],
+  navidad:   ['🎄', 'Espíritu navideño', 'Completa la trivia especial de Navidad']
+});
+
+/* ---------- utilidades ---------- */
+function weekId(d = new Date()) {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return `${t.getUTCFullYear()}-S${String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, '0')}`;
+}
+function nextMonday() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + ((8 - (d.getDay() || 7)) % 7 || 7)); return d; }
+const qid = q => hash(q.q).toString(36).slice(0, 12);
+const rpc = async (fn, args) => { const c = await loadSupabase(); const { data, error } = await c.rpc(fn, args || {}); if (error) throw error; return data; };
+const myName = () => (S.rankName || S.student || '').trim();
+function needName(cb) {
+  if (myName()) return cb(myName());
+  showDialog({ icon: '✍️', title: '¿Cómo te llamas, mago?', body: '<input id="dlgName" maxlength="20" class="w-full bg-stone-950 border border-amber-700/50 rounded-lg px-3 py-2 text-sm text-stone-100" placeholder="Tu nombre de mago">',
+    actions: [{ label: 'Continuar', primary: true, onClick: () => { const v = ($('dlgName') && $('dlgName').value || '').trim().slice(0, 20); if (v) { S.rankName = v; save(); cb(v); } } }, { label: 'Cancelar' }] });
+  setTimeout(() => $('dlgName') && $('dlgName').focus(), 100);
+}
+
+/* =====================================================================
+   EVENTOS POR FECHA (Halloween, Navidad, cumpleaños de Harry)
+   Para probarlos antes: agrega ?evento=halloween (o navidad, cumple) a la dirección
+===================================================================== */
+const EVENTS = {
+  halloween: { name: 'Halloween', icon: '🎃', from: [10, 20], to: [11, 2], text: 'Trivia especial, murciélagos en el castillo y un logro de edición limitada.' },
+  navidad:   { name: 'Navidad', icon: '🎄', from: [12, 15], to: [1, 6], text: 'Nieve en el castillo, trivia navideña y un logro de edición limitada.' },
+  cumple:    { name: 'Cumpleaños de Harry', icon: '🎂', from: [7, 31], to: [7, 31], text: '¡Feliz cumpleaños, Harry! Hoy recibes un regalo de 100 galeones.' }
+};
+let forcedEvent = null;
+try { forcedEvent = new URLSearchParams(location.search).get('evento') || sessionStorage.getItem('hp-evento'); if (forcedEvent) sessionStorage.setItem('hp-evento', forcedEvent); } catch (e) {}
+function activeEvent(d = new Date()) {
+  if (forcedEvent && EVENTS[forcedEvent]) return forcedEvent;
+  const md = (d.getMonth() + 1) * 100 + d.getDate();
+  for (const [k, e] of Object.entries(EVENTS)) {
+    const a = e.from[0] * 100 + e.from[1], b = e.to[0] * 100 + e.to[1];
+    if (a <= b ? (md >= a && md <= b) : (md >= a || md <= b)) return k;
+  }
+  return null;
+}
+function applyEvent() {
+  const ev = activeEvent(), box = $('eventBanner');
+  document.documentElement.classList.remove('event-halloween', 'event-navidad', 'event-cumple');
+  if (!ev) { if (box) box.innerHTML = ''; return; }
+  document.documentElement.classList.add('event-' + ev);
+  const e = EVENTS[ev];
+  if (box) box.innerHTML = `<div class="event-banner rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+    <span class="text-5xl event-bob">${e.icon}</span>
+    <div class="flex-grow"><p class="font-wizard font-black text-lg text-amber-100">¡Evento de ${e.name}!</p><p class="text-xs text-amber-100/80">${e.text}</p></div>
+    ${ev !== 'cumple' ? `<button onclick="startQuiz(${ev === 'halloween' ? 13 : 14})" class="btn-gold">Jugar la trivia especial</button>` : ''}</div>`;
+  if (ev === 'cumple') {
+    const key = 'cumple-' + new Date().getFullYear();
+    if (!S.claimed[key]) { S.claimed[key] = true; S.gold += 100; save(); updateWallet(); setTimeout(() => { fireConfetti({ particleCount: 160, spread: 120 }); toast('¡Feliz cumpleaños, Harry! Recibes 100 galeones 🎂', '🎁'); }, 1500); }
+  }
+  decorateEvent(ev);
+}
+let snowRaf = 0;
+function decorateEvent(ev) {
+  const layer = $('eventLayer'); if (!layer) return;
+  layer.innerHTML = ''; cancelAnimationFrame(snowRaf);
+  if (reduceMotion) return;
+  if (ev === 'halloween') {
+    layer.innerHTML = Array.from({ length: 7 }, (_, i) => `<span class="bat" style="top:${10 + Math.random() * 60}%;animation-delay:${i * 2.3}s;animation-duration:${11 + Math.random() * 8}s">🦇</span>`).join('');
+    document.querySelectorAll('#candleField .candle-flame').forEach((f, i) => { if (i % 2 === 0) f.parentElement.innerHTML = '<div class="text-2xl">🎃</div>'; });
+  } else if (ev === 'navidad') {
+    const c = document.createElement('canvas'); c.className = 'fixed inset-0 w-full h-full pointer-events-none'; layer.appendChild(c);
+    const x = c.getContext('2d'); let W, H; const fl = [];
+    const size = () => { W = c.width = innerWidth; H = c.height = innerHeight; }; size(); addEventListener('resize', size);
+    for (let i = 0; i < 90; i++) fl.push({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.5, s: .4 + Math.random() * 1.2, d: Math.random() * 6 });
+    const loop = t => { x.clearRect(0, 0, W, H); x.fillStyle = 'rgba(255,255,255,.85)'; fl.forEach(f => { f.y += f.s; f.x += Math.sin(t / 1500 + f.d) * .4; if (f.y > H) { f.y = -5; f.x = Math.random() * W; } x.beginPath(); x.arc(f.x, f.y, f.r, 0, 7); x.fill(); }); snowRaf = requestAnimationFrame(loop); };
+    snowRaf = requestAnimationFrame(loop);
+  }
+}
+
+/* =====================================================================
+   COPA DE LAS CASAS GLOBAL + TORNEO SEMANAL + ESTADÍSTICAS
+===================================================================== */
+const v4 = { copa: null, copaAt: 0, pendingCup: 0, cupTimer: null, torneoTimer: null, statBuf: [] };
+const _v4AddPoints = addPoints;
+addPoints = function (n) {
+  _v4AddPoints(n);
+  if (n > 0) {
+    ensureV4State(); S.week.pts += n; save();
+    if (S.pet && S.pet.type) { S.pet.xp = (S.pet.xp || 0) + Math.ceil(n / 2); }
+    if (supaReady() && S.house) {
+      v4.pendingCup += n; clearTimeout(v4.cupTimer);
+      v4.cupTimer = setTimeout(flushCup, 6000);
+      clearTimeout(v4.torneoTimer); v4.torneoTimer = setTimeout(pushTorneo, 7000);
+    }
+  }
+};
+async function flushCup() {
+  const n = v4.pendingCup; if (!n || !S.house) return; v4.pendingCup = 0;
+  try { await rpc('sumar_copa', { p_casa: S.house, p_puntos: n }); v4.copaAt = 0; if (currentTab === 'home') renderCup(); } catch (e) { v4.pendingCup += n; }
+}
+async function pushTorneo() {
+  if (!supaReady() || !myName()) return;
+  try { await rpc('torneo_puntaje', { p_id: S.playerId, p_secreto: S.secret, p_semana: S.week.id, p_nombre: myName(), p_casa: S.house || '', p_puntos: S.week.pts }); } catch (e) {}
+}
+async function getGlobalCup(force) {
+  if (!supaReady()) return null;
+  if (!force && v4.copa && Date.now() - v4.copaAt < 60000) return v4.copa;
+  try { const c = await loadSupabase(); const { data, error } = await c.from('copa_casas').select('casa,puntos'); if (error) throw error;
+    v4.copa = Object.fromEntries((data || []).map(r => [r.casa, Number(r.puntos)])); v4.copaAt = Date.now(); return v4.copa; } catch (e) { return null; }
+}
+const _v4RenderCup = renderCup;
+renderCup = function () {
+  _v4RenderCup();
+  if (!supaReady()) return;
+  getGlobalCup().then(cup => {
+    if (!cup || !Object.values(cup).some(v => v > 0)) return;
+    const entries = Object.entries(cup).sort((a, b) => b[1] - a[1]); const max = Math.max(1, entries[0][1]);
+    const box = $('houseCupBox'); if (!box) return;
+    box.innerHTML = `<p class="text-[10px] uppercase tracking-widest text-emerald-300 font-bold mb-1">🌐 En vivo · todos los jugadores</p>` + entries.map(([h, p], i) => `
+      <div class="flex items-center gap-2.5 ${h === S.house ? 'bg-amber-500/10 border border-amber-500/40' : 'border border-transparent'} rounded-xl p-1.5">
+        <span class="w-4 text-center text-xs font-bold text-stone-400">${i + 1}</span>${shield(h, 24)}
+        <div class="flex-grow min-w-0"><div class="flex justify-between text-xs"><span class="font-bold ${HOUSES[h].text}">${h}${h === S.house ? ' <span class="text-[9px] text-amber-300">(tú)</span>' : ''}</span><span class="font-mono text-amber-200">${p.toLocaleString('es-PE')}</span></div>
+        <div class="w-full h-1.5 bg-stone-950 rounded-full overflow-hidden mt-1"><div class="h-full rounded-full transition-all duration-700" style="width:${(p / max) * 100}%;background:linear-gradient(90deg, ${HOUSES[h].c1}, ${HOUSES[h].c2})"></div></div></div></div>`).join('');
+  });
+};
+/* Registrar aciertos y fallos para el panel de administrador */
+const _v4CheckAnswer = checkAnswer;
+checkAnswer = function (idx) {
+  const q = quiz && !quiz.answered ? quiz.list[quiz.i] : null;
+  _v4CheckAnswer(idx);
+  if (q) v4.statBuf.push({ id: qid(q), t: q.q, ok: idx >= 0 && q.opts[idx] === q.a });
+};
+const _v4FinishQuiz = finishQuiz;
+finishQuiz = function () {
+  const mid = quiz && quiz.movieId;
+  _v4FinishQuiz();
+  if (mid === 13 && activeEvent() === 'halloween') unlockLimited('halloween', 't-halloween', 'Calabaza Embrujada');
+  if (mid === 14 && activeEvent() === 'navidad') unlockLimited('navidad', 't-navidad', 'Elfo Navideño');
+  flushStats();
+};
+function unlockLimited(ach, titleId, titleName) {
+  unlock(ach);
+  if (!S.owned.includes(titleId)) { S.owned.push(titleId); save(); toast(`Título exclusivo desbloqueado: <b>${titleName}</b>`, '🏅'); }
+  addExclusiveTitles();
+}
+async function flushStats() {
+  if (!supaReady() || !v4.statBuf.length) return;
+  const items = v4.statBuf.splice(0, 50);
+  try { await rpc('registrar_respuestas', { p_items: items }); } catch (e) {}
+}
+const EXCLUSIVE_TITLES = { 't-champ': 'Campeón del Torneo', 't-halloween': 'Calabaza Embrujada', 't-navidad': 'Elfo Navideño', 't-grad': 'Graduado de Hogwarts' };
+function addExclusiveTitles() {
+  Object.entries(EXCLUSIVE_TITLES).forEach(([id, name]) => {
+    if (S.owned.includes(id) && !SHOP.title.items.some(i => i.id === id)) SHOP.title.items.push({ id, name: '★ ' + name, price: 0, exclusive: true });
+  });
+}
+async function checkTournamentPrize() {
+  if (!supaReady() || !S.week.prev || !S.week.prev.id || S.claimed['torneo-' + S.week.prev.id] || !S.week.prev.pts) return;
+  try {
+    const pos = await rpc('torneo_puesto', { p_id: S.playerId, p_semana: S.week.prev.id });
+    S.claimed['torneo-' + S.week.prev.id] = true; save();
+    if (pos && pos <= 3) {
+      const prize = [0, 300, 200, 100][pos]; S.gold += prize;
+      if (!S.owned.includes('t-champ')) S.owned.push('t-champ');
+      save(); updateWallet(); addExclusiveTitles(); unlock('champion');
+      showDialog({ icon: '👑', title: `¡Quedaste ${pos}.º en el torneo!`, body: `La semana pasada terminaste en el puesto ${pos}. Recibes <b>${prize} galeones</b> y el título exclusivo <b>«Campeón del Torneo»</b>.` });
+      fireConfetti({ particleCount: 180, spread: 120 });
+    }
+  } catch (e) {}
+}
+
+/* =====================================================================
+   PESTAÑA COMUNIDAD: El Profeta, torneo, amigos, encuestas
+===================================================================== */
+const POLLS = [
+  { id: 'mejor-pelicula', q: '¿Cuál es la mejor película de la saga?', o: MOVIES.map(m => m.title) },
+  { id: 'mejor-profe', q: '¿Quién es el mejor profesor de Hogwarts?', o: ['Dumbledore', 'McGonagall', 'Snape', 'Lupin', 'Hagrid', 'Flitwick'] },
+  { id: 'mejor-hechizo', q: '¿Qué hechizo te gustaría tener?', o: ['Expecto Patronum', 'Accio', 'Alohomora', 'Wingardium Leviosa', 'Lumos', 'Expelliarmus'] },
+  { id: 'reliquia', q: 'Si pudieras tener una Reliquia de la Muerte…', o: ['La Varita de Saúco', 'La Piedra de la Resurrección', 'La Capa de Invisibilidad'] }
+];
+let pollResults = null, pollAt = 0;
+async function loadPolls(force) {
+  if (!supaReady()) return null;
+  if (!force && pollResults && Date.now() - pollAt < 30000) return pollResults;
+  try { const c = await loadSupabase(); const { data, error } = await c.from('resultados_votos').select('encuesta,opcion,total'); if (error) throw error;
+    pollResults = {}; (data || []).forEach(r => { (pollResults[r.encuesta] = pollResults[r.encuesta] || {})[r.opcion] = r.total; }); pollAt = Date.now(); return pollResults; } catch (e) { return null; }
+}
+async function vote(pollId, opt) {
+  S.votes[pollId] = opt; save(); unlock('vote'); sfx('correct');
+  if (supaReady()) { try { await rpc('votar', { p_encuesta: pollId, p_votante: S.playerId, p_opcion: opt }); } catch (e) {} await loadPolls(true); }
+  renderPolls();
+}
+async function renderPolls() {
+  const box = $('pollsBox'); if (!box) return;
+  const res = await loadPolls();
+  box.innerHTML = POLLS.map(p => {
+    const mine = S.votes[p.id], r = (res && res[p.id]) || {};
+    const total = Object.values(r).reduce((a, b) => a + b, 0);
+    return `<div class="glass-card rounded-2xl p-4 space-y-2"><p class="font-bold text-amber-200 text-sm">${p.q}</p>${p.o.map((o, i) => {
+      const n = r[i] || 0, pct = total ? Math.round(n / total * 100) : 0;
+      return mine === undefined
+        ? `<button onclick="vote('${p.id}', ${i})" class="opt-btn !min-h-0 !py-2 text-xs">${esc(o)}</button>`
+        : `<div class="relative rounded-lg overflow-hidden bg-stone-950 border ${mine === i ? 'border-amber-500' : 'border-stone-800'}"><div class="absolute inset-y-0 left-0 bg-amber-500/25" style="width:${res ? pct : 0}%"></div><div class="relative flex justify-between px-3 py-1.5 text-xs"><span class="text-stone-200">${mine === i ? '✔ ' : ''}${esc(o)}</span><span class="font-bold text-amber-200">${res ? pct + '%' : ''}</span></div></div>`;
+    }).join('')}${mine !== undefined ? `<p class="text-[10px] text-stone-500">${res ? total + ' votos' : 'Tu voto quedó guardado. Conecta Supabase para ver los resultados de todos.'} · <button class="underline" onclick="delete S.votes['${p.id}'];save();renderPolls()">cambiar voto</button></p>` : ''}</div>`;
+  }).join('');
+}
+async function renderTorneo() {
+  const box = $('torneoBox'); if (!box) return;
+  const ms = nextMonday() - new Date(); const d = Math.floor(ms / 86400000), h = Math.floor(ms % 86400000 / 3600000);
+  $('torneoCountdown').textContent = `Termina en ${d} d ${h} h`;
+  $('torneoMine').innerHTML = `Tus puntos esta semana: <b class="text-amber-300">${S.week.pts}</b>`;
+  if (!supaReady()) { box.innerHTML = '<p class="text-xs text-stone-400">Conecta Supabase para competir con todos.</p>'; return; }
+  try {
+    const c = await loadSupabase();
+    const { data, error } = await c.from('torneo').select('nombre,casa,puntos').eq('semana', S.week.id).order('puntos', { ascending: false }).limit(20);
+    if (error) throw error;
+    box.innerHTML = (data || []).length ? data.map((r, i) => `<div class="flex items-center gap-2 text-xs py-1 ${r.nombre === myName() && r.puntos === S.week.pts ? 'text-amber-200 font-bold' : 'text-stone-300'}"><span class="w-6 text-center">${['🥇', '🥈', '🥉'][i] || i + 1}</span>${HOUSES[r.casa] ? shield(r.casa, 18) : ''}<span class="flex-grow truncate">${esc(r.nombre)}</span><span class="font-mono">${r.puntos}</span></div>`).join('')
+      : '<p class="text-xs text-stone-400">Nadie ha sumado puntos esta semana. ¡Sé el primero!</p>';
+  } catch (e) { box.innerHTML = '<p class="text-xs text-red-300">No se pudo cargar el torneo.</p>'; }
+}
+async function renderProfeta() {
+  const box = $('profetaBox'); if (!box) return;
+  const cup = (await getGlobalCup()) || S.cup || {};
+  const lead = Object.entries(cup).sort((a, b) => b[1] - a[1])[0];
+  let top = null;
+  try { if (supaReady()) { const c = await loadSupabase(); const { data } = await c.from('torneo').select('nombre,casa,puntos').eq('semana', S.week.id).order('puntos', { ascending: false }).limit(1); top = data && data[0]; } } catch (e) {}
+  const res = await loadPolls(); let pollLine = 'Vota en las encuestas de esta edición';
+  if (res && res['mejor-pelicula']) { const best = Object.entries(res['mejor-pelicula']).sort((a, b) => b[1] - a[1])[0]; if (best) pollLine = `Los lectores eligen «${MOVIES[best[0]].title}» como la mejor película`; }
+  const dq = dailyQuestion(), ev = activeEvent();
+  const hoy = new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const portrait = (emoji, cls) => `<div class="profeta-photo ${cls}"><span>${emoji}</span></div>`;
+  box.innerHTML = `
+    <div class="profeta parchment-bg rounded-2xl p-4 sm:p-6 border-2 border-amber-900 text-amber-950">
+      <div class="text-center border-b-4 border-double border-amber-900 pb-2 mb-3">
+        <p class="text-[10px] tracking-[.3em] uppercase">Edición especial · ${hoy}</p>
+        <h2 class="font-wizard font-black text-3xl sm:text-5xl tracking-wider">EL PROFETA</h2>
+        <p class="text-[10px] tracking-widest uppercase">El periódico de la comunidad de Hogwarts Magic Experience · 5 knuts</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2 space-y-2">
+          ${portrait(lead ? HOUSES[lead[0]].emoji : '🏆', 'big')}
+          <h3 class="font-wizard font-black text-xl sm:text-2xl leading-tight">${lead && lead[1] ? `¡${lead[0]} lidera la Copa de las Casas con ${Number(lead[1]).toLocaleString('es-PE')} puntos!` : '¡Empieza la carrera por la Copa de las Casas!'}</h3>
+          <p class="text-sm leading-relaxed">Las demás casas no se rinden. Cada pregunta respondida, cada duelo ganado y cada snitch atrapada suma puntos para tu casa. ${S.house ? `Los alumnos de ${S.house} piden a sus compañeros no aflojar.` : ''}</p>
+        </div>
+        <div class="space-y-3 md:border-l md:border-amber-900/40 md:pl-4">
+          <div>${portrait('🧙', 'small')}<h4 class="font-wizard font-bold">${top ? `${esc(top.nombre)} arrasa en el torneo semanal` : 'El torneo semanal espera a su campeón'}</h4><p class="text-xs">${top ? `Suma ${top.puntos} puntos${top.casa ? ' para ' + esc(top.casa) : ''}.` : 'Los tres primeros ganan galeones y un título exclusivo.'}</p></div>
+          <div><h4 class="font-wizard font-bold">🗳️ Encuesta</h4><p class="text-xs">${esc(pollLine)}.</p></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-amber-900/40 text-xs">
+        <div><h4 class="font-wizard font-bold">❓ La pregunta del día</h4><p>${esc(dq.q)}</p></div>
+        <div><h4 class="font-wizard font-bold">${ev ? EVENTS[ev].icon + ' ' + EVENTS[ev].name : '📅 Próximo evento'}</h4><p>${ev ? EVENTS[ev].text : nextEventText()}</p></div>
+        <div><h4 class="font-wizard font-bold">🪄 Consejo de Ollivander</h4><p>«${esc(['La varita elige al mago.', 'Practica Lumos antes de dormir.', 'Nunca subestimes una varita de saúco.', 'Una varita bien cuidada dura toda la vida.'][new Date().getDate() % 4])}»</p></div>
+      </div>
+    </div>`;
+}
+function nextEventText() {
+  const now = new Date(); let best = null;
+  Object.values(EVENTS).forEach(e => { let d = new Date(now.getFullYear(), e.from[0] - 1, e.from[1]); if (d < now) d.setFullYear(d.getFullYear() + 1); if (!best || d < best.d) best = { d, e }; });
+  return best ? `${best.e.icon} ${best.e.name} empieza en ${Math.ceil((best.d - now) / 86400000)} días.` : '';
+}
+
+/* ---------- Perfiles públicos y amigos (requieren cuenta) ---------- */
+const friendCode = () => cloud.user ? cloud.user.id.replace(/-/g, '').slice(0, 8).toUpperCase() : null;
+async function publishProfile() {
+  if (!cloud.user || !sb) return;
+  const meta = cloud.user.user_metadata || {};
+  try {
+    await sb.from('perfiles').upsert({ user_id: cloud.user.id, codigo: friendCode(), nombre: (S.student || meta.full_name || 'Mago').slice(0, 40), casa: S.house, xp: S.xp, puntos: S.points,
+      rango: rankFor(S.xp)[1], titulo: titleName() || null, avatar: meta.avatar_url || meta.picture || null, logros: S.ach.length, varita: wandText(), patronus: patronusFor(S.student || myName())[0], updated_at: new Date().toISOString() });
+  } catch (e) {}
+}
+const _v4CloudPush = cloudPush;
+cloudPush = async function () { await _v4CloudPush(); publishProfile(); };
+const profileLink = code => `${siteUrl().replace(/\/?$/, '/')}?perfil=${code}`;
+async function fetchProfiles(codes) {
+  if (!codes.length || !supaReady()) return [];
+  const c = await loadSupabase();
+  const { data, error } = await c.from('perfiles').select('codigo,nombre,casa,xp,puntos,rango,titulo,avatar,logros,varita,patronus,updated_at').in('codigo', codes);
+  if (error) throw error; return data || [];
+}
+function profileCardHtml(p) {
+  const h = HOUSES[p.casa];
+  return `<div class="rounded-2xl p-4 text-left space-y-2" style="background:linear-gradient(160deg, ${h ? h.c1 : '#3b2410'}, #0c0a09 70%)">
+    <div class="flex items-center gap-3"><span class="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/70 flex items-center justify-center bg-stone-900 text-2xl">${p.avatar ? `<img src="${esc(p.avatar)}" referrerpolicy="no-referrer" class="w-full h-full object-cover" alt="">` : '🧙'}</span>
+    <div><p class="font-wizard font-black text-lg text-amber-100">${esc(p.nombre)}</p><p class="text-[11px] text-amber-200/80">${esc(p.casa || 'Sin casa')} · ${esc(p.rango || '')}${p.titulo ? ' · «' + esc(p.titulo) + '»' : ''}</p></div></div>
+    <div class="grid grid-cols-3 gap-2 text-center text-xs"><div class="bg-black/30 rounded-lg p-2"><b class="block text-amber-200 text-base">${p.xp}</b>XP</div><div class="bg-black/30 rounded-lg p-2"><b class="block text-amber-200 text-base">${p.puntos}</b>puntos</div><div class="bg-black/30 rounded-lg p-2"><b class="block text-amber-200 text-base">${p.logros}</b>logros</div></div>
+    <p class="text-[11px] text-stone-300">🪄 ${esc(p.varita || 'Sin varita')}<br>✨ Patronus: ${esc(p.patronus || '—')}</p></div>`;
+}
+async function showPublicProfile(code) {
+  try {
+    const [p] = await fetchProfiles([code]);
+    if (!p) { toast('No encontré ese perfil.', '🔍'); return; }
+    const isMe = code === friendCode(), isFriend = S.friends.includes(code);
+    showDialog({ icon: '🪪', title: 'Perfil de mago', body: profileCardHtml(p),
+      actions: isMe ? [{ label: 'Cerrar', primary: true }] : [
+        ...(isFriend ? [] : [{ label: 'Agregar como amigo', primary: true, onClick: () => addFriend(code) }]),
+        { label: 'Retar a un duelo', primary: isFriend, onClick: () => challengeFriend(p.nombre) }, { label: 'Cerrar' }] });
+  } catch (e) { toast('No se pudo abrir el perfil.', '⚠️'); }
+}
+function addFriend(code) {
+  code = String(code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 8) { toast('El código de amigo tiene 8 caracteres.', '🤝'); return; }
+  if (code === friendCode()) { toast('Ese es tu propio código 😄', '🤝'); return; }
+  if (S.friends.includes(code)) { toast('Ya es tu amigo.', '🤝'); return; }
+  fetchProfiles([code]).then(([p]) => {
+    if (!p) { toast('No existe un mago con ese código.', '🔍'); return; }
+    S.friends.push(code); save(); unlock('friend'); sfx('achieve');
+    toast(`¡${esc(p.nombre)} ahora es tu amigo!`, '🤝'); renderFriends();
+  }).catch(() => toast('No se pudo agregar.', '⚠️'));
+}
+function removeFriend(code) { S.friends = S.friends.filter(c => c !== code); save(); renderFriends(); }
+function challengeFriend(name) {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const code = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const link = `${siteUrl().replace(/\/?$/, '/')}?duelo=${code}`;
+  shareText(`⚔️ ${myName() || 'Un mago'} te reta a un duelo de magos en Hogwarts Magic Experience. Entra con este enlace: ${link}`);
+  switchTab('duel'); setDuelMode('online');
+  setTimeout(() => { $('onlineName').value = myName() || $('onlineName').value; if ($('onlineName').value) joinRoom(code, true, $('onlineName').value); }, 300);
+}
+async function renderFriends() {
+  const box = $('friendsBox'); if (!box) return;
+  if (!cloud.user) { box.innerHTML = `<p class="text-xs text-stone-300 mb-2">Para tener amigos y un perfil público necesitas iniciar sesión.</p><button onclick="openAuthModal()" class="btn-gold w-full"><i class="fa-brands fa-google"></i> Iniciar sesión</button>`; return; }
+  const code = friendCode();
+  box.innerHTML = `<div class="bg-stone-950/70 rounded-xl p-3 text-center space-y-1"><p class="text-[10px] text-stone-400 uppercase tracking-widest">Tu código de amigo</p><p class="font-mono font-black text-2xl tracking-[.25em] text-amber-300">${code}</p>
+      <div class="flex justify-center gap-2"><button class="btn-ghost !py-1.5 !text-[11px]" onclick="copyText('${code}')"><i class="fa-solid fa-copy"></i> Copiar</button><button class="btn-ghost !py-1.5 !text-[11px]" onclick="shareText('🪄 Agrégame en Hogwarts Magic Experience. Mi perfil: ${profileLink(code)}')"><i class="fa-solid fa-share-nodes"></i> Compartir perfil</button></div></div>
+    <div class="flex gap-2 mt-3"><input id="friendCodeInput" maxlength="8" placeholder="Código de tu amigo" class="flex-grow min-w-0 uppercase tracking-widest bg-stone-950 border border-amber-800/50 rounded-xl px-3 py-2 text-sm text-amber-100 focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter')addFriend(this.value)"><button class="btn-gold !py-2" onclick="addFriend($('friendCodeInput').value)">Agregar</button></div>
+    <div id="friendsList" class="space-y-2 mt-3"><p class="text-xs text-stone-500">Cargando…</p></div>`;
+  try {
+    const list = await fetchProfiles(S.friends);
+    $('friendsList').innerHTML = list.length ? list.sort((a, b) => b.xp - a.xp).map(p => `<div class="flex items-center gap-2 bg-stone-950/60 rounded-xl p-2">
+      ${HOUSES[p.casa] ? shield(p.casa, 26) : '<span>🎩</span>'}<div class="flex-grow min-w-0"><p class="text-sm font-bold text-amber-100 truncate">${esc(p.nombre)}</p><p class="text-[10px] text-stone-400">${esc(p.rango || '')} · ${p.xp} XP</p></div>
+      <button class="btn-ghost !p-2 !text-[11px]" title="Ver perfil" onclick="showPublicProfile('${p.codigo}')"><i class="fa-solid fa-id-card"></i></button>
+      <button class="btn-gold !p-2 !text-[11px]" title="Retar" onclick="challengeFriend('${esc(p.nombre)}')"><i class="fa-solid fa-bolt"></i></button>
+      <button class="btn-ghost !p-2 !text-[11px]" title="Quitar" onclick="removeFriend('${p.codigo}')"><i class="fa-solid fa-xmark"></i></button></div>`).join('')
+      : '<p class="text-xs text-stone-400">Aún no tienes amigos agregados. Comparte tu código.</p>';
+  } catch (e) { $('friendsList').innerHTML = '<p class="text-xs text-red-300">No se pudo cargar la lista.</p>'; }
+}
+function renderCommunity() { renderProfeta(); renderTorneo(); renderFriends(); renderPolls(); }
+
+/* =====================================================================
+   PANEL DE ADMINISTRADOR (solo correos de la tabla admins)
+===================================================================== */
+let isAdmin = false;
+async function checkAdmin() {
+  isAdmin = false;
+  if (cloud.user && supaReady()) { try { isAdmin = !!(await rpc('es_admin')); } catch (e) {} }
+  const has = NAV.some(n => n[0] === 'admin');
+  if (isAdmin && !has) NAV.push(['admin', 'fa-chart-line', 'Admin']);
+  if (!isAdmin && has) NAV.splice(NAV.findIndex(n => n[0] === 'admin'), 1);
+  renderNav(); document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === currentTab));
+}
+async function renderAdmin() {
+  const box = $('adminBox'); if (!box) return;
+  if (!isAdmin) { box.innerHTML = '<p class="text-center text-stone-400">Solo los administradores pueden ver esta sección.</p>'; return; }
+  box.innerHTML = '<p class="text-center text-stone-400"><i class="fa-solid fa-spinner fa-spin"></i> Cargando estadísticas…</p>';
+  try {
+    const s = await rpc('admin_stats');
+    const card = (icon, label, v) => `<div class="glass-card rounded-2xl p-4 text-center"><div class="text-2xl">${icon}</div><div class="text-2xl font-black text-amber-200">${Number(v || 0).toLocaleString('es-PE')}</div><div class="text-[11px] text-stone-400">${label}</div></div>`;
+    const casas = s.casas || {}, totalC = Object.values(casas).reduce((a, b) => a + b, 0) || 1;
+    box.innerHTML = `
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">${card('👤', 'Cuentas con Google', s.cuentas)}${card('🆕', 'Cuentas nuevas hoy', s.cuentas_hoy)}${card('🟢', 'Entraron hoy', s.activos_hoy)}${card('📆', 'Activos en 7 días', s.activos_semana)}
+      ${card('🏆', 'Jugadores en el ranking', s.jugadores_ranking)}${card('☁️', 'Progresos guardados', s.progresos)}${card('❓', 'Respuestas registradas', s.respuestas)}${card('🗳️', 'Votos', s.votos)}</div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+        <div class="glass-card rounded-2xl p-4 space-y-2"><h3 class="font-wizard font-bold text-amber-300">Casas de los jugadores con cuenta</h3>${Object.entries(casas).sort((a, b) => b[1] - a[1]).map(([h, n]) => `<div class="text-xs"><div class="flex justify-between"><span>${HOUSES[h] ? HOUSES[h].emoji : '🎩'} ${esc(h)}</span><b>${n} (${Math.round(n / totalC * 100)}%)</b></div><div class="h-2 bg-stone-950 rounded-full overflow-hidden"><div class="h-full" style="width:${n / totalC * 100}%;background:${HOUSES[h] ? HOUSES[h].c1 : '#78716c'}"></div></div></div>`).join('') || '<p class="text-xs text-stone-400">Sin datos aún.</p>'}</div>
+        <div class="glass-card rounded-2xl p-4 space-y-2"><h3 class="font-wizard font-bold text-amber-300">Preguntas que más se fallan</h3>${(s.mas_falladas || []).map(q => `<div class="text-xs border-b border-stone-800 pb-1.5"><p class="text-stone-200">${esc(q.texto)}</p><p class="text-red-300">${q.pct}% de error · ${q.fallos} fallos, ${q.aciertos} aciertos</p></div>`).join('') || '<p class="text-xs text-stone-400">Se necesitan al menos 3 respuestas por pregunta.</p>'}</div>
+      </div>
+      <p class="text-[11px] text-stone-500 mt-3">Las visitas totales (también de quienes no inician sesión) se ven en Vercel → tu proyecto → Analytics.</p>`;
+  } catch (e) { box.innerHTML = `<p class="text-center text-red-300">No se pudieron cargar las estadísticas. ¿Ejecutaste supabase-comunidad.sql y agregaste tu correo a la tabla admins?</p>`; }
+}
+
+/* =====================================================================
+   NOTIFICACIONES (recordatorio diario en la app instalada)
+===================================================================== */
+async function enableReminders() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) { toast('Tu navegador no permite notificaciones.', '🔕'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { toast('No diste permiso para notificaciones.', '🔕'); return; }
+  const reg = await navigator.serviceWorker.ready.catch(() => null);
+  S.settings.reminders = true; save();
+  if (reg && 'periodicSync' in reg) {
+    try { await reg.periodicSync.register('desafio-diario', { minInterval: 20 * 60 * 60 * 1000 }); toast('¡Listo! Te avisaremos del desafío diario.', '🔔'); }
+    catch (e) { toast('Instala la página como app para recibir el recordatorio diario.', '📱'); }
+  } else toast('Tu navegador no permite recordatorios automáticos. Funciona en Chrome para Android con la app instalada.', '📱');
+  if (reg) reg.showNotification('🪄 Hogwarts Magic Experience', { body: 'Así se verán tus recordatorios del desafío diario.', icon: 'icon-192.png', badge: 'icon-192.png', tag: 'prueba' });
+}
+
+/* =====================================================================
+   VERCEL ANALYTICS
+===================================================================== */
+function initAnalytics() {
+  if (!CONFIG.ANALYTICS || !location.hostname.endsWith('vercel.app') && !location.hostname.includes('.')) return;
+  if (!location.protocol.startsWith('http')) return;
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  const s = document.createElement('script'); s.defer = true; s.src = '/_vercel/insights/script.js'; document.head.appendChild(s);
+}
+
+/* =====================================================================
+   TRIVIA EN VIVO (estilo Kahoot) — Supabase Realtime, sin tablas
+===================================================================== */
+const LIVE_SHAPES = [['▲', '#e21b3c'], ['◆', '#1368ce'], ['●', '#d89e00'], ['■', '#26890c']];
+const lv = { role: null, ch: null, code: '', me: { id: uuid(), name: '' }, players: {}, i: -1, list: [], timer: null, t: 0, answers: {}, scores: {}, state: 'idle', cfg: { cat: 'all', n: 10, secs: 20 } };
+function liveSend(payload) { if (lv.ch) lv.ch.send({ type: 'broadcast', event: 'm', payload }); }
+async function liveLeave() {
+  clearInterval(lv.timer);
+  if (lv.ch) { try { await lv.ch.unsubscribe(); if (sb) sb.removeChannel(lv.ch); } catch (e) {} }
+  lv.ch = null; lv.role = null; lv.state = 'idle'; setDuck('live', false);
+}
+function liveNeedsSupabase() {
+  if (supaReady()) return false;
+  showDialog({ icon: '📡', title: 'Trivia en vivo sin conectar', body: SETUP_HTML }); return true;
+}
+function renderLiveHome() {
+  const box = $('liveBox'); if (!box) return;
+  if (lv.role) return;
+  const cats = [['all', 'Toda la saga'], ...MOVIES.map(m => [String(m.id), m.title]), ['9', 'Frases célebres'], ...CATEGORIES.filter(c => !c.event).map(c => [String(c.id), c.title])];
+  box.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+      <div class="glass-card rounded-3xl p-5 space-y-3">
+        <h3 class="font-wizard font-bold text-amber-300 text-lg">🎤 Crear una partida</h3>
+        <p class="text-xs text-stone-300">Ideal para jugar con tus amigos, tu grupo de Facebook o en clase. Muestra esta pantalla en la tele o el proyector y los demás se unen con su celular.</p>
+        <label class="block text-xs text-stone-300">Tema<select id="liveCat" class="mt-1 w-full bg-stone-950 border border-amber-800/50 rounded-xl p-2 text-sm text-amber-100">${cats.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}</select></label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="block text-xs text-stone-300">Preguntas<select id="liveN" class="mt-1 w-full bg-stone-950 border border-amber-800/50 rounded-xl p-2 text-sm text-amber-100"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></label>
+          <label class="block text-xs text-stone-300">Segundos<select id="liveSecs" class="mt-1 w-full bg-stone-950 border border-amber-800/50 rounded-xl p-2 text-sm text-amber-100"><option>10</option><option>15</option><option selected>20</option><option>30</option></select></label>
+        </div>
+        <button onclick="liveHost()" class="btn-gold w-full"><i class="fa-solid fa-tower-broadcast"></i> Crear partida</button>
+      </div>
+      <div class="glass-card rounded-3xl p-5 space-y-3">
+        <h3 class="font-wizard font-bold text-amber-300 text-lg">🙋 Unirme a una partida</h3>
+        <p class="text-xs text-stone-300">Escribe el código que aparece en la pantalla del presentador.</p>
+        <input id="liveCode" maxlength="5" placeholder="CÓDIGO" class="w-full uppercase tracking-[.4em] text-center font-black text-2xl bg-stone-950 border border-amber-700/50 rounded-xl px-3 py-3 text-amber-200 focus:outline-none focus:border-amber-500" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+        <input id="liveName" maxlength="16" placeholder="Tu nombre" value="${esc(myName())}" class="w-full bg-stone-950 border border-amber-700/50 rounded-xl px-3 py-2.5 text-sm text-stone-100 focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter')liveJoin()">
+        <button onclick="liveJoin()" class="btn-gold w-full"><i class="fa-solid fa-right-to-bracket"></i> Unirme</button>
+      </div>
+    </div>`;
+}
+function livePool(cat) {
+  if (cat === 'all') return ALL_Q;
+  const id = +cat; return (movieById(id) || {}).q || ALL_Q;
+}
+async function liveOpenChannel(code) {
+  const client = await loadSupabase();
+  const ch = client.channel('vivo-' + code, { config: { broadcast: { self: false }, presence: { key: lv.me.id } } });
+  lv.ch = ch;
+  ch.on('broadcast', { event: 'm' }, ({ payload }) => liveOnMsg(payload));
+  ch.on('presence', { event: 'sync' }, () => liveOnPresence(ch.presenceState()));
+  return new Promise((res, rej) => {
+    ch.subscribe(async status => {
+      if (status === 'SUBSCRIBED') { await ch.track({ name: lv.me.name, role: lv.role }); res(); }
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') rej(new Error(status));
+    });
+  });
+}
+async function liveHost() {
+  if (liveNeedsSupabase()) return;
+  await liveLeave();
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  lv.code = Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  lv.role = 'host'; lv.me.name = 'Presentador'; lv.players = {}; lv.scores = {}; lv.i = -1; lv.state = 'lobby';
+  lv.cfg = { cat: $('liveCat').value, n: +$('liveN').value, secs: +$('liveSecs').value };
+  lv.list = shuffle(livePool(lv.cfg.cat)).slice(0, lv.cfg.n).map(q => ({ q: q.q, a: q.a, opts: shuffle([q.a, ...q.w]), movie: q.movie, e: q.e }));
+  renderLiveLobby();
+  try { await liveOpenChannel(lv.code); unlock('live'); } catch (e) { toast('No se pudo abrir la sala. Revisa Realtime en Supabase.', '⚠️'); liveLeave(); renderLiveHome(); }
+}
+function liveJoin() {
+  if (liveNeedsSupabase()) return;
+  const code = ($('liveCode').value || '').trim().toUpperCase(), name = ($('liveName').value || '').trim().slice(0, 16);
+  if (code.length !== 5) { toast('El código tiene 5 caracteres.', '🔑'); return; }
+  if (!name) { toast('Escribe tu nombre.', '✍️'); return; }
+  S.rankName = S.rankName || name; save();
+  liveLeave().then(async () => {
+    lv.code = code; lv.role = 'player'; lv.me.name = name; lv.state = 'waiting'; lv.myScore = 0;
+    $('liveBox').innerHTML = `<div class="max-w-md mx-auto glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-5xl float-y">⏳</div><p class="font-wizard text-xl text-amber-200">Conectando a la sala ${code}…</p></div>`;
+    try {
+      await liveOpenChannel(code);
+      liveSend({ t: 'hello', id: lv.me.id, name });
+      $('liveBox').innerHTML = `<div class="max-w-md mx-auto glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-5xl float-y">🪄</div><p class="font-wizard text-2xl text-amber-200">¡Estás dentro, ${esc(name)}!</p><p class="text-sm text-stone-300">Mira la pantalla del presentador. La partida empieza pronto.</p><button onclick="liveExit()" class="text-xs text-stone-500 underline">Salir</button></div>`;
+      unlock('live');
+    } catch (e) { toast('No se pudo entrar. Revisa el código.', '⚠️'); liveLeave(); renderLiveHome(); }
+  });
+}
+function liveExit() { liveLeave().then(() => { lv.role = null; renderLiveHome(); }); }
+function liveOnPresence(state) {
+  if (lv.role !== 'host') return;
+  const now = {};
+  Object.entries(state).forEach(([id, metas]) => { const m = metas[0]; if (m && m.role === 'player') now[id] = m.name; });
+  Object.entries(now).forEach(([id, name]) => { if (!lv.players[id]) lv.players[id] = { name, score: 0, streak: 0 }; lv.players[id].online = true; });
+  Object.keys(lv.players).forEach(id => { if (!now[id]) lv.players[id].online = false; });
+  if (lv.state === 'lobby') renderLiveLobby();
+}
+function renderLiveLobby() {
+  const box = $('liveBox'); const ps = Object.values(lv.players).filter(p => p.online !== false);
+  box.innerHTML = `<div class="max-w-4xl mx-auto space-y-4 text-center">
+    <div class="glass-card rounded-3xl p-5"><p class="text-sm text-stone-300">Entra a <b class="text-amber-200">${esc(siteUrl().replace(/^https?:\/\//, '').replace(/\/$/, '') || 'la página')}</b> → <b>En vivo</b> → Unirme, con el código:</p>
+      <p class="font-black text-6xl sm:text-8xl tracking-[.2em] text-amber-300 my-2 font-mono">${lv.code}</p>
+      <p class="text-xs text-stone-400">${lv.list.length} preguntas · ${lv.cfg.secs} s cada una</p></div>
+    <div class="glass-card rounded-3xl p-5"><p class="font-wizard text-amber-300 mb-3">${ps.length} jugador${ps.length === 1 ? '' : 'es'} conectado${ps.length === 1 ? '' : 's'}</p>
+      <div class="flex flex-wrap justify-center gap-2">${ps.map(p => `<span class="pop bg-stone-950 border border-amber-700/50 rounded-full px-3 py-1 text-sm text-amber-100">${esc(p.name)}</span>`).join('') || '<span class="text-stone-500 text-sm">Esperando jugadores…</span>'}</div></div>
+    <div class="flex justify-center gap-2"><button onclick="liveStart()" class="btn-gold text-base" ${ps.length ? '' : 'disabled'}><i class="fa-solid fa-play"></i> Empezar</button><button onclick="liveExit()" class="btn-ghost">Cancelar</button></div></div>`;
+}
+function liveStart() { lv.state = 'playing'; setDuck('live', true); liveSend({ t: 'start', n: lv.list.length }); liveNext(); }
+function liveNext() {
+  lv.i++;
+  if (lv.i >= lv.list.length) return liveEnd();
+  const q = lv.list[lv.i]; lv.answers = {}; lv.t = lv.cfg.secs; lv.qStart = Date.now();
+  liveSend({ t: 'q', i: lv.i, total: lv.list.length, q: q.q, opts: q.opts, secs: lv.cfg.secs, movie: q.movie });
+  renderLiveHostQuestion();
+  clearInterval(lv.timer);
+  lv.timer = setInterval(() => {
+    lv.t--; const el = $('liveTime'); if (el) el.textContent = Math.max(0, lv.t);
+    if (lv.t <= 3 && lv.t > 0) sfx('tick');
+    const online = Object.values(lv.players).filter(p => p.online !== false).length;
+    if (lv.t <= 0 || (online && Object.keys(lv.answers).length >= online)) { clearInterval(lv.timer); liveReveal(); }
+  }, 1000);
+}
+function renderLiveHostQuestion() {
+  const q = lv.list[lv.i];
+  $('liveBox').innerHTML = `<div class="max-w-5xl mx-auto space-y-3">
+    <div class="flex justify-between items-center text-sm text-stone-300"><span>Pregunta ${lv.i + 1} de ${lv.list.length}</span><span class="text-3xl font-black text-amber-300 font-mono" id="liveTime">${lv.t}</span><span><b id="liveCount">0</b> respuestas</span></div>
+    <div class="glass-card rounded-3xl p-5 sm:p-8 text-center"><p class="text-[11px] uppercase tracking-widest text-amber-500 font-bold">${esc(q.movie)}</p><p class="text-xl sm:text-3xl font-bold text-stone-100 mt-1">${esc(q.q)}</p></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${q.opts.map((o, i) => `<div class="rounded-2xl p-4 sm:p-5 text-white font-bold text-base sm:text-xl flex items-center gap-3" style="background:${LIVE_SHAPES[i][1]}"><span class="text-2xl">${LIVE_SHAPES[i][0]}</span>${esc(o)}</div>`).join('')}</div>
+    <div class="text-right"><button onclick="clearInterval(lv.timer);liveReveal()" class="btn-ghost !py-2 !text-[11px]">Mostrar respuesta ahora</button></div></div>`;
+}
+function liveOnMsg(m) {
+  if (!m) return;
+  if (lv.role === 'host') {
+    if (m.t === 'hello') { if (!lv.players[m.id]) lv.players[m.id] = { name: m.name, score: 0, streak: 0 }; lv.players[m.id].online = true; if (lv.state === 'lobby') renderLiveLobby(); else liveSend({ t: 'late', to: m.id }); }
+    if (m.t === 'a' && m.i === lv.i && !lv.answers[m.id] && lv.players[m.id]) {
+      lv.answers[m.id] = { c: m.c, ms: Math.min(Date.now() - lv.qStart, lv.cfg.secs * 1000) };
+      const el = $('liveCount'); if (el) el.textContent = Object.keys(lv.answers).length;
+    }
+    return;
+  }
+  if (lv.role !== 'player') return;
+  if (m.t === 'start') { lv.myScore = 0; }
+  if (m.t === 'late' && m.to === lv.me.id) toast('La partida ya empezó: entrarás en la siguiente pregunta.', '⏳');
+  if (m.t === 'q') renderLivePlayerQuestion(m);
+  if (m.t === 'r') renderLivePlayerResult(m);
+  if (m.t === 'end') renderLiveEnd(m.podium, m.all);
+}
+function renderLivePlayerQuestion(m) {
+  lv.curQ = m; lv.picked = null; lv.qStart = Date.now();
+  $('liveBox').innerHTML = `<div class="max-w-xl mx-auto space-y-3">
+    <div class="flex justify-between text-xs text-stone-400"><span>Pregunta ${m.i + 1} de ${m.total}</span><span>⏱ <b id="liveTime">${m.secs}</b> s</span></div>
+    <p class="text-center text-base sm:text-lg font-bold text-stone-100">${esc(m.q)}</p>
+    <div class="grid grid-cols-2 gap-3" id="liveOpts">${m.opts.map((o, i) => `<button onclick="liveAnswer(${i})" class="rounded-2xl p-3 min-h-[110px] text-white font-bold text-sm flex flex-col items-center justify-center gap-1 active:scale-95 transition" style="background:${LIVE_SHAPES[i][1]}"><span class="text-3xl">${LIVE_SHAPES[i][0]}</span><span class="leading-tight">${esc(o)}</span></button>`).join('')}</div></div>`;
+  clearInterval(lv.timer); let t = m.secs;
+  lv.timer = setInterval(() => { t--; const el = $('liveTime'); if (el) el.textContent = Math.max(0, t); if (t <= 0) clearInterval(lv.timer); }, 1000);
+}
+function liveAnswer(i) {
+  if (lv.picked !== null || !lv.curQ) return;
+  lv.picked = i; liveSend({ t: 'a', id: lv.me.id, i: lv.curQ.i, c: i }); sfx('tick');
+  $('liveOpts').innerHTML = `<div class="col-span-2 rounded-2xl p-8 text-center text-white font-bold" style="background:${LIVE_SHAPES[i][1]}"><div class="text-5xl">${LIVE_SHAPES[i][0]}</div><p class="mt-2">Respuesta enviada</p><p class="text-xs opacity-80">Esperando a los demás…</p></div>`;
+}
+function liveReveal() {
+  const q = lv.list[lv.i], correct = q.opts.indexOf(q.a), T = lv.cfg.secs * 1000, per = {};
+  Object.entries(lv.players).forEach(([id, p]) => {
+    const a = lv.answers[id]; let pts = 0;
+    if (a && a.c === correct) { p.streak = (p.streak || 0) + 1; pts = Math.round(1000 * (1 - a.ms / T / 2)) + Math.min(p.streak - 1, 4) * 100; }
+    else p.streak = 0;
+    p.score += pts; per[id] = { pts, ok: !!(a && a.c === correct), answered: !!a };
+  });
+  const ranking = Object.entries(lv.players).sort((a, b) => b[1].score - a[1].score);
+  ranking.forEach(([id], idx) => { per[id].rank = idx + 1; per[id].total = lv.players[id].score; });
+  const counts = [0, 0, 0, 0]; Object.values(lv.answers).forEach(a => counts[a.c]++);
+  liveSend({ t: 'r', i: lv.i, correct, answer: q.a, per, last: lv.i === lv.list.length - 1 });
+  const top = ranking.slice(0, 5);
+  $('liveBox').innerHTML = `<div class="max-w-5xl mx-auto space-y-3">
+    <div class="glass-card rounded-3xl p-5 text-center"><p class="text-sm text-stone-300">${esc(q.q)}</p><p class="text-2xl font-black text-emerald-300 mt-1">✔ ${esc(q.a)}</p><p class="text-xs text-stone-400 mt-1">${esc(q.e || '')}</p></div>
+    <div class="grid grid-cols-4 gap-2 items-end h-28">${counts.map((n, i) => `<div class="flex flex-col items-center justify-end h-full"><span class="text-white text-sm font-bold">${n}</span><div class="w-full rounded-t-lg ${i === correct ? '' : 'opacity-40'}" style="height:${Math.max(6, n / Math.max(1, ...counts) * 80)}px;background:${LIVE_SHAPES[i][1]}"></div><span class="text-xl">${LIVE_SHAPES[i][0]}${i === correct ? '✔' : ''}</span></div>`).join('')}</div>
+    <div class="glass-card rounded-3xl p-5"><p class="font-wizard text-amber-300 mb-2">🏆 Marcador</p>${top.map(([id, p], i) => `<div class="flex justify-between py-1 text-sm ${i === 0 ? 'text-amber-200 font-bold' : 'text-stone-200'}"><span>${i + 1}. ${esc(p.name)} ${p.streak > 1 ? '🔥' + p.streak : ''}</span><span class="font-mono">${p.score}</span></div>`).join('') || '<p class="text-stone-500 text-sm">Sin jugadores</p>'}</div>
+    <div class="text-center"><button onclick="liveNext()" class="btn-gold text-base">${lv.i + 1 < lv.list.length ? 'Siguiente pregunta' : 'Ver podio'} <i class="fa-solid fa-arrow-right"></i></button></div></div>`;
+  sfx('correct');
+}
+function renderLivePlayerResult(m) {
+  clearInterval(lv.timer);
+  const me = m.per[lv.me.id] || { pts: 0, ok: false, answered: false, rank: '-', total: lv.myScore || 0 };
+  lv.myScore = me.total;
+  $('liveBox').innerHTML = `<div class="max-w-md mx-auto rounded-3xl p-6 text-center space-y-2 text-white" style="background:${me.ok ? '#15803d' : '#b91c1c'}">
+    <div class="text-6xl pop">${me.ok ? '✔' : me.answered ? '✘' : '⏰'}</div>
+    <p class="font-wizard text-2xl font-black">${me.ok ? '¡Correcto!' : me.answered ? 'Incorrecto' : 'Se acabó el tiempo'}</p>
+    ${me.ok ? `<p class="text-xl font-bold">+${me.pts}</p>` : `<p class="text-sm">Era: <b>${esc(m.answer)}</b></p>`}
+    <p class="text-sm opacity-90">Vas en el puesto <b>${me.rank}</b> con <b>${me.total}</b> puntos</p></div>`;
+  me.ok ? sfx('correct') : sfx('wrong');
+  if (me.ok) burst(innerWidth / 2, innerHeight / 2, '#22c55e', 40);
+}
+function liveEnd() {
+  const ranking = Object.entries(lv.players).sort((a, b) => b[1].score - a[1].score);
+  const podium = ranking.slice(0, 3).map(([id, p]) => ({ id, name: p.name, score: p.score }));
+  const all = Object.fromEntries(ranking.map(([id, p], i) => [id, { rank: i + 1, score: p.score }]));
+  liveSend({ t: 'end', podium, all }); renderLiveEnd(podium, all); setDuck('live', false); lv.state = 'ended';
+}
+function renderLiveEnd(podium, all) {
+  clearInterval(lv.timer);
+  const order = [1, 0, 2], heights = ['h-28', 'h-40', 'h-20'], medals = ['🥈', '🥇', '🥉'];
+  const mine = all && all[lv.me.id];
+  $('liveBox').innerHTML = `<div class="max-w-3xl mx-auto space-y-4 text-center">
+    <h2 class="font-wizard font-black text-3xl text-amber-300">🏆 Podio final</h2>
+    <div class="flex items-end justify-center gap-3">${order.map((k, j) => podium[k] ? `<div class="flex flex-col items-center w-28"><span class="text-4xl pop">${medals[j]}</span><span class="font-bold text-amber-100 text-sm truncate w-full">${esc(podium[k].name)}</span><span class="text-xs text-stone-300">${podium[k].score} pts</span><div class="w-full ${heights[j]} rounded-t-xl mt-1" style="background:linear-gradient(rgb(var(--amber-400)), rgb(var(--amber-800)))"></div></div>` : '').join('')}</div>
+    ${mine ? `<p class="text-stone-200">Terminaste en el puesto <b class="text-amber-300">${mine.rank}</b> con <b>${mine.score}</b> puntos.</p>` : ''}
+    <button onclick="liveExit()" class="btn-gold">Volver</button></div>`;
+  fireConfetti({ particleCount: 200, spread: 120 }); sfx('levelup');
+  if (mine && lv.role === 'player') { const pts = Math.max(5, Math.round(mine.score / 100)); addPoints(pts); toast(`+${pts} puntos por la trivia en vivo`, '📡'); }
+}
+
+/* =====================================================================
+   DUELO: «BUSCAR RIVAL» (emparejamiento automático)
+===================================================================== */
+const mm = { ch: null, timer: null, since: 0 };
+async function findRival() {
+  if (!supaReady()) { showDialog({ icon: '🌐', title: 'Duelo en línea sin conectar', body: SETUP_HTML }); return; }
+  const me = needOnlineName(); if (!me) return;
+  await stopFindRival(true);
+  const client = await loadSupabase();
+  mm.since = Date.now();
+  const ch = client.channel('lobby-duelo', { config: { broadcast: { self: false }, presence: { key: od.myId } } });
+  mm.ch = ch;
+  ch.on('presence', { event: 'sync' }, () => {
+    const st = ch.presenceState();
+    const waiting = Object.entries(st).map(([id, m]) => ({ id, ...m[0] })).filter(p => p.waiting).sort((a, b) => a.since - b.since || (a.id < b.id ? -1 : 1));
+    if (waiting.length >= 2 && waiting[0].id === od.myId) {
+      const rival = waiting[1];
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      const code = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      ch.send({ type: 'broadcast', event: 'match', payload: { to: rival.id, code, from: me } });
+      matched(code, true, me, rival.name);
+    }
+  });
+  ch.on('broadcast', { event: 'match' }, ({ payload }) => { if (payload.to === od.myId) matched(payload.code, false, me, payload.from); });
+  ch.subscribe(async status => { if (status === 'SUBSCRIBED') await ch.track({ name: me, waiting: true, since: mm.since }); });
+  onlineStatus(`<i class="fa-solid fa-magnifying-glass fa-beat"></i> Buscando un rival… <span id="mmSecs">0</span> s<br><button onclick="stopFindRival()" class="text-xs underline text-stone-400 mt-1">Cancelar</button>`);
+  clearInterval(mm.timer);
+  mm.timer = setInterval(() => {
+    const s = Math.round((Date.now() - mm.since) / 1000); const el = $('mmSecs'); if (el) el.textContent = s;
+    if (s >= 60) { stopFindRival(); onlineStatus('No hay rivales conectados ahora mismo. Intenta en un rato, reta a un amigo o juega contra la IA.'); }
+  }, 1000);
+}
+async function stopFindRival(silent) {
+  clearInterval(mm.timer);
+  if (mm.ch) { try { await mm.ch.untrack(); await mm.ch.unsubscribe(); if (sb) sb.removeChannel(mm.ch); } catch (e) {} }
+  mm.ch = null;
+  if (!silent) onlineStatus('Búsqueda cancelada.');
+}
+async function matched(code, host, me, rivalName) {
+  await stopFindRival(true);
+  unlock('matched');
+  onlineStatus(`¡Rival encontrado: <b class="text-emerald-300">${esc(rivalName || 'Mago')}</b>! Preparando el duelo…`);
+  setTimeout(() => joinRoom(code, host, me), host ? 200 : 900);
+}
+/* Enlace de reto: ?duelo=CODIGO */
+function handleDuelLink() {
+  let code = null; try { code = new URLSearchParams(location.search).get('duelo'); } catch (e) {}
+  if (!code || !supaReady()) return;
+  code = code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+  setTimeout(() => {
+    switchTab('duel'); setDuelMode('online'); $('onlineCode').value = code;
+    needName(name => { $('onlineName').value = name; joinRoom(code, false, name); });
+  }, 1200);
+}
+function handleProfileLink() {
+  let code = null; try { code = new URLSearchParams(location.search).get('perfil'); } catch (e) {}
+  if (code && supaReady()) setTimeout(() => showPublicProfile(code.toUpperCase()), 1500);
+}
+
+/* =====================================================================
+   MAGIA REAL: voz, linterna, celular como varita y foto con tu casa
+===================================================================== */
+const mag = { rec: null, listening: false, torchTrack: null, torchStream: null, torchOn: false, motion: false, lastFlick: 0, wandSpell: 0, cam: null, camFacing: 'user', camRaf: 0 };
+const VOICE_SPELLS = [
+  { k: ['expecto patronum', 'patronus', 'expecto'], fx: 'patronus' },
+  { k: ['wingardium leviosa', 'leviosa', 'wingardium'], fx: 'leviosa' },
+  { k: ['avada kedavra', 'avada'], fx: 'quick', i: 5 },
+  { k: ['expelliarmus', 'expeliarmus', 'expelli'], fx: 'quick', i: 2 },
+  { k: ['incendio'], fx: 'quick', i: 3 },
+  { k: ['protego'], fx: 'quick', i: 4 },
+  { k: ['lumos', 'lumus', 'lumo'], fx: 'lumos' },
+  { k: ['nox', 'knox', 'nocs'], fx: 'nox' },
+  { k: ['riddikulus', 'ridiculus', 'ridículus', 'ridiculo'], fx: 'riddikulus' },
+  { k: ['alohomora', 'aloha mora', 'alohomora'], fx: 'alohomora' },
+  { k: ['accio', 'axio', 'acio'], fx: 'accio' },
+  { k: ['travesura realizada'], fx: 'mischief' }
+];
+function normalizeSpeech(t) { return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function castByVoice(text) {
+  const t = normalizeSpeech(text);
+  for (const s of VOICE_SPELLS) if (s.k.some(k => t.includes(normalizeSpeech(k)))) { runSpellFx(s, t); unlock('voice'); return true; }
+  return false;
+}
+function runSpellFx(s, said) {
+  const mid = { clientX: innerWidth / 2, clientY: innerHeight / 2 };
+  setSpellPill(`✨ ${s.k[0].replace(/\b\w/g, c => c.toUpperCase())}`);
+  if (s.fx === 'quick') castQuickSpell(s.i, mid);
+  if (s.fx === 'lumos') { if (!S.lumos) toggleLumosMode(true); castQuickSpell(0, mid); if (mag.torchTrack) setTorch(true); }
+  if (s.fx === 'nox') { if (S.lumos) toggleLumosMode(true); sfx('spell'); flash('rgba(0,0,0,.5)', false); if (mag.torchTrack) setTorch(false); }
+  if (s.fx === 'patronus') summonPatronus();
+  if (s.fx === 'leviosa') { sfx('spell'); document.body.classList.add('leviosa'); setTimeout(() => document.body.classList.remove('leviosa'), 3200); }
+  if (s.fx === 'riddikulus') { sfx('spell'); document.body.classList.add('riddikulus'); setTimeout(() => document.body.classList.remove('riddikulus'), 1600); }
+  if (s.fx === 'alohomora') { sfx('spell'); burst(innerWidth / 2, innerHeight / 2, '#fbbf24', 50); toast('🔓 ¡Alohomora! Se abrió un secreto: +5 galeones', '🗝️'); S.gold += 5; save(); updateWallet(); }
+  if (s.fx === 'accio') {
+    const targets = { trivia: 'movies', juegos: 'games', duelo: 'duel', biblioteca: 'library', tienda: 'shop', callejon: 'shop', perfil: 'profile', carta: 'letter', varita: 'wand', vivo: 'live', comunidad: 'community', inicio: 'home' };
+    const hit = Object.keys(targets).find(k => said.includes(k));
+    sfx('spell'); if (hit) { switchTab(targets[hit]); toast(`¡Accio ${hit}!`, '🪄'); } else toast('Di «Accio» y una sección: «Accio trivia», «Accio juegos»…', '🪄');
+  }
+  if (s.fx === 'mischief') { sfx('tick'); toast('Travesura realizada. 🗺️', '📜'); }
+}
+function summonPatronus() {
+  const [name, emoji] = patronusFor(S.student || myName());
+  sfx('spell'); flash('rgba(186,230,253,.35)', false);
+  const el = document.createElement('div'); el.className = 'patronus-fly'; el.innerHTML = `<span>${emoji}</span><small>${name}</small>`;
+  document.body.appendChild(el); setTimeout(() => el.remove(), 4200);
+  for (let i = 0; i < 6; i++) setTimeout(() => burst(innerWidth * (.2 + i * .12), innerHeight * .45, '#bae6fd', 18), i * 380);
+}
+function setSpellPill(txt) {
+  const p = $('spellPill'); if (!p) return;
+  p.textContent = txt; p.classList.remove('hidden'); clearTimeout(p._t);
+  p._t = setTimeout(() => { if (!mag.listening) p.classList.add('hidden'); else p.textContent = '🎙️ Escuchando hechizos…'; }, 1800);
+}
+function toggleVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showDialog({ icon: '🎙️', title: 'Tu navegador no reconoce voz', body: 'Los hechizos por voz funcionan en Google Chrome (Android, Windows y Mac) y en Safari reciente. Prueba abriendo la página en Chrome.' }); return; }
+  if (mag.listening) { mag.listening = false; try { mag.rec.stop(); } catch (e) {} renderMagicCard(); $('spellPill').classList.add('hidden'); return; }
+  const rec = new SR(); mag.rec = rec;
+  rec.lang = 'es-ES'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 3;
+  rec.onresult = ev => {
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const r = ev.results[i]; const alts = Array.from(r).map(a => a.transcript).join(' ');
+      if (r.isFinal || r[0].confidence > .6) { if (castByVoice(alts) && !r.isFinal) { try { rec.abort(); } catch (e) {} } }
+    }
+  };
+  rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { mag.listening = false; renderMagicCard(); toast('Necesito permiso para usar el micrófono.', '🎙️'); } };
+  rec.onend = () => { if (mag.listening) { try { rec.start(); } catch (e) {} } };
+  try { rec.start(); mag.listening = true; setSpellPill('🎙️ Escuchando hechizos…'); toast('Di un hechizo: «Lumos», «Expecto Patronum», «Wingardium Leviosa»…', '🎙️'); } catch (e) {}
+  renderMagicCard();
+}
+/* ---------- Lumos real: linterna del celular ---------- */
+async function toggleTorchMode() {
+  if (mag.torchTrack) { setTorch(false); mag.torchStream.getTracks().forEach(t => t.stop()); mag.torchTrack = null; mag.torchStream = null; renderMagicCard(); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Tu navegador no permite usar la linterna.', '🔦'); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+    const track = stream.getVideoTracks()[0];
+    const caps = track.getCapabilities ? track.getCapabilities() : {};
+    if (!caps.torch) { stream.getTracks().forEach(t => t.stop()); showDialog({ icon: '🔦', title: 'Linterna no disponible', body: 'Tu dispositivo o navegador no permite controlar la linterna desde una página web. Funciona en la mayoría de celulares Android con Chrome. En iPhone no está permitido.' }); return; }
+    mag.torchStream = stream; mag.torchTrack = track; renderMagicCard();
+    toast('Linterna lista: di o toca «Lumos» para encenderla y «Nox» para apagarla.', '🔦');
+  } catch (e) { toast('No diste permiso a la cámara, que es la que controla la linterna.', '🔦'); }
+}
+async function setTorch(on) {
+  if (!mag.torchTrack) return;
+  try { await mag.torchTrack.applyConstraints({ advanced: [{ torch: on }] }); mag.torchOn = on; if (on) unlock('torch'); renderMagicCard(); } catch (e) {}
+}
+/* ---------- El celular como varita ---------- */
+async function toggleWandMotion() {
+  if (mag.motion) { mag.motion = false; window.removeEventListener('devicemotion', onWandMotion); renderMagicCard(); return; }
+  if (!('DeviceMotionEvent' in window)) { toast('Tu dispositivo no tiene sensores de movimiento.', '📱'); return; }
+  try { if (typeof DeviceMotionEvent.requestPermission === 'function') { const r = await DeviceMotionEvent.requestPermission(); if (r !== 'granted') { toast('Permiso denegado.', '📱'); return; } } } catch (e) {}
+  mag.motion = true; window.addEventListener('devicemotion', onWandMotion); renderMagicCard();
+  toast('¡Agita el celular como una varita para lanzar el hechizo elegido!', '📱');
+}
+function onWandMotion(e) {
+  const a = e.acceleration && e.acceleration.x !== null ? e.acceleration : null; if (!a) return;
+  const mag3 = Math.hypot(a.x || 0, a.y || 0, a.z || 0); const now = Date.now();
+  if (mag3 > 17 && now - mag.lastFlick > 900) {
+    mag.lastFlick = now;
+    const s = QUICK[mag.wandSpell] || QUICK[0];
+    castQuickSpell(mag.wandSpell, { clientX: innerWidth / 2, clientY: innerHeight / 3 });
+    setSpellPill(`📱 ${s.name}`);
+    if (navigator.vibrate) navigator.vibrate(60);
+    if (s.name === 'Lumos' && mag.torchTrack) setTorch(true);
+  }
+}
+function renderMagicCard() {
+  const box = $('magicCard'); if (!box) return;
+  const btn = (on, icon, title, desc, fn) => `<button onclick="${fn}" class="text-left rounded-2xl p-3 border transition ${on ? 'bg-amber-500/15 border-amber-400' : 'bg-stone-950/70 border-amber-900/40 hover:border-amber-600'}"><div class="flex items-center gap-2"><span class="text-2xl">${icon}</span><span class="font-bold text-sm text-amber-100">${title}</span><span class="ml-auto text-[10px] font-bold ${on ? 'text-emerald-300' : 'text-stone-500'}">${on ? 'ACTIVO' : 'APAGADO'}</span></div><p class="text-[11px] text-stone-400 mt-1">${desc}</p></button>`;
+  box.innerHTML = `
+    <div class="flex items-center justify-between"><h3 class="font-wizard text-lg font-bold text-amber-300">✨ Magia real</h3><span class="text-[10px] text-stone-500">Mejor en celular con Chrome</span></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      ${btn(mag.listening, '🎙️', 'Hechizos por voz', 'Di «Lumos», «Nox», «Expecto Patronum», «Wingardium Leviosa», «Accio trivia»…', 'toggleVoice()')}
+      ${btn(!!mag.torchTrack, mag.torchOn ? '💡' : '🔦', 'Lumos real', 'Enciende la linterna de tu celular con Lumos y apágala con Nox.', 'toggleTorchMode()')}
+      ${btn(mag.motion, '📱', 'Celular como varita', 'Agita el celular para lanzar el hechizo que elijas abajo.', 'toggleWandMotion()')}
+      <button onclick="openPhotoBooth()" class="text-left rounded-2xl p-3 border bg-stone-950/70 border-amber-900/40 hover:border-amber-600"><div class="flex items-center gap-2"><span class="text-2xl">📸</span><span class="font-bold text-sm text-amber-100">Foto con tu casa</span></div><p class="text-[11px] text-stone-400 mt-1">Tómate una foto con la bufanda y el escudo de tu casa.</p></button>
+    </div>
+    ${mag.torchTrack ? `<div class="flex gap-2"><button onclick="setTorch(true);castQuickSpell(0)" class="btn-gold flex-1 !py-2">💡 Lumos</button><button onclick="setTorch(false)" class="btn-ghost flex-1 !py-2">🌑 Nox</button></div>` : ''}
+    ${mag.motion ? `<label class="block text-xs text-stone-300">Hechizo de la varita<select onchange="mag.wandSpell=+this.value" class="mt-1 w-full bg-stone-950 border border-amber-800/50 rounded-xl p-2 text-sm text-amber-100">${QUICK.map((q, i) => `<option value="${i}" ${i === mag.wandSpell ? 'selected' : ''}>${q.icon} ${q.name}</option>`).join('')}</select></label>` : ''}`;
+}
+/* ---------- Foto con tu casa ---------- */
+async function openPhotoBooth() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Tu navegador no permite usar la cámara.', '📸'); return; }
+  if (!$('photoModal')) document.body.insertAdjacentHTML('beforeend', `
+    <div id="photoModal" class="fixed inset-0 z-[180] bg-stone-950/95 flex items-center justify-center p-3">
+      <div class="w-full max-w-md space-y-3 text-center">
+        <canvas id="photoCanvas" width="1080" height="1350" class="w-full rounded-2xl border-2 border-amber-600/60 bg-black"></canvas>
+        <div class="flex justify-center gap-2 flex-wrap">
+          <button onclick="snapPhoto()" class="btn-gold"><i class="fa-solid fa-camera"></i> Tomar foto</button>
+          <button onclick="flipCamera()" class="btn-ghost"><i class="fa-solid fa-camera-rotate"></i></button>
+          <button onclick="closePhotoBooth()" class="btn-ghost"><i class="fa-solid fa-xmark"></i> Cerrar</button>
+        </div>
+        <p class="text-[11px] text-stone-400">La foto no se sube a ningún lado: se guarda solo en tu dispositivo.</p>
+      </div></div>`);
+  $('photoModal').classList.remove('hidden');
+  await startCamera();
+}
+async function startCamera() {
+  stopCamera();
+  try {
+    mag.cam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mag.camFacing, width: { ideal: 1280 }, height: { ideal: 1600 } }, audio: false });
+    const v = document.createElement('video'); v.playsInline = true; v.muted = true; v.srcObject = mag.cam; await v.play(); mag.video = v;
+    const loop = () => { drawPhotoFrame(); mag.camRaf = requestAnimationFrame(loop); }; loop();
+  } catch (e) { toast('No diste permiso a la cámara.', '📸'); closePhotoBooth(); }
+}
+function stopCamera() { cancelAnimationFrame(mag.camRaf); if (mag.cam) mag.cam.getTracks().forEach(t => t.stop()); mag.cam = null; }
+function flipCamera() { mag.camFacing = mag.camFacing === 'user' ? 'environment' : 'user'; startCamera(); }
+function closePhotoBooth() { stopCamera(); const m = $('photoModal'); if (m) m.classList.add('hidden'); }
+function drawPhotoFrame() {
+  const c = $('photoCanvas'), v = mag.video; if (!c || !v || !v.videoWidth) return;
+  const x = c.getContext('2d'), W = c.width, H = c.height;
+  const house = S.house ? HOUSES[S.house] : { c1: '#7c2d12', c2: '#d3a625', emoji: '🎩' };
+  const s = Math.max(W / v.videoWidth, H / v.videoHeight), vw = v.videoWidth * s, vh = v.videoHeight * s;
+  x.save(); if (mag.camFacing === 'user') { x.translate(W, 0); x.scale(-1, 1); }
+  x.drawImage(v, (W - vw) / 2, (H - vh) / 2, vw, vh); x.restore();
+  // Bufanda a rayas
+  const sy = H - 300; x.save(); x.beginPath(); x.moveTo(0, sy + 40); x.quadraticCurveTo(W / 2, sy - 30, W, sy + 40); x.lineTo(W, sy + 220); x.quadraticCurveTo(W / 2, sy + 150, 0, sy + 220); x.closePath(); x.clip();
+  for (let i = -10; i < 30; i++) { x.fillStyle = i % 2 ? house.c1 : house.c2; x.beginPath(); x.moveTo(i * 70, sy - 60); x.lineTo(i * 70 + 70, sy - 60); x.lineTo(i * 70 + 170, H); x.lineTo(i * 70 + 100, H); x.closePath(); x.fill(); }
+  x.restore();
+  x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = 3; for (let i = 0; i < 14; i++) { x.beginPath(); x.moveTo(60 + i * 70, sy + 210); x.lineTo(60 + i * 70, sy + 260); x.stroke(); }
+  // Marco
+  x.lineWidth = 26; x.strokeStyle = house.c1; x.strokeRect(13, 13, W - 26, H - 26);
+  x.lineWidth = 8; x.strokeStyle = house.c2; x.strokeRect(40, 40, W - 80, H - 80);
+  // Escudo
+  const cx = W - 150, cy = 90; x.save(); x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 20;
+  x.beginPath(); x.moveTo(cx - 80, cy); x.lineTo(cx + 80, cy); x.lineTo(cx + 80, cy + 110); x.lineTo(cx, cy + 180); x.lineTo(cx - 80, cy + 110); x.closePath();
+  const g = x.createLinearGradient(cx, cy, cx, cy + 180); g.addColorStop(0, house.c1); g.addColorStop(1, house.c2); x.fillStyle = g; x.fill(); x.restore();
+  x.font = '90px serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(house.emoji, cx, cy + 80);
+  x.textBaseline = 'alphabetic'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.8)'; x.shadowBlur = 12;
+  x.font = '900 62px Cinzel, Georgia, serif'; x.fillText((S.student || myName() || 'Mago de Hogwarts').toUpperCase().slice(0, 22), W / 2, H - 70);
+  x.font = '700 34px Montserrat, sans-serif'; x.fillText(S.house ? `Casa ${S.house}` : 'Hogwarts Magic Experience', W / 2, 140 + 0); x.shadowBlur = 0;
+}
+function snapPhoto() {
+  const c = $('photoCanvas'); drawPhotoFrame(); sfx('levelup'); flash('rgba(255,255,255,.8)', false); unlock('photo');
+  c.toBlob(blob => {
+    const file = new File([blob], 'foto-hogwarts.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'Mi foto de Hogwarts' }).catch(() => {});
+    else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'foto-hogwarts.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('Foto guardada en tus descargas.', '📸'); }
+  }, 'image/png');
+}
+
+/* =====================================================================
+   JUEGOS NUEVOS: Año Escolar, Escoba, Ajedrez, Escape room
+===================================================================== */
+GAMES.unshift({ id: 'school', name: 'Modo Año Escolar', icon: '🎓', desc: '7 años de clases y exámenes, la batalla final y tu certificado de graduación.', g: ['#7c2d12', '#1c1917'] });
+GAMES.push(
+  { id: 'broom', name: 'Escoba Voladora', icon: '🧹', desc: 'Vuela esquivando torres y atrapa snitches. Toca o usa la barra espaciadora.', g: ['#0e7490', '#0c0a09'] },
+  { id: 'chess', name: 'Ajedrez Mágico', icon: '♟️', desc: 'Una partida de verdad contra la IA, con 3 niveles de dificultad.', g: ['#44403c', '#0c0a09'] },
+  { id: 'escape', name: 'Escape de la Cámara', icon: '🗝️', desc: 'Resuelve los acertijos de la Cámara de los Secretos antes de que se acabe el tiempo.', g: ['#14532d', '#022c22'] }
+);
+const _v4BestText = bestText;
+bestText = function (id) {
+  const g = S.games;
+  if (id === 'school') return S.school.graduated ? '🎓 Graduado' : `Año ${Math.min(8, S.school.passed.length + 1)} de 8`;
+  if (id === 'broom') return g.broom ? `Récord: ${g.broom} m` : '';
+  if (id === 'chess') return g.chess ? `Victorias: ${g.chess}` : '';
+  if (id === 'escape') return g.escape ? `Récord: ${g.escape} s` : '';
+  return _v4BestText(id);
+};
+const _v4OpenGame = openGame;
+openGame = function (id) {
+  const extra = { school: schoolInit, broom: broomInit, chess: chessInit, escape: escapeInit }[id];
+  if (!extra) return _v4OpenGame(id);
+  stopAllGames(); activeGame = id;
+  const g = GAMES.find(x => x.id === id);
+  $('gamesHubWrap').classList.add('hidden'); $('gameStage').classList.remove('hidden');
+  $('gameTitle').textContent = `${g.icon} ${g.name}`; $('gameBest').textContent = bestText(id);
+  extra(); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+};
+const _v4StopAll = stopAllGames;
+stopAllGames = function () { _v4StopAll(); cancelAnimationFrame(gameState.broomRaf); gameState.broomRun = false; clearInterval(gameState.escTimer); };
+
+/* ---------------- 1. MODO AÑO ESCOLAR ---------------- */
+const SCHOOL_YEARS = [
+  { n: 1, name: 'Primer año', mid: 1, prof: ['McGonagall', 'Flitwick', 'Quirrell'] },
+  { n: 2, name: 'Segundo año', mid: 2, prof: ['McGonagall', 'Snape', 'Lockhart'] },
+  { n: 3, name: 'Tercer año', mid: 3, prof: ['Trelawney', 'Hagrid', 'Lupin'] },
+  { n: 4, name: 'Cuarto año', mid: 4, prof: ['McGonagall', 'Snape', 'Ojoloco Moody'] },
+  { n: 5, name: 'Quinto año', mid: 5, prof: ['Snape', 'Trelawney', 'Umbridge'] },
+  { n: 6, name: 'Sexto año', mid: 6, prof: ['Slughorn', 'McGonagall', 'Snape'] },
+  { n: 7, name: 'Séptimo año', mid: 7, prof: ['Lupin', 'Kingsley', 'Ojoloco Moody'] },
+  { n: 8, name: 'La Batalla de Hogwarts', mid: 8, prof: ['McGonagall', 'Neville', 'Molly Weasley'] }
+];
+const SCHOOL_CLASSES = ['Encantamientos', 'Pociones', 'Defensa Contra las Artes Oscuras'];
+function schoolInit() {
+  const next = S.school.passed.length;
+  $('gameBody').innerHTML = `<div class="max-w-4xl mx-auto space-y-3">
+    <p class="text-center text-sm text-stone-300">Cada año tiene 3 clases de 5 preguntas y un examen final de 10. Necesitas 7 aciertos para aprobar el examen y pasar al siguiente año.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${SCHOOL_YEARS.map((y, i) => {
+      const locked = i > next, done = S.school.passed.includes(y.n);
+      const cls = SCHOOL_CLASSES.map((c, j) => S.school.classes[`${y.n}-${j}`] ? '✔' : '○').join(' ');
+      return `<div class="glass-card rounded-2xl p-4 ${locked ? 'opacity-50' : ''}">
+        <div class="flex items-center gap-3"><span class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background:linear-gradient(150deg, ${MOVIES[y.mid - 1].g[0]}, ${MOVIES[y.mid - 1].g[1]})">${done ? '🎓' : locked ? '🔒' : MOVIES[y.mid - 1].icon}</span>
+        <div class="flex-grow"><p class="font-wizard font-bold text-amber-200">${y.n < 8 ? 'Año ' + y.n : '⚔️'} · ${y.name}</p><p class="text-[11px] text-stone-400">Clases: ${cls} ${done ? '· <b class="text-emerald-300">Aprobado</b>' : ''}</p></div></div>
+        ${locked ? '' : `<div class="grid grid-cols-2 gap-2 mt-3">${SCHOOL_CLASSES.map((c, j) => `<button onclick="schoolClass(${y.n},${j})" class="btn-ghost !py-1.5 !text-[10px] !px-2">${S.school.classes[`${y.n}-${j}`] ? '✔ ' : ''}${y.n === 8 ? ['Defender la torre', 'Proteger el Gran Comedor', 'Enfrentar a los mortífagos'][j] : c}</button>`).join('')}
+        <button onclick="schoolExam(${y.n})" class="btn-gold !py-1.5 !text-[11px]">${y.n === 8 ? '⚔️ Batalla final' : '📝 Examen final'}</button></div>`}</div>`;
+    }).join('')}</div>
+    ${S.school.graduated ? `<div class="text-center"><button onclick="downloadCertificate()" class="btn-gold"><i class="fa-solid fa-scroll"></i> Descargar mi certificado de graduación</button></div>` : ''}</div>`;
+}
+function schoolQuestions(year, n, seedKey) { const pool = MOVIES[year - 1].q; return seededShuffle(pool, hash(seedKey + Date.now())).slice(0, n); }
+function schoolClass(year, j) {
+  const y = SCHOOL_YEARS[year - 1];
+  runMiniQuiz({ title: `${y.name} · ${year === 8 ? 'Batalla' : SCHOOL_CLASSES[j]}`, intro: `${['🧙‍♀️', '🧪', '🛡️'][j]} Profesor/a ${y.prof[j]}: «${['Varitas en alto. Empecemos.', 'Silencio. Hoy veremos si prestaron atención.', 'Estén alertas: el peligro no avisa.'][j]}»`,
+    list: schoolQuestions(year, 5, `c${year}${j}`), pass: 3, onDone: (ok, score) => { if (ok) { S.school.classes[`${year}-${j}`] = true; save(); addPoints(10); } schoolInit(); } });
+}
+function schoolExam(year) {
+  const y = SCHOOL_YEARS[year - 1];
+  runMiniQuiz({ title: `${y.name} · ${year === 8 ? 'Batalla final' : 'Examen final'}`, intro: year === 8 ? '⚔️ Voldemort ataca el castillo. ¡Responde bien para defender Hogwarts!' : `📝 Examen de ${y.name.toLowerCase()}. Necesitas 7 de 10.`,
+    list: schoolQuestions(year, 10, 'e' + year), pass: 7, onDone: ok => {
+      if (ok) {
+        if (!S.school.passed.includes(year)) S.school.passed.push(year);
+        addPoints(year === 8 ? 100 : 40); if (year === 1) unlock('year1');
+        if (year === 8 && !S.school.graduated) { S.school.graduated = true; if (!S.owned.includes('t-grad')) S.owned.push('t-grad'); addExclusiveTitles(); unlock('school'); save(); fireConfetti({ particleCount: 220, spread: 140 }); showDialog({ icon: '🎓', title: '¡Te graduaste de Hogwarts!', body: 'Ganaste el título exclusivo «Graduado de Hogwarts» y tu certificado oficial.', actions: [{ label: 'Descargar certificado', primary: true, onClick: downloadCertificate }, { label: 'Cerrar' }] }); }
+        save();
+      }
+      schoolInit(); refreshBest();
+    } });
+}
+function runMiniQuiz({ title, intro, list, pass, onDone }) {
+  const st = { i: 0, ok: 0, list: list.map(q => ({ ...q, opts: shuffle([q.a, ...q.w]) })) };
+  const render = () => {
+    if (st.i >= st.list.length) {
+      const passed = st.ok >= pass; sfx(passed ? 'levelup' : 'wrong'); if (passed) fireConfetti({ particleCount: 80, spread: 70 });
+      $('gameBody').innerHTML = `<div class="max-w-md mx-auto glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-5xl">${passed ? '🏅' : '📚'}</div><p class="font-wizard text-2xl font-bold text-amber-300">${st.ok} de ${st.list.length}</p><p class="text-sm text-stone-300">${passed ? '¡Aprobado! Muy bien hecho.' : `Necesitabas ${pass}. ¡Estudia un poco más e inténtalo otra vez!`}</p><button class="btn-gold" id="miniDone">Continuar</button></div>`;
+      $('miniDone').onclick = () => onDone(passed, st.ok); return;
+    }
+    const q = st.list[st.i];
+    $('gameBody').innerHTML = `<div class="max-w-2xl mx-auto glass-card rounded-3xl p-5 space-y-3">
+      <div class="flex justify-between text-xs text-stone-400"><span class="font-wizard text-amber-300">${esc(title)}</span><span>${st.i + 1}/${st.list.length} · ✔ ${st.ok}</span></div>
+      ${st.i === 0 ? `<p class="text-xs italic text-amber-100/80 bg-stone-950/60 rounded-xl p-2">${esc(intro)}</p>` : ''}
+      <p class="text-base sm:text-lg font-semibold text-stone-100">${esc(q.q)}</p>
+      <div class="grid gap-2" id="miniOpts">${q.opts.map((o, i) => `<button class="opt-btn text-sm" data-i="${i}"><span class="key-hint">${i + 1}</span><span>${esc(o)}</span></button>`).join('')}</div>
+      <div id="miniFb"></div></div>`;
+    $('miniOpts').querySelectorAll('button').forEach(b => b.onclick = () => {
+      const i = +b.dataset.i, ok = q.opts[i] === q.a; if (ok) st.ok++;
+      [...$('miniOpts').children].forEach((x, j) => { x.disabled = true; if (q.opts[j] === q.a) x.classList.add('correct'); else if (j === i) x.classList.add('wrong'); });
+      sfx(ok ? 'correct' : 'wrong');
+      $('miniFb').innerHTML = `<p class="text-xs ${ok ? 'text-emerald-300' : 'text-red-300'}">${ok ? '¡Correcto!' : 'La respuesta era: ' + esc(q.a)} <span class="text-stone-400">${esc(q.e)}</span></p><button class="btn-gold w-full mt-2" id="miniNext">Siguiente</button>`;
+      $('miniNext').onclick = () => { st.i++; render(); };
+    });
+  };
+  render();
+}
+async function downloadCertificate() {
+  const c = document.createElement('canvas'); c.width = 1600; c.height = 1130; const x = c.getContext('2d');
+  try { await document.fonts.load('900 60px Cinzel'); await document.fonts.load('700 60px Caveat'); } catch (e) {}
+  const W = c.width, H = c.height, house = S.house ? HOUSES[S.house] : { c1: '#7c2d12', c2: '#d3a625', emoji: '🎩' };
+  const g = x.createRadialGradient(W / 2, H / 2, 100, W / 2, H / 2, W * .7); g.addColorStop(0, '#f7ebc8'); g.addColorStop(1, '#d9bf86');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.strokeStyle = '#7c2d12'; x.lineWidth = 18; x.strokeRect(30, 30, W - 60, H - 60); x.strokeStyle = '#b45309'; x.lineWidth = 4; x.strokeRect(62, 62, W - 124, H - 124);
+  x.textAlign = 'center'; x.fillStyle = '#3b2410';
+  x.font = '700 40px Cinzel, Georgia, serif'; x.fillText('COLEGIO HOGWARTS DE MAGIA Y HECHICERÍA', W / 2, 190);
+  x.font = '900 92px Cinzel, Georgia, serif'; x.fillText('CERTIFICADO DE GRADUACIÓN', W / 2, 310);
+  x.font = '700 46px Caveat, cursive'; x.fillText('Se otorga el presente reconocimiento a', W / 2, 410);
+  x.font = '900 84px Cinzel, Georgia, serif'; x.fillStyle = house.c1; x.fillText((S.student || myName() || 'Mago de Hogwarts').toUpperCase().slice(0, 26), W / 2, 520);
+  x.fillStyle = '#3b2410'; x.font = '700 44px Caveat, cursive';
+  x.fillText(`de la casa ${S.house || '—'}, por completar sus siete años de estudios`, W / 2, 610);
+  x.fillText('y defender el castillo en la Batalla de Hogwarts.', W / 2, 665);
+  x.font = '600 30px Montserrat, sans-serif'; x.fillText(new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }), W / 2, 760);
+  x.font = '700 46px Caveat, cursive'; x.fillText('Minerva McGonagall', W * .27, 930); x.fillText('Albus Dumbledore', W * .73, 930);
+  x.strokeStyle = '#3b2410'; x.lineWidth = 2; [[W * .14, W * .4], [W * .6, W * .86]].forEach(([a, b]) => { x.beginPath(); x.moveTo(a, 945); x.lineTo(b, 945); x.stroke(); });
+  x.font = '600 24px Montserrat, sans-serif'; x.fillText('Directora', W * .27, 985); x.fillText('Director honorario', W * .73, 985);
+  x.beginPath(); x.arc(W / 2, 930, 70, 0, 7); x.fillStyle = '#991b1b'; x.fill(); x.fillStyle = '#fecaca'; x.font = '900 70px Cinzel, Georgia, serif'; x.fillText('H', W / 2, 955);
+  x.fillStyle = '#78716c'; x.font = '600 20px Montserrat, sans-serif'; x.fillText('Hogwarts Magic Experience · by Leandro Zamora', W / 2, H - 90);
+  c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'certificado-hogwarts.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }, 'image/png');
+  toast('Certificado descargado.', '🎓');
+}
+
+/* ---------------- 2. ESCOBA VOLADORA ---------------- */
+function broomInit() {
+  $('gameBody').innerHTML = `<div class="max-w-3xl mx-auto space-y-2">
+    <div class="flex justify-between text-sm font-bold"><span class="text-amber-300">📏 <span id="brDist">0</span> m</span><span class="text-yellow-300">🟡 <span id="brSn">0</span></span><span class="text-stone-400 text-xs">Récord: ${S.games.broom} m</span></div>
+    <div class="relative h-80 sm:h-[28rem] rounded-2xl overflow-hidden border-2 border-amber-700/60"><canvas id="broomCanvas" class="block w-full h-full" style="touch-action:none"></canvas>
+      <div id="brOverlay" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-stone-950/60 text-center p-4"><p class="font-wizard text-xl text-amber-200 font-bold">¡Monta tu escoba!</p><p class="text-xs text-stone-300 max-w-xs">Toca la pantalla (o la barra espaciadora) para subir. Esquiva las torres y atrapa snitches.</p><button onclick="broomStart()" class="btn-gold">¡Despegar!</button></div></div></div>`;
+  const c = $('broomCanvas'); c.addEventListener('pointerdown', e => { e.preventDefault(); broomFlap(); });
+  broomSize(); broomDraw();
+}
+function broomSize() { const c = $('broomCanvas'); if (!c) return; const r = c.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); c.width = r.width * dpr; c.height = r.height * dpr; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); gameState.brW = r.width; gameState.brH = r.height; }
+function broomStart() {
+  const st = gameState; $('brOverlay').classList.add('hidden');
+  st.br = { y: st.brH / 2, vy: 0, dist: 0, sn: 0, speed: 2.6, towers: [], snitches: [], t: 0, clouds: Array.from({ length: 6 }, () => ({ x: Math.random() * st.brW, y: Math.random() * st.brH * .6, s: .3 + Math.random() * .5 })) };
+  st.broomRun = true; st.brLast = performance.now(); cancelAnimationFrame(st.broomRaf); st.broomRaf = requestAnimationFrame(broomLoop);
+}
+function broomFlap() { const b = gameState.br; if (!gameState.broomRun || !b) return; b.vy = -5.4; sfx('tick'); }
+document.addEventListener('keydown', e => { if (activeGame === 'broom' && currentTab === 'games' && (e.code === 'Space' || e.key === 'ArrowUp')) { e.preventDefault(); if (!gameState.broomRun) { if (!$('brOverlay').classList.contains('hidden')) broomStart(); } else broomFlap(); } });
+function broomLoop(now) {
+  const st = gameState, b = st.br; if (!st.broomRun) return;
+  const dt = Math.min(2.5, (now - st.brLast) / 16.7); st.brLast = now; const W = st.brW, H = st.brH;
+  b.vy += .32 * dt; b.y += b.vy * dt; b.dist += b.speed * dt * .1; b.speed = 2.6 + b.dist / 120; b.t += dt;
+  if (!b.towers.length || b.towers[b.towers.length - 1].x < W - 230) {
+    const gap = Math.max(120, 170 - b.dist / 8), top = 30 + Math.random() * (H - gap - 60);
+    b.towers.push({ x: W + 40, top, gap, w: 54, passed: false });
+    if (Math.random() < .6) b.snitches.push({ x: W + 160, y: top + gap / 2 + (Math.random() - .5) * gap * .5, got: false });
+  }
+  b.towers.forEach(t => t.x -= b.speed * dt); b.snitches.forEach(s => s.x -= b.speed * dt);
+  b.towers = b.towers.filter(t => t.x > -80); b.snitches = b.snitches.filter(s => s.x > -30 && !s.got);
+  b.clouds.forEach(cl => { cl.x -= cl.s * b.speed * dt * .3; if (cl.x < -120) cl.x = W + 60; });
+  const px = W * .22, py = b.y;
+  b.snitches.forEach(s => { if (Math.hypot(s.x - px, s.y - py) < 26) { s.got = true; b.sn++; b.dist += 5; sfx('correct'); } });
+  const hit = py < 8 || py > H - 8 || b.towers.some(t => px + 16 > t.x && px - 16 < t.x + t.w && (py - 10 < t.top || py + 10 > t.top + t.gap));
+  broomDraw();
+  $('brDist').textContent = Math.floor(b.dist); $('brSn').textContent = b.sn;
+  if (hit) return broomEnd();
+  st.broomRaf = requestAnimationFrame(broomLoop);
+}
+function broomDraw() {
+  const c = $('broomCanvas'); if (!c) return; const x = c.getContext('2d'), st = gameState, W = st.brW, H = st.brH, b = st.br;
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1e1b4b'); g.addColorStop(.6, '#7c3aed'); g.addColorStop(1, '#f59e0b'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  if (!b) { x.font = '64px serif'; x.textAlign = 'center'; x.fillText('🧹', W / 2, H / 2); return; }
+  x.fillStyle = 'rgba(255,255,255,.18)'; b.clouds.forEach(cl => { x.beginPath(); x.ellipse(cl.x, cl.y, 60, 18, 0, 0, 7); x.fill(); });
+  b.towers.forEach(t => {
+    const tower = (y0, y1, roofDown) => { x.fillStyle = '#292524'; x.fillRect(t.x, y0, t.w, y1 - y0); x.fillStyle = '#fbbf24'; for (let yy = y0 + 20; yy < y1 - 10; yy += 46) x.fillRect(t.x + t.w / 2 - 5, yy, 10, 14);
+      x.fillStyle = '#7f1d1d'; x.beginPath(); if (roofDown) { x.moveTo(t.x - 8, y1); x.lineTo(t.x + t.w + 8, y1); x.lineTo(t.x + t.w / 2, y1 + 36); } else { x.moveTo(t.x - 8, y0); x.lineTo(t.x + t.w + 8, y0); x.lineTo(t.x + t.w / 2, y0 - 36); } x.fill(); };
+    tower(0, t.top - 36, true); tower(t.top + t.gap + 36, H, false);
+  });
+  b.snitches.forEach(s => { x.fillStyle = '#facc15'; x.shadowColor = '#fde047'; x.shadowBlur = 14; x.beginPath(); x.arc(s.x, s.y, 7, 0, 7); x.fill(); x.shadowBlur = 0; x.fillStyle = 'rgba(255,255,255,.8)'; const f = Math.sin(performance.now() / 40) * 4; x.beginPath(); x.ellipse(s.x - 11, s.y - 2, 8, 3 + f * .3, -.3, 0, 7); x.ellipse(s.x + 11, s.y - 2, 8, 3 + f * .3, .3, 0, 7); x.fill(); });
+  x.save(); x.translate(W * .22, b.y); x.rotate(Math.max(-.5, Math.min(.6, b.vy / 10)));
+  x.strokeStyle = '#78350f'; x.lineWidth = 5; x.beginPath(); x.moveTo(-26, 6); x.lineTo(24, 6); x.stroke();
+  x.fillStyle = '#a16207'; x.beginPath(); x.moveTo(-26, 0); x.lineTo(-44, -4); x.lineTo(-44, 16); x.lineTo(-26, 12); x.fill();
+  x.font = '26px serif'; x.textAlign = 'center'; x.fillText('🧙', 0, 2); x.restore();
+}
+function broomEnd() {
+  const st = gameState, b = st.br; st.broomRun = false; sfx('wrong'); flash('rgba(0,0,0,.4)', true);
+  const d = Math.floor(b.dist), best = d > S.games.broom; if (best) { S.games.broom = d; save(); refreshBest(); }
+  if (d >= 100) unlock('broom');
+  $('brOverlay').classList.remove('hidden');
+  $('brOverlay').innerHTML = `<p class="font-wizard text-2xl text-amber-200 font-bold">${d} metros</p><p class="text-sm text-yellow-200">🟡 ${b.sn} snitches</p>${best ? '<p class="text-sky-300 text-sm font-bold">🏆 ¡Nuevo récord!</p>' : ''}<button onclick="broomStart()" class="btn-gold">Volar de nuevo</button>`;
+  const pts = Math.floor(d / 10) + b.sn * 3; if (pts) gameReward(pts, `Vuelo de ${d} m`);
+}
+window.addEventListener('resize', () => { if (activeGame === 'broom') { broomSize(); broomDraw(); } });
+
+/* ---------------- 3. AJEDREZ MÁGICO ---------------- */
+const CH = { board: null, turn: 'w', sel: null, moves: [], castle: null, ep: null, over: false, level: 2, last: null, thinking: false };
+const PIECE_VAL = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+const GLYPH = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟', k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+const isW = p => p && p === p.toUpperCase();
+const colorOf = p => p ? (isW(p) ? 'w' : 'b') : null;
+function chessInit() {
+  CH.board = ['rnbqkbnr', 'pppppppp', '........', '........', '........', '........', 'PPPPPPPP', 'RNBQKBNR'].map(r => r.split('').map(c => c === '.' ? null : c));
+  Object.assign(CH, { turn: 'w', sel: null, moves: [], castle: { K: true, Q: true, k: true, q: true }, ep: null, over: false, last: null, thinking: false });
+  $('gameBody').innerHTML = `<div class="max-w-xl mx-auto space-y-3">
+    <div class="flex flex-wrap justify-between items-center gap-2"><p id="chStatus" class="text-sm font-bold text-amber-200">Tu turno (blancas)</p>
+      <label class="text-xs text-stone-300">IA: <select onchange="CH.level=+this.value" class="bg-stone-900 border border-amber-800/50 rounded-lg p-1 text-amber-200 text-xs"><option value="1" ${CH.level === 1 ? 'selected' : ''}>Primer año</option><option value="2" ${CH.level === 2 ? 'selected' : ''}>Prefecto</option><option value="3" ${CH.level === 3 ? 'selected' : ''}>Gran Mago</option></select></label>
+      <button onclick="chessInit()" class="btn-ghost !py-1.5 !text-[11px]"><i class="fa-solid fa-rotate"></i> Nueva partida</button></div>
+    <div id="chBoard" class="chess-board"></div></div>`;
+  chessRender();
+}
+function chessRender() {
+  const box = $('chBoard'); if (!box) return;
+  const targets = new Set(CH.moves.filter(m => CH.sel && m.fr === CH.sel[0] && m.fc === CH.sel[1]).map(m => m.tr * 8 + m.tc));
+  const kingPos = findKing(CH.board, CH.turn), inCheck = kingPos && attacked(CH.board, kingPos[0], kingPos[1], CH.turn === 'w' ? 'b' : 'w');
+  let html = '';
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+    const p = CH.board[r][c], dark = (r + c) % 2 === 1, idx = r * 8 + c;
+    const isSel = CH.sel && CH.sel[0] === r && CH.sel[1] === c, isLast = CH.last && ((CH.last.fr === r && CH.last.fc === c) || (CH.last.tr === r && CH.last.tc === c));
+    const chk = inCheck && kingPos[0] === r && kingPos[1] === c;
+    html += `<button class="sq ${dark ? 'dark' : 'light'} ${isSel ? 'sel' : ''} ${isLast ? 'last' : ''} ${chk ? 'check' : ''}" onclick="chessClick(${r},${c})">${p ? `<span class="pc ${isW(p) ? 'white' : 'black'} ${CH.last && CH.last.tr === r && CH.last.tc === c ? 'moved' : ''}">${GLYPH[p]}</span>` : ''}${targets.has(idx) ? `<i class="${p ? 'cap' : 'dot'}"></i>` : ''}</button>`;
+  }
+  box.innerHTML = html;
+}
+function chessClick(r, c) {
+  if (CH.over || CH.turn !== 'w' || CH.thinking) return;
+  const p = CH.board[r][c];
+  if (CH.sel) {
+    const mv = legalMoves(CH, 'w').find(m => m.fr === CH.sel[0] && m.fc === CH.sel[1] && m.tr === r && m.tc === c);
+    if (mv) { chessDo(mv); return; }
+  }
+  if (p && isW(p)) { CH.sel = [r, c]; CH.moves = legalMoves(CH, 'w'); sfx('tick'); } else { CH.sel = null; }
+  chessRender();
+}
+function chessDo(mv) {
+  const cap = CH.board[mv.tr][mv.tc] || mv.ep;
+  applyMove(CH, mv); CH.last = mv; CH.sel = null; CH.moves = [];
+  if (cap) { sfx('zap'); const el = $('chBoard'); if (el) { const r = el.getBoundingClientRect(); burst(r.left + (mv.tc + .5) * r.width / 8, r.top + (mv.tr + .5) * r.height / 8, '#fbbf24', 26); } } else sfx('tick');
+  chessRender(); if (chessCheckEnd()) return;
+  if (CH.turn === 'b') { CH.thinking = true; $('chStatus').textContent = 'La IA está pensando…'; setTimeout(chessAI, 350); }
+}
+function chessAI() {
+  const moves = legalMoves(CH, 'b'); if (!moves.length) return;
+  let best = null, bestScore = -Infinity; const depth = CH.level;
+  const ordered = moves.sort((a, b) => (CH.board[b.tr][b.tc] ? PIECE_VAL[CH.board[b.tr][b.tc].toLowerCase()] : 0) - (CH.board[a.tr][a.tc] ? PIECE_VAL[CH.board[a.tr][a.tc].toLowerCase()] : 0));
+  for (const m of ordered) {
+    const st = cloneState(CH); applyMove(st, m);
+    const s = -negamax(st, depth - 1, -Infinity, Infinity, 'w') + (CH.level === 1 ? Math.random() * 120 : Math.random() * 8);
+    if (s > bestScore) { bestScore = s; best = m; }
+  }
+  CH.thinking = false; chessDo(best);
+}
+function negamax(st, depth, a, b, side) {
+  if (depth <= 0) return evaluate(st.board) * (side === 'w' ? 1 : -1);
+  const moves = legalMoves(st, side);
+  if (!moves.length) { const k = findKing(st.board, side); return k && attacked(st.board, k[0], k[1], side === 'w' ? 'b' : 'w') ? -99999 - depth : 0; }
+  let best = -Infinity;
+  for (const m of moves) { const s2 = cloneState(st); applyMove(s2, m); const v = -negamax(s2, depth - 1, -b, -a, side === 'w' ? 'b' : 'w'); if (v > best) best = v; if (best > a) a = best; if (a >= b) break; }
+  return best;
+}
+function evaluate(bd) {
+  let s = 0;
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = bd[r][c]; if (!p) continue; const v = PIECE_VAL[p.toLowerCase()] + (p.toLowerCase() === 'p' ? (isW(p) ? (6 - r) * 8 : (r - 1) * 8) : 0) + ((c >= 2 && c <= 5 && r >= 2 && r <= 5) ? 10 : 0); s += isW(p) ? v : -v; }
+  return s;
+}
+const cloneState = st => ({ board: st.board.map(r => r.slice()), turn: st.turn, castle: { ...st.castle }, ep: st.ep });
+function findKing(bd, side) { const k = side === 'w' ? 'K' : 'k'; for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) if (bd[r][c] === k) return [r, c]; return null; }
+function attacked(bd, r, c, by) {
+  const inB = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+  const pd = by === 'w' ? 1 : -1;
+  for (const dc of [-1, 1]) { const rr = r + pd, cc = c + dc; if (inB(rr, cc) && bd[rr][cc] === (by === 'w' ? 'P' : 'p')) return true; }
+  for (const [dr, dc] of [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]]) { const rr = r + dr, cc = c + dc; if (inB(rr, cc) && bd[rr][cc] === (by === 'w' ? 'N' : 'n')) return true; }
+  for (const [dr, dc] of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    let rr = r + dr, cc = c + dc, dist = 1;
+    while (inB(rr, cc)) { const p = bd[rr][cc]; if (p) { if (colorOf(p) === by) { const t = p.toLowerCase(), diag = dr && dc; if (t === 'q' || (diag && t === 'b') || (!diag && t === 'r') || (t === 'k' && dist === 1)) return true; } break; } rr += dr; cc += dc; dist++; }
+  }
+  return false;
+}
+function pseudoMoves(st, side) {
+  const bd = st.board, out = [], inB = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+    const p = bd[r][c]; if (!p || colorOf(p) !== side) continue; const t = p.toLowerCase();
+    const add = (tr, tc, extra) => out.push({ fr: r, fc: c, tr, tc, ...extra });
+    if (t === 'p') {
+      const d = side === 'w' ? -1 : 1, start = side === 'w' ? 6 : 1, last = side === 'w' ? 0 : 7;
+      if (inB(r + d, c) && !bd[r + d][c]) { add(r + d, c, r + d === last ? { promo: true } : {}); if (r === start && !bd[r + 2 * d][c]) add(r + 2 * d, c, { dbl: true }); }
+      for (const dc of [-1, 1]) { const tr = r + d, tc = c + dc; if (!inB(tr, tc)) continue; if (bd[tr][tc] && colorOf(bd[tr][tc]) !== side) add(tr, tc, tr === last ? { promo: true } : {}); else if (st.ep && st.ep[0] === tr && st.ep[1] === tc) add(tr, tc, { ep: true }); }
+    } else if (t === 'n' || t === 'k') {
+      const steps = t === 'n' ? [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]] : [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
+      for (const [dr, dc] of steps) { const tr = r + dr, tc = c + dc; if (inB(tr, tc) && colorOf(bd[tr][tc]) !== side) add(tr, tc); }
+      if (t === 'k') {
+        const row = side === 'w' ? 7 : 0, opp = side === 'w' ? 'b' : 'w', K = side === 'w' ? 'K' : 'k', Q = side === 'w' ? 'Q' : 'q';
+        if (r === row && c === 4 && !attacked(bd, row, 4, opp)) {
+          if (st.castle[K] && !bd[row][5] && !bd[row][6] && bd[row][7] === (side === 'w' ? 'R' : 'r') && !attacked(bd, row, 5, opp) && !attacked(bd, row, 6, opp)) add(row, 6, { castle: 'k' });
+          if (st.castle[Q] && !bd[row][3] && !bd[row][2] && !bd[row][1] && bd[row][0] === (side === 'w' ? 'R' : 'r') && !attacked(bd, row, 3, opp) && !attacked(bd, row, 2, opp)) add(row, 2, { castle: 'q' });
+        }
+      }
+    } else {
+      const dirs = t === 'b' ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : t === 'r' ? [[1, 0], [-1, 0], [0, 1], [0, -1]] : [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
+      for (const [dr, dc] of dirs) { let tr = r + dr, tc = c + dc; while (inB(tr, tc)) { if (bd[tr][tc]) { if (colorOf(bd[tr][tc]) !== side) add(tr, tc); break; } add(tr, tc); tr += dr; tc += dc; } }
+    }
+  }
+  return out;
+}
+function legalMoves(st, side) { return pseudoMoves(st, side).filter(m => { const s2 = cloneState(st); applyMove(s2, m); const k = findKing(s2.board, side); return k && !attacked(s2.board, k[0], k[1], side === 'w' ? 'b' : 'w'); }); }
+function applyMove(st, m) {
+  const bd = st.board, p = bd[m.fr][m.fc], side = colorOf(p);
+  if (m.ep) bd[m.fr][m.tc] = null;
+  bd[m.tr][m.tc] = m.promo ? (side === 'w' ? 'Q' : 'q') : p; bd[m.fr][m.fc] = null;
+  if (m.castle) { const row = m.fr; if (m.castle === 'k') { bd[row][5] = bd[row][7]; bd[row][7] = null; } else { bd[row][3] = bd[row][0]; bd[row][0] = null; } }
+  if (p === 'K') st.castle.K = st.castle.Q = false; if (p === 'k') st.castle.k = st.castle.q = false;
+  if (m.fr === 7 && m.fc === 0 || m.tr === 7 && m.tc === 0) st.castle.Q = false; if (m.fr === 7 && m.fc === 7 || m.tr === 7 && m.tc === 7) st.castle.K = false;
+  if (m.fr === 0 && m.fc === 0 || m.tr === 0 && m.tc === 0) st.castle.q = false; if (m.fr === 0 && m.fc === 7 || m.tr === 0 && m.tc === 7) st.castle.k = false;
+  st.ep = m.dbl ? [(m.fr + m.tr) / 2, m.fc] : null;
+  st.turn = side === 'w' ? 'b' : 'w';
+}
+function chessCheckEnd() {
+  const side = CH.turn, moves = legalMoves(CH, side), k = findKing(CH.board, side), check = k && attacked(CH.board, k[0], k[1], side === 'w' ? 'b' : 'w');
+  const st = $('chStatus');
+  if (!moves.length) {
+    CH.over = true;
+    if (check && side === 'b') { st.textContent = '♛ ¡Jaque mate! Ganaste la partida'; S.games.chess++; save(); unlock('chess'); refreshBest(); fireConfetti({ particleCount: 150, spread: 100 }); gameReward(40 + CH.level * 20, 'Victoria en ajedrez'); sfx('levelup'); }
+    else if (check) { st.textContent = '♚ Jaque mate… la IA gana esta vez'; sfx('wrong'); }
+    else { st.textContent = '🤝 Tablas por ahogado'; }
+    return true;
+  }
+  st.textContent = side === 'w' ? (check ? '⚠️ ¡Jaque! Tu turno' : 'Tu turno (blancas)') : 'Turno de la IA';
+  return false;
+}
+
+/* ---------------- 4. ESCAPE DE LA CÁMARA DE LOS SECRETOS ---------------- */
+const ESC = { stage: 0, start: 0, seq: [], input: [], word: '', built: [] };
+function escapeInit() {
+  Object.assign(ESC, { stage: 0, start: Date.now(), seq: [], input: [], built: [] });
+  clearInterval(gameState.escTimer);
+  gameState.escTimer = setInterval(() => { const el = $('escTime'); if (!el) return; const left = 300 - Math.floor((Date.now() - ESC.start) / 1000); el.textContent = `${Math.floor(Math.max(0, left) / 60)}:${String(Math.max(0, left) % 60).padStart(2, '0')}`; if (left <= 0) escapeLose(); }, 1000);
+  escapeRender();
+}
+function escapeShell(inner, title, sub) {
+  $('gameBody').innerHTML = `<div class="max-w-2xl mx-auto space-y-3">
+    <div class="flex justify-between items-center text-xs text-stone-300"><span>Etapa ${ESC.stage + 1} de 4</span><span class="font-mono text-lg text-emerald-300">⏳ <span id="escTime">5:00</span></span></div>
+    <div class="rounded-3xl p-5 border-2 border-emerald-800/60 space-y-3" style="background:radial-gradient(circle at 50% 0%, #064e3b, #022c22 60%, #0c0a09)">
+      <h3 class="font-wizard font-bold text-emerald-200 text-lg">${title}</h3><p class="text-sm text-emerald-50/80">${sub}</p>${inner}</div></div>`;
+}
+function escapeRender() {
+  if (ESC.stage === 0) {
+    escapeShell(`<div class="grid grid-cols-3 gap-3 text-center">${[['🚰', 'Lavabo', 'Un lavabo con una pequeña serpiente grabada en el grifo.'], ['🪞', 'Espejo', 'Alguien escribió en el espejo: «Habla como ella y se abrirá».'], ['👻', 'Myrtle', '«Murí aquí, en este baño. Solo recuerdo unos ojos amarillos enormes…»']].map(([e, n, t], i) => `<button onclick="toast('${t.replace(/'/g, "\\'")}', '${e}');ESC.seen=(ESC.seen||0)|${1 << i};if(ESC.seen===7)$('escGo').classList.remove('hidden')" class="rounded-2xl bg-black/30 p-4 hover:bg-black/50"><div class="text-4xl">${e}</div><div class="text-xs text-emerald-100 mt-1">${n}</div></button>`).join('')}</div>
+      <button id="escGo" onclick="ESC.stage=1;escapeRender()" class="hidden btn-gold w-full">Acercarse al lavabo de la serpiente</button>`,
+      '🚽 El baño de Myrtle la Llorona', 'Investiga el baño. Toca los tres elementos para encontrar la entrada.');
+  } else if (ESC.stage === 1) {
+    ESC.seq = Array.from({ length: 5 }, () => Math.floor(Math.random() * 4)); ESC.input = [];
+    escapeShell(`<div class="grid grid-cols-4 gap-2" id="escSnakes">${['🐍', '🐍', '🐍', '🐍'].map((s, i) => `<button data-i="${i}" onclick="escHiss(${i})" class="snake-btn rounded-2xl py-5 text-4xl bg-black/30" style="filter:hue-rotate(${i * 60}deg)">${s}</button>`).join('')}</div>
+      <div class="flex justify-between items-center"><button onclick="escPlaySeq()" class="btn-ghost !py-2"><i class="fa-solid fa-ear-listen"></i> Escuchar el siseo</button><span class="text-xs text-emerald-100">Tu secuencia: <b id="escProg">0</b>/5</span></div>`,
+      '🐍 Hablar pársel', 'Para abrir el lavabo hay que repetir el siseo de las serpientes. Toca «Escuchar» y repite la secuencia en el mismo orden.');
+    setTimeout(escPlaySeq, 600);
+  } else if (ESC.stage === 2) {
+    const target = 'SOY LORD VOLDEMORT'.replace(/ /g, '');
+    ESC.word = target; ESC.built = [];
+    const tiles = shuffle(target.split('').map((ch, i) => ({ ch, i })));
+    escapeShell(`<p class="text-center font-wizard text-emerald-100">TOM MARVOLO RIDDLE</p>
+      <div id="escBuilt" class="min-h-[3rem] flex flex-wrap justify-center gap-1 bg-black/30 rounded-xl p-2"></div>
+      <div class="flex flex-wrap justify-center gap-1">${tiles.map(t => `<button data-k="${t.i}" onclick="escTile(this,'${t.ch}')" class="w-9 h-10 rounded-lg bg-amber-100 text-amber-950 font-black font-wizard">${t.ch}</button>`).join('')}</div>
+      <div class="flex justify-center gap-2"><button onclick="ESC.stage=2;escapeRender()" class="btn-ghost !py-1.5 !text-[11px]">Reiniciar letras</button><button onclick="toast('Pista: empieza con «SOY» y termina con su nombre más temido.','💡')" class="btn-ghost !py-1.5 !text-[11px]">💡 Pista</button></div>`,
+      '📔 El anagrama del diario', 'Las letras de «Tom Marvolo Riddle» esconden una frase. Reordénalas tocando las letras en el orden correcto.');
+  } else if (ESC.stage === 3) {
+    escapeShell(`<div class="text-center text-6xl">🐍👁️👁️</div><p class="text-sm text-emerald-50 text-center">El basilisco está frente a ti y Tom Riddle se vuelve más fuerte. Fawkes te trae el Sombrero Seleccionador.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${shuffle([['sword', '⚔️ Sacar la espada del Sombrero y enfrentar al basilisco'], ['run', '🏃 Correr de vuelta al túnel'], ['spell', '🪄 Lanzar Expelliarmus al basilisco'], ['eyes', '👀 Mirar fijamente al basilisco']]).map(([k, t]) => `<button onclick="escFinal1('${k}')" class="opt-btn !min-h-0 text-xs">${t}</button>`).join('')}</div>
+      <div id="escFinal2"></div>`,
+      '🐉 La Cámara de los Secretos', 'Elige bien qué hacer. Luego tendrás que destruir el diario.');
+  }
+}
+function escPlaySeq() {
+  const btns = document.querySelectorAll('#escSnakes .snake-btn'); ESC.input = []; $('escProg').textContent = 0; ESC.playing = true;
+  ESC.seq.forEach((n, k) => setTimeout(() => { btns[n].classList.add('lit'); tone(220 + n * 90, .3, 'sawtooth', .07, 120 + n * 40); setTimeout(() => btns[n].classList.remove('lit'), 380); if (k === ESC.seq.length - 1) setTimeout(() => ESC.playing = false, 420); }, 600 * k));
+}
+function escHiss(i) {
+  if (ESC.playing) return;
+  const btn = document.querySelectorAll('#escSnakes .snake-btn')[i]; btn.classList.add('lit'); setTimeout(() => btn.classList.remove('lit'), 200); tone(220 + i * 90, .25, 'sawtooth', .07, 120 + i * 40);
+  ESC.input.push(i); const k = ESC.input.length - 1;
+  if (ESC.input[k] !== ESC.seq[k]) { sfx('wrong'); toast('El lavabo no se mueve. Escucha otra vez.', '🐍'); setTimeout(escPlaySeq, 700); return; }
+  $('escProg').textContent = ESC.input.length;
+  if (ESC.input.length === ESC.seq.length) { sfx('levelup'); toast('¡El lavabo se abre y aparece un túnel!', '🕳️'); setTimeout(() => { ESC.stage = 2; escapeRender(); }, 900); }
+}
+function escTile(btn, ch) {
+  const need = ESC.word[ESC.built.length];
+  if (ch !== need) { btn.classList.add('wrong'); sfx('wrong'); setTimeout(() => btn.classList.remove('wrong'), 300); return; }
+  btn.disabled = true; btn.style.visibility = 'hidden'; ESC.built.push(ch); sfx('tick');
+  const pretty = 'SOY LORD VOLDEMORT'; let out = '', n = 0; for (const c of pretty) { if (c === ' ') out += ' '; else if (n < ESC.built.length) { out += c; n++; } }
+  $('escBuilt').innerHTML = out.split('').map(c => c === ' ' ? '<span class="w-3"></span>' : `<span class="w-8 h-9 rounded bg-emerald-200 text-emerald-950 font-black font-wizard flex items-center justify-center">${c}</span>`).join('');
+  if (ESC.built.length === ESC.word.length) { sfx('levelup'); toast('«Soy Lord Voldemort». La puerta de la cámara se abre…', '🚪'); setTimeout(() => { ESC.stage = 3; escapeRender(); }, 1200); }
+}
+function escFinal1(k) {
+  if (k !== 'sword') { sfx('wrong'); const msg = { run: 'Ginny sigue en peligro: no puedes huir.', spell: 'Los hechizos rebotan en sus escamas.', eyes: '¡Nunca mires a los ojos de un basilisco! Pierdes 30 segundos.' }[k]; if (k === 'eyes') ESC.start -= 30000; toast(msg, '⚠️'); return; }
+  sfx('zap'); burst(innerWidth / 2, innerHeight / 2, '#e5e7eb', 60);
+  $('escFinal2').innerHTML = `<p class="text-sm text-emerald-50 text-center mt-3">¡Venciste al basilisco! Uno de sus colmillos quedó clavado en tu brazo. ¿Qué haces con el diario?</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">${shuffle([['fang', '🦷 Clavarle el colmillo del basilisco'], ['burn', '🔥 Quemarlo con Incendio'], ['tear', '📄 Romper sus páginas']]).map(([k2, t]) => `<button onclick="escFinal2('${k2}')" class="opt-btn !min-h-0 text-xs">${t}</button>`).join('')}</div>`;
+}
+function escFinal2(k) {
+  if (k !== 'fang') { sfx('wrong'); toast(k === 'burn' ? 'El diario no arde: está protegido por magia oscura.' : 'Las páginas se rehacen solas.', '📔'); return; }
+  clearInterval(gameState.escTimer);
+  const secs = Math.round((Date.now() - ESC.start) / 1000), best = !S.games.escape || secs < S.games.escape;
+  if (best) { S.games.escape = secs; save(); refreshBest(); }
+  unlock('escape'); sfx('levelup'); fireConfetti({ particleCount: 160, spread: 110, colors: ['#10b981', '#fbbf24'] });
+  $('gameBody').innerHTML = `<div class="max-w-md mx-auto glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-6xl">🗝️</div><p class="font-wizard text-2xl font-bold text-emerald-300">¡Escapaste de la Cámara!</p><p class="text-sm text-stone-300">Tiempo: <b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b>${best ? ' · 🏆 ¡Nuevo récord!' : ''}</p><button onclick="escapeInit()" class="btn-gold">Jugar otra vez</button></div>`;
+  gameReward(Math.max(20, 120 - Math.floor(secs / 3)), 'Escape de la Cámara');
+}
+function escapeLose() {
+  clearInterval(gameState.escTimer); sfx('wrong');
+  $('gameBody').innerHTML = `<div class="max-w-md mx-auto glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-6xl">⌛</div><p class="font-wizard text-2xl font-bold text-red-300">Se acabó el tiempo</p><p class="text-sm text-stone-300">Tom Riddle se salió con la suya esta vez.</p><button onclick="escapeInit()" class="btn-gold">Intentar de nuevo</button></div>`;
+}
+
+/* =====================================================================
+   MASCOTA MÁGICA
+===================================================================== */
+const PETS = { owl: { emoji: '🦉', name: 'Lechuza', food: '🐭 Ratón seco' }, cat: { emoji: '🐈', name: 'Gato', food: '🐟 Pescado' }, toad: { emoji: '🐸', name: 'Sapo', food: '🪰 Moscas' }, kneazle: { emoji: '🐱', name: 'Kneazle', food: '🥛 Leche' } };
+function petTick() {
+  const p = S.pet; if (!p || !p.type) return null;
+  const h = (Date.now() - (p.last || Date.now())) / 3600000;
+  p.hunger = Math.max(0, (p.hunger ?? 80) - h * 5); p.joy = Math.max(0, (p.joy ?? 80) - h * 4); p.last = Date.now();
+  p.level = Math.floor(Math.sqrt((p.xp || 0) / 25)) + 1; return p;
+}
+function adoptPet(type) {
+  needName(() => {
+    showDialog({ icon: PETS[type].emoji, title: `Adoptar un/a ${PETS[type].name}`, body: '<input id="petName" maxlength="14" class="w-full bg-stone-950 border border-amber-700/50 rounded-lg px-3 py-2 text-sm text-stone-100" placeholder="¿Cómo se llamará?">',
+      actions: [{ label: 'Adoptar', primary: true, onClick: () => { const n = ($('petName').value || '').trim() || PETS[type].name; S.pet = { type, name: n.slice(0, 14), xp: 0, hunger: 90, joy: 90, last: Date.now() }; save(); unlock('pet'); sfx('achieve'); fireConfetti({ particleCount: 60, spread: 70 }); renderShop(); renderPetCard(); toast(`¡${esc(n)} ahora es tu mascota!`, PETS[type].emoji); } }, { label: 'Cancelar' }] });
+  });
+}
+function feedPet() {
+  const p = petTick(); if (!p) return;
+  if (S.gold < 10) { toast('Necesitas 10 galeones para comprar comida.', '🪙'); return; }
+  S.gold -= 10; p.hunger = Math.min(100, p.hunger + 35); p.xp += 5; save(); updateWallet(); sfx('correct'); renderPetCard(); if (currentTab === 'shop') renderShop();
+  toast(`${esc(p.name)} comió ${PETS[p.type].food}. ¡Ñam!`, PETS[p.type].emoji);
+}
+function playPet() {
+  const p = petTick(); if (!p) return;
+  if (Date.now() - (p.lastPlay || 0) < 60000) { toast(`${esc(p.name)} está descansando. Prueba en un minuto.`, '💤'); return; }
+  p.lastPlay = Date.now(); p.joy = Math.min(100, p.joy + 25); p.xp += 8; save(); sfx('spell'); renderPetCard(); if (currentTab === 'shop') renderShop();
+  const el = document.querySelector('.pet-emoji'); if (el) { el.classList.remove('pet-jump'); void el.offsetWidth; el.classList.add('pet-jump'); }
+  burst(innerWidth / 2, innerHeight / 2, '#f9a8d4', 30);
+}
+function petMood(p) { const m = (p.hunger + p.joy) / 2; return m > 70 ? ['😄', 'Feliz'] : m > 40 ? ['🙂', 'Tranquilo'] : m > 15 ? ['😟', 'Triste'] : ['😢', 'Te extraña']; }
+function petHtml(compact) {
+  const p = petTick();
+  if (!p) return `<div class="text-center space-y-2"><p class="text-sm text-stone-300">Aún no tienes mascota. Adopta una en el Emporio de Lechuzas del Callejón Diagon.</p>${compact ? `<button onclick="switchTab('shop');setTimeout(()=>diagonGo('pets'),200)" class="btn-gold">Ir al Callejón Diagon</button>` : ''}</div>`;
+  const [face, mood] = petMood(p), bar = (v, c) => `<div class="h-2 bg-stone-950 rounded-full overflow-hidden"><div class="h-full ${c}" style="width:${v}%"></div></div>`;
+  return `<div class="flex items-center gap-4"><div class="pet-emoji text-6xl">${PETS[p.type].emoji}</div>
+    <div class="flex-grow space-y-1.5"><p class="font-wizard font-bold text-amber-200">${esc(p.name)} <span class="text-xs text-stone-400">· Nivel ${p.level}</span></p><p class="text-[11px] text-stone-400">${face} ${mood}</p>
+      <div class="text-[10px] text-stone-400">🍖 Hambre</div>${bar(p.hunger, 'bg-orange-500')}<div class="text-[10px] text-stone-400">💖 Felicidad</div>${bar(p.joy, 'bg-pink-500')}</div></div>
+    <div class="grid grid-cols-2 gap-2 mt-3"><button onclick="feedPet()" class="btn-ghost !py-2 !text-[11px]">${PETS[p.type].food.split(' ')[0]} Alimentar (10🪙)</button><button onclick="playPet()" class="btn-gold !py-2 !text-[11px]">🎾 Jugar</button></div>
+    <p class="text-[10px] text-stone-500 mt-1">Tu mascota gana experiencia cada vez que tú ganas puntos.</p>`;
+}
+function renderPetCard() { const b = $('petCard'); if (b) b.innerHTML = `<h3 class="font-wizard text-lg font-bold text-amber-300 mb-2">🐾 Tu mascota</h3>${petHtml(true)}`; }
+
+/* =====================================================================
+   CALLEJÓN DIAGON (la tienda convertida en una calle)
+===================================================================== */
+let diagonStore = 'weasley';
+const DIAGON = [
+  { id: 'ollivanders', name: 'Ollivanders', icon: '🪄', color: '#78350f', desc: 'Fabricantes de varitas desde el 382 a. C.' },
+  { id: 'weasley', name: 'Sortilegios Weasley', icon: '🎆', color: '#c2410c', desc: 'Chispas de varita y títulos para tu perfil.' },
+  { id: 'malkin', name: 'Madame Malkin', icon: '🧥', color: '#6d28d9', desc: 'Túnicas y marcos para tu tarjeta de mago.' },
+  { id: 'pets', name: 'Emporio de Lechuzas', icon: '🦉', color: '#0e7490', desc: 'Adopta y cuida a tu mascota mágica.' },
+  { id: 'gringotts', name: 'Gringotts', icon: '🏦', color: '#a16207', desc: 'Guarda galeones en tu cámara y gana intereses.' },
+  { id: 'flourish', name: 'Flourish y Blotts', icon: '📚', color: '#166534', desc: 'Libros sobre personajes, criaturas e historia.' }
+];
+function diagonGo(id) {
+  if (id === 'ollivanders') { switchTab('wand'); return; }
+  if (id === 'flourish') { switchTab('library'); return; }
+  diagonStore = id; sfx('tick'); renderShop();
+  const el = $('diagonPanel'); if (el) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+}
+function vaultTick() { const v = S.vault; const days = Math.floor((Date.now() - v.last) / 86400000); if (days > 0 && v.amount > 0) { const gain = Math.min(50 * days, Math.floor(v.amount * .05) * days); v.amount += gain; v.last += days * 86400000; save(); if (gain) toast(`Gringotts te pagó ${gain} galeones de intereses.`, '🏦'); } else if (days > 0) v.last += days * 86400000; }
+function vaultMove(dir) {
+  const inp = $('vaultAmt'); const n = Math.floor(+inp.value || 0); if (n <= 0) return;
+  if (dir > 0) { if (n > S.gold) { toast('No tienes tantos galeones en tu bolsa.', '🪙'); return; } S.gold -= n; S.vault.amount += n; }
+  else { if (n > S.vault.amount) { toast('Tu cámara no tiene tantos galeones.', '🏦'); return; } S.vault.amount -= n; S.gold += n; }
+  S.vault.last = S.vault.amount && dir > 0 && S.vault.amount === n ? Date.now() : S.vault.last;
+  save(); updateWallet(); sfx('correct'); renderShop();
+}
+const _v4RenderShop = renderShop;
+renderShop = function () {
+  _v4RenderShop(); addExclusiveTitles(); vaultTick();
+  const body = $('shopBody'); if (!body) return;
+  const groups = [...body.children];
+  const street = `<div class="diagon-street rounded-3xl p-3 sm:p-4 overflow-x-auto"><div class="flex gap-2 min-w-max">${DIAGON.map(s => `
+    <button onclick="diagonGo('${s.id}')" class="shopfront ${diagonStore === s.id ? 'active' : ''}" style="--c:${s.color}">
+      <span class="roof"></span><span class="sign">${s.name}</span><span class="window">${s.icon}</span><span class="door"></span></button>`).join('')}</div></div>`;
+  const store = DIAGON.find(s => s.id === diagonStore);
+  let panel = '';
+  if (diagonStore === 'weasley') panel = groups.filter((_, i) => i === 0 || i === 2).map(g => g.outerHTML).join('');
+  else if (diagonStore === 'malkin') panel = groups.filter((_, i) => i === 1).map(g => g.outerHTML).join('') + `<p class="text-xs text-stone-400">Los marcos se usan en tu tarjeta de mago (Perfil).</p>`;
+  else if (diagonStore === 'pets') panel = `<div class="glass-card rounded-2xl p-4">${petHtml(false)}</div>` + `<div><h3 class="font-wizard font-bold text-amber-300 mb-2">${S.pet ? 'Cambiar de mascota' : 'Adopta una mascota'}</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${Object.entries(PETS).map(([k, p]) => `<button onclick="adoptPet('${k}')" class="glass-card hoverable rounded-2xl p-3 text-center"><div class="text-4xl">${p.emoji}</div><div class="text-xs font-bold text-amber-100 mt-1">${p.name}</div><div class="text-[10px] text-stone-400">Gratis</div></button>`).join('')}</div>${S.pet ? '<p class="text-[10px] text-stone-500 mt-1">Si adoptas otra, tu mascota actual vuelve al Emporio.</p>' : ''}</div>`;
+  else if (diagonStore === 'gringotts') panel = `<div class="glass-card rounded-2xl p-5 space-y-3 text-center"><div class="text-5xl">🏦</div><p class="text-sm text-stone-300">Los galeones guardados en tu cámara ganan <b class="text-amber-300">5% de interés al día</b> (máximo 50 por día). Los duendes no hacen favores: retirar es gratis, pero solo cuentan los días completos.</p>
+      <div class="grid grid-cols-2 gap-2"><div class="bg-stone-950 rounded-xl p-3"><p class="text-[10px] text-stone-400">En tu bolsa</p><p class="text-xl font-black text-amber-300">${S.gold} 🪙</p></div><div class="bg-stone-950 rounded-xl p-3"><p class="text-[10px] text-stone-400">En tu cámara</p><p class="text-xl font-black text-amber-300">${S.vault.amount} 🪙</p></div></div>
+      <input id="vaultAmt" type="number" min="1" placeholder="Cantidad" class="w-full bg-stone-950 border border-amber-800/50 rounded-xl px-3 py-2 text-center text-amber-100">
+      <div class="grid grid-cols-2 gap-2"><button onclick="vaultMove(1)" class="btn-gold">Depositar</button><button onclick="vaultMove(-1)" class="btn-ghost">Retirar</button></div></div>`;
+  body.innerHTML = street + `<div id="diagonPanel" class="space-y-4"><div class="flex items-center gap-3"><span class="text-3xl">${store.icon}</span><div><h3 class="font-wizard font-bold text-xl text-amber-300">${store.name}</h3><p class="text-xs text-stone-400">${store.desc}</p></div></div>${panel}</div>`;
+};
+
+/* =====================================================================
+   INTEGRACIÓN VERSIÓN 4
+===================================================================== */
+NAV.splice(NAV.findIndex(n => n[0] === 'duel') + 1, 0, ['live', 'fa-tower-broadcast', 'En vivo'], ['community', 'fa-newspaper', 'Comunidad']);
+NAV.find(n => n[0] === 'shop')[2] = 'Callejón Diagon';
+NAV.find(n => n[0] === 'shop')[1] = 'fa-shop';
+TABS.push('live', 'community', 'admin');
+const _v4SwitchTab = switchTab;
+switchTab = function (tab) {
+  if (currentTab === 'live' && tab !== 'live' && lv.role) { /* la partida sigue en segundo plano */ }
+  _v4SwitchTab(tab);
+  if (tab === 'live') renderLiveHome();
+  if (tab === 'community') renderCommunity();
+  if (tab === 'admin') renderAdmin();
+  if (tab === 'studio') renderMagicCard();
+  if (tab === 'home') { renderPetCard(); applyEvent(); }
+};
+const _v4RenderAll = renderAll;
+renderAll = function () { ensureV4State(); _v4RenderAll(); addExclusiveTitles(); renderPetCard(); };
+let adminCheckT = null;
+const _v4RenderAccount = renderAccount;
+renderAccount = function () { _v4RenderAccount(); clearTimeout(adminCheckT); adminCheckT = setTimeout(() => { checkAdmin(); if (cloud.user) publishProfile(); }, 800); };
+const _v4RenderSettings = renderSettings;
+renderSettings = function () {
+  _v4RenderSettings();
+  const ib = $('installBtn'); if (!ib || $('reminderBtn')) return;
+  ib.insertAdjacentHTML('afterend', `<button id="reminderBtn" onclick="enableReminders()" class="btn-ghost w-full mt-2"><i class="fa-solid fa-bell"></i> Recordatorio diario del desafío</button>`);
+};
+function initV4() {
+  ensureV4State(); save();
+  addExclusiveTitles();
+  renderNav();
+  applyEvent();
+  renderPetCard();
+  renderMagicCard();
+  initAnalytics();
+  handleDuelLink();
+  handleProfileLink();
+  setTimeout(checkTournamentPrize, 4000);
+  if (S.house && supaReady()) setTimeout(pushTorneo, 5000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { flushCup(); flushStats(); } });
+}
+
 
 init();
 
