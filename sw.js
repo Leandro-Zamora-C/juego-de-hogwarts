@@ -1,11 +1,11 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v7';
+const VERSION = 'hogwarts-v8';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 const OPTIONAL = ['./musica1.mp3', './musica2.mp3', './musica3.mp3', './musica.mp3', './sombrero.mp3',
   './gryffindor.mp3', './slytherin.mp3', './ravenclaw.mp3', './hufflepuff.mp3',
-  ...['dueloimagen', 'frases', 'maraton', 'pelicula1', 'pelicula2', 'pelicula3', 'pelicula4', 'pelicula5', 'pelicula6', 'pelicula7', 'pelicula8']
+  ...['dueloimagen', 'frases', 'maraton', 'hechizos', 'criaturas', 'personajes', 'halloween', 'navidad', 'pelicula1', 'pelicula2', 'pelicula3', 'pelicula4', 'pelicula5', 'pelicula6', 'pelicula7', 'pelicula8']
     .flatMap(n => [`./${n}.jpg`, `./${n}.webp`, `./${n}.png`])];
 
 self.addEventListener('install', event => {
@@ -84,5 +84,22 @@ self.addEventListener('fetch', event => {
       return res;
     }).catch(() => cached);
     return cached || network;
+  })());
+});
+
+/* Recordatorio diario (Chrome para Android con la app instalada) */
+self.addEventListener('periodicsync', event => {
+  if (event.tag !== 'desafio-diario') return;
+  event.waitUntil(self.registration.showNotification('🪄 ¡Nuevo desafío diario!', {
+    body: 'Hay una pregunta nueva esperándote. Acierta y gana 25 puntos para tu casa.',
+    icon: 'icon-192.png', badge: 'icon-192.png', tag: 'desafio-diario', renotify: false
+  }));
+});
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) { if ('focus' in c) return c.focus(); }
+    return self.clients.openWindow('./');
   })());
 });
