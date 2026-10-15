@@ -35,6 +35,7 @@
 - 📸 **Foto con tu casa:** la cámara te pone la bufanda, el escudo y el marco de tu casa.
 - 🎓 **Modo Año Escolar:** 7 cursos y la Batalla de Hogwarts, con certificado descargable al graduarte.
 - 🧹 **Juegos nuevos:** Carrera de Escobas, Ajedrez Mágico contra la máquina y Escape de la Cámara Secreta.
+- 🎮 **Gráficos 3D en tiempo real (WebGL):** Ajedrez con piezas torneadas de marfil y ébano, sombras y velas flotantes; Escoba Voladora de noche junto al castillo; estadio de quidditch en 3D para Atrapa la Snitch. Incluye un botón para volver a los gráficos clásicos en equipos lentos.
 - 🌐 **Minijuegos en línea con código:** Ajedrez (por turnos, con piezas talladas y vista 3D), carrera de escobas con el fantasma del rival, duelo de buscadores de la snitch y memoria por turnos. Se puede invitar con un enlace por WhatsApp.
 - 🦉 **Mascota mágica:** lechuza, gato, sapo o kneazle, a la que tienes que alimentar y cuidar.
 - 🛍️ **Callejón Diagon:** Ollivanders, Sortilegios Weasley, Madame Malkin y Gringotts, que da intereses diarios.
@@ -68,6 +69,7 @@
 
 - **HTML5 + JavaScript** sin frameworks: toda la aplicación vive en un único `index.html`.
 - **Tailwind CSS** y **Font Awesome**.
+- **WebGL** con un motor 3D propio (luces, sombras, niebla, partículas y texturas procedurales) para el ajedrez, la escoba y la snitch.
 - **Canvas 2D**, que se usa para:
   - los juegos (escoba, ajedrez, snitch, quidditch);
   - el cielo nocturno;
