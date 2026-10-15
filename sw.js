@@ -1,7 +1,7 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v9';
+const VERSION = 'hogwarts-v10';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 const OPTIONAL = ['./musica1.mp3', './musica2.mp3', './musica3.mp3', './musica.mp3', './sombrero.mp3',
   './gryffindor.mp3', './slytherin.mp3', './ravenclaw.mp3', './hufflepuff.mp3',
