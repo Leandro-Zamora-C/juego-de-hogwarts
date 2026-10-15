@@ -6821,7 +6821,7 @@ chessCheckEnd = function () {
   return false;
 };
 const _v5ChessAI = chessAI;
-chessAI = function () { if (CH.mode !== 'ai' || CH.over || !$('chBoard')) { CH.thinking = false; return; } _v5ChessAI(); };
+chessAI = function () { if (CH.mode !== 'ai' || CH.over || !$('chStatus')) { CH.thinking = false; return; } _v5ChessAI(); };
 function chessResign() {
   if (CH.over || CH.mode !== 'online') return;
   showDialog({ icon: '🏳️', title: '¿Rendirte?', body: 'Tu rival ganará la partida.', actions: [{ label: 'Sí, me rindo', primary: true, onClick: () => { grSend({ type: 'resign' }); CH.over = true; $('chStatus').textContent = `🏳️ Te rendiste. Ganó ${gr.opp}`; chessOnlineEnd(false, false); } }, { label: 'Seguir jugando' }] });
@@ -7314,6 +7314,780 @@ renderGamesHub = function () {
 };
 const _v5InitV4 = initV4;
 initV4 = function () { _v5InitV4(); handleGameLink(); };
+
+
+/* =====================================================================
+   VERSIÓN 6 · MOTOR 3D PROPIO (WebGL) PARA AJEDREZ, ESCOBA Y SNITCH
+===================================================================== */
+const M3 = (() => {
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  const M = {
+    ident: () => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    mul(a, b) { const o = new Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; },
+    persp(fovy, asp, n, f) { const t = 1 / Math.tan(fovy / 2), nf = 1 / (n - f); return [t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) * nf, -1, 0, 0, 2 * f * n * nf, 0]; },
+    ortho(l, r, b, t, n, f) { return [2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1]; },
+    lookAt(e, c, up) { const z = norm(sub(e, c)), x = norm(cross(up, z)), y = cross(z, x); return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, e), -dot(y, e), -dot(z, e), 1]; },
+    compose(p, r, s) {
+      const cx = Math.cos(r[0]), sx = Math.sin(r[0]), cy = Math.cos(r[1]), sy = Math.sin(r[1]), cz = Math.cos(r[2]), sz = Math.sin(r[2]);
+      const m00 = cy * cz + sy * sx * sz, m01 = -cy * sz + sy * sx * cz, m02 = sy * cx, m10 = cx * sz, m11 = cx * cz, m12 = -sx, m20 = -sy * cz + cy * sx * sz, m21 = sy * sz + cy * sx * cz, m22 = cy * cx;
+      return [m00 * s[0], m10 * s[0], m20 * s[0], 0, m01 * s[1], m11 * s[1], m21 * s[1], 0, m02 * s[2], m12 * s[2], m22 * s[2], 0, p[0], p[1], p[2], 1];
+    },
+    invert(m) {
+      const inv = new Array(16);
+      inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
+      inv[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] * m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
+      inv[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] * m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
+      inv[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] * m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
+      inv[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] - m[9] * m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
+      inv[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] + m[8] * m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
+      inv[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] - m[8] * m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
+      inv[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] + m[8] * m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
+      inv[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] + m[5] * m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
+      inv[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] - m[4] * m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
+      inv[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] + m[4] * m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
+      inv[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] - m[4] * m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
+      inv[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] - m[5] * m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
+      inv[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] + m[4] * m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
+      inv[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] - m[4] * m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
+      inv[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] * m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
+      let det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12]; det = det ? 1 / det : 0;
+      return inv.map(v => v * det);
+    },
+    normalMat(m) {
+      const a = (i, j) => m[j * 4 + i];
+      const c00 = a(1, 1) * a(2, 2) - a(1, 2) * a(2, 1), c01 = -(a(1, 0) * a(2, 2) - a(1, 2) * a(2, 0)), c02 = a(1, 0) * a(2, 1) - a(1, 1) * a(2, 0);
+      const c10 = -(a(0, 1) * a(2, 2) - a(0, 2) * a(2, 1)), c11 = a(0, 0) * a(2, 2) - a(0, 2) * a(2, 0), c12 = -(a(0, 0) * a(2, 1) - a(0, 1) * a(2, 0));
+      const c20 = a(0, 1) * a(1, 2) - a(0, 2) * a(1, 1), c21 = -(a(0, 0) * a(1, 2) - a(0, 2) * a(1, 0)), c22 = a(0, 0) * a(1, 1) - a(0, 1) * a(1, 0);
+      const det = a(0, 0) * c00 + a(0, 1) * c01 + a(0, 2) * c02 || 1;
+      return [c00 / det, c10 / det, c20 / det, c01 / det, c11 / det, c21 / det, c02 / det, c12 / det, c22 / det].map((v, k) => v);
+    },
+    xf(m, v) { const x = v[0], y = v[1], z = v[2], w = v[3] == null ? 1 : v[3]; return [m[0] * x + m[4] * y + m[8] * z + m[12] * w, m[1] * x + m[5] * y + m[9] * z + m[13] * w, m[2] * x + m[6] * y + m[10] * z + m[14] * w, m[3] * x + m[7] * y + m[11] * z + m[15] * w]; }
+  };
+  /* ---------- geometría ---------- */
+  const G = {
+    empty: () => ({ p: [], n: [], c: [], u: [], i: [] }),
+    push(g, p, n, u, c) { g.p.push(p[0], p[1], p[2]); g.n.push(n[0], n[1], n[2]); g.u.push(u ? u[0] : 0, u ? u[1] : 0); const cc = c || [1, 1, 1]; g.c.push(cc[0], cc[1], cc[2]); return g.p.length / 3 - 1; },
+    box(w, h, d) {
+      const g = G.empty(), x = w / 2, y = h / 2, z = d / 2;
+      const F = [[[0, 0, 1], [[-x, -y, z], [x, -y, z], [x, y, z], [-x, y, z]]], [[0, 0, -1], [[x, -y, -z], [-x, -y, -z], [-x, y, -z], [x, y, -z]]], [[1, 0, 0], [[x, -y, z], [x, -y, -z], [x, y, -z], [x, y, z]]], [[-1, 0, 0], [[-x, -y, -z], [-x, -y, z], [-x, y, z], [-x, y, -z]]], [[0, 1, 0], [[-x, y, z], [x, y, z], [x, y, -z], [-x, y, -z]]], [[0, -1, 0], [[-x, -y, -z], [x, -y, -z], [x, -y, z], [-x, -y, z]]]];
+      F.forEach(([n, vs]) => { const b = vs.map((v, k) => G.push(g, v, n, [[0, 0], [1, 0], [1, 1], [0, 1]][k])); g.i.push(b[0], b[1], b[2], b[0], b[2], b[3]); });
+      return g;
+    },
+    lathe(prof, seg) {
+      const g = G.empty(), rows = prof.length;
+      for (let k = 0; k < rows; k++) for (let s = 0; s <= seg; s++) { const a = s / seg * Math.PI * 2, r = prof[k][0]; G.push(g, [Math.cos(a) * r, prof[k][1], Math.sin(a) * r], [0, 1, 0], [s / seg, k / (rows - 1)]); }
+      for (let k = 0; k < rows - 1; k++) for (let s = 0; s < seg; s++) { const a = k * (seg + 1) + s, b = a + seg + 1; g.i.push(a, b, a + 1, a + 1, b, b + 1); }
+      return G.normals(g);
+    },
+    cyl(rt, rb, h, seg, caps) {
+      const prof = caps === false ? [[rb, 0], [rt, h]] : [[0, 0], [rb, 0], [rb, 0], [rt, h], [rt, h], [0, h]].filter((p, i) => !(i >= 4 && rt === 0));
+      return G.lathe(prof, seg);
+    },
+    sphere(r, ws, hs) { const prof = []; for (let k = 0; k <= hs; k++) { const a = -Math.PI / 2 + k / hs * Math.PI; prof.push([Math.cos(a) * r, Math.sin(a) * r]); } prof[0][0] = 0; prof[hs][0] = 0; return G.lathe(prof, ws); },
+    torus(R, r, seg, tseg) {
+      const g = G.empty();
+      for (let i = 0; i <= seg; i++) for (let j = 0; j <= tseg; j++) {
+        const u = i / seg * Math.PI * 2, v = j / tseg * Math.PI * 2, cx = Math.cos(u), sx = Math.sin(u);
+        G.push(g, [(R + r * Math.cos(v)) * cx, r * Math.sin(v), (R + r * Math.cos(v)) * sx], [Math.cos(v) * cx, Math.sin(v), Math.cos(v) * sx], [i / seg, j / tseg]);
+      }
+      for (let i = 0; i < seg; i++) for (let j = 0; j < tseg; j++) { const a = i * (tseg + 1) + j, b = a + tseg + 1; g.i.push(a, a + 1, b, a + 1, b + 1, b); }
+      return g;
+    },
+    plane(w, d, sx, sz, hf) {
+      const g = G.empty();
+      for (let z = 0; z <= sz; z++) for (let x = 0; x <= sx; x++) { const px = -w / 2 + x / sx * w, pz = -d / 2 + z / sz * d; G.push(g, [px, hf ? hf(px, pz) : 0, pz], [0, 1, 0], [x / sx, z / sz]); }
+      for (let z = 0; z < sz; z++) for (let x = 0; x < sx; x++) { const a = z * (sx + 1) + x, b = a + sx + 1; g.i.push(a, b, a + 1, a + 1, b, b + 1); }
+      return hf ? G.normals(g) : g;
+    },
+    triangulate(pts) {
+      const idx = pts.map((_, i) => i), out = [];
+      let area = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; area += a[0] * b[1] - b[0] * a[1]; }
+      if (area < 0) idx.reverse();
+      const inside = (p, a, b, c) => { const d = (u, v, w) => (v[0] - u[0]) * (w[1] - u[1]) - (v[1] - u[1]) * (w[0] - u[0]); return d(a, b, p) >= 0 && d(b, c, p) >= 0 && d(c, a, p) >= 0; };
+      let guard = 0;
+      while (idx.length > 3 && guard++ < 5000) {
+        let cut = false;
+        for (let k = 0; k < idx.length; k++) {
+          const i0 = idx[(k + idx.length - 1) % idx.length], i1 = idx[k], i2 = idx[(k + 1) % idx.length], a = pts[i0], b = pts[i1], c = pts[i2];
+          if ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) <= 0) continue;
+          if (idx.some(j => j !== i0 && j !== i1 && j !== i2 && inside(pts[j], a, b, c))) continue;
+          out.push(i0, i1, i2); idx.splice(k, 1); cut = true; break;
+        }
+        if (!cut) break;
+      }
+      if (idx.length === 3) out.push(idx[0], idx[1], idx[2]);
+      return out;
+    },
+    extrude(pts, depth) {
+      const g = G.empty(), z = depth / 2, tri = G.triangulate(pts), n = pts.length;
+      const f = pts.map(p => G.push(g, [p[0], p[1], z], [0, 0, 1], [p[0], p[1]])), b = pts.map(p => G.push(g, [p[0], p[1], -z], [0, 0, -1], [p[0], p[1]]));
+      for (let k = 0; k < tri.length; k += 3) { g.i.push(f[tri[k]], f[tri[k + 1]], f[tri[k + 2]]); g.i.push(b[tri[k]], b[tri[k + 2]], b[tri[k + 1]]); }
+      let area = 0; for (let i = 0; i < n; i++) { const a = pts[i], c = pts[(i + 1) % n]; area += a[0] * c[1] - c[0] * a[1]; }
+      const s = area > 0 ? 1 : -1;
+      for (let i = 0; i < n; i++) {
+        const a = pts[i], c = pts[(i + 1) % n], nn = norm([(c[1] - a[1]) * s, -(c[0] - a[0]) * s, 0]);
+        const v = [[a[0], a[1], z], [c[0], c[1], z], [c[0], c[1], -z], [a[0], a[1], -z]].map(q => G.push(g, q, nn));
+        if (s > 0) g.i.push(v[0], v[3], v[2], v[0], v[2], v[1]); else g.i.push(v[0], v[1], v[2], v[0], v[2], v[3]);
+      }
+      return g;
+    },
+    normals(g) {
+      const n = new Array(g.p.length).fill(0);
+      for (let k = 0; k < g.i.length; k += 3) {
+        const [a, b, c] = [g.i[k], g.i[k + 1], g.i[k + 2]], pa = g.p.slice(a * 3, a * 3 + 3), pb = g.p.slice(b * 3, b * 3 + 3), pc = g.p.slice(c * 3, c * 3 + 3);
+        const fn = cross(sub(pb, pa), sub(pc, pa));
+        [a, b, c].forEach(v => { n[v * 3] += fn[0]; n[v * 3 + 1] += fn[1]; n[v * 3 + 2] += fn[2]; });
+      }
+      for (let v = 0; v < n.length; v += 3) { const q = norm([n[v], n[v + 1], n[v + 2]]); n[v] = q[0]; n[v + 1] = q[1]; n[v + 2] = q[2]; }
+      g.n = n; return g;
+    },
+    flip(g) { for (let k = 0; k < g.i.length; k += 3) { const t = g.i[k + 1]; g.i[k + 1] = g.i[k + 2]; g.i[k + 2] = t; } return g; },
+    xform(g, m, col) {
+      const nm = M.normalMat(m), o = G.empty();
+      for (let v = 0; v < g.p.length / 3; v++) {
+        const p = M.xf(m, [g.p[v * 3], g.p[v * 3 + 1], g.p[v * 3 + 2]]), x = g.n[v * 3], y = g.n[v * 3 + 1], z = g.n[v * 3 + 2];
+        const nn = norm([nm[0] * x + nm[3] * y + nm[6] * z, nm[1] * x + nm[4] * y + nm[7] * z, nm[2] * x + nm[5] * y + nm[8] * z]);
+        const c = col ? [g.c[v * 3] * col[0], g.c[v * 3 + 1] * col[1], g.c[v * 3 + 2] * col[2]] : g.c.slice(v * 3, v * 3 + 3);
+        G.push(o, p, nn, [g.u[v * 2], g.u[v * 2 + 1]], c);
+      }
+      o.i = g.i.slice(); return o;
+    },
+    merge(list) {
+      const o = G.empty();
+      list.forEach(([g, m, col]) => { const t = m ? G.xform(g, m, col) : (col ? G.xform(g, M.ident(), col) : g); const base = o.p.length / 3; o.p.push(...t.p); o.n.push(...t.n); o.c.push(...t.c); o.u.push(...t.u); t.i.forEach(i => o.i.push(i + base)); });
+      return o;
+    },
+    at: (x, y, z, rx = 0, ry = 0, rz = 0, sx = 1, sy = sx, sz = sx) => M.compose([x, y, z], [rx, ry, rz], [sx, sy, sz])
+  };
+  const hex = h => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
+  /* ---------- shaders ---------- */
+  const VS = `attribute vec3 aP;attribute vec3 aN;attribute vec3 aC;attribute vec2 aU;
+uniform mat4 uM,uVP,uLVP;uniform mat3 uNM;varying vec3 vW,vN,vC,vO;varying vec2 vU;varying vec4 vL;
+void main(){vec4 w=uM*vec4(aP,1.);vW=w.xyz;vO=aP;vN=uNM*aN;vC=aC;vU=aU;vL=uLVP*w;gl_Position=uVP*w;}`;
+  const FS = `precision highp float;
+uniform vec3 uCol,uEm,uSky,uGnd,uLDir,uLCol,uCam,uFogC,uRimC,uPL0,uPC0,uPL1,uPC1;
+uniform float uSpec,uShin,uOp,uFog,uRim,uUnlit,uPat,uPatS,uShadow,uTexOn,uSMs,uPR0,uPR1,uTime;
+uniform sampler2D uTex,uSM;varying vec3 vW,vN,vC,vO;varying vec2 vU;varying vec4 vL;
+float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float ns(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hs(i),hs(i+vec2(1.,0.)),f.x),mix(hs(i+vec2(0.,1.)),hs(i+vec2(1.,1.)),f.x),f.y);}
+float fb(vec2 p){return ns(p)*.5+ns(p*2.1)*.25+ns(p*4.3)*.125;}
+float up(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
+float shd(float nl){vec3 s=vL.xyz/vL.w*.5+.5;if(s.x<0.||s.x>1.||s.y<0.||s.y>1.||s.z>1.)return 1.;float bi=.0025+.008*(1.-nl);float r=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=up(texture2D(uSM,s.xy+vec2(float(x),float(y))/uSMs));r+=s.z-bi>d?0.:1.;}return r/9.;}
+void main(){vec3 b=uCol*vC;
+if(uTexOn>.5)b*=texture2D(uTex,vU).rgb;
+if(uPat>.5&&uPat<1.5){float g=sin((vO.y+vO.z)*uPatS*40.+fb(vO.xz*uPatS*vec2(3.,30.))*7.);b*=.84+.16*g;}
+else if(uPat>1.5&&uPat<2.5){float u=atan(vO.z,vO.x)*uPatS,v=vW.y*3.;float row=floor(v);u+=mod(row,2.)*.5;float fu=fract(u),fv=fract(v);float m=step(.07,fu)*step(.1,fv);float t=.72+.4*hs(vec2(floor(u),row));b*=mix(.42,t,m)*(.8+.35*fb(vW.xy*6.));}
+else if(uPat>2.5&&uPat<3.5){b*=.86+.12*step(.5,fract(vW.x*.18))+.12*fb(vW.xz*3.);}
+else if(uPat>3.5&&uPat<4.5){float v=sin(vW.x*2.+vW.z*1.3+fb(vW.xz*1.6)*7.);b*=.8+.22*smoothstep(-.2,1.,v);}
+else if(uPat>4.5&&uPat<5.5){b*=.6+.6*fb(vO.xy*5.+vO.zz*3.);}
+else if(uPat>5.5&&uPat<6.5){b*=.75+.35*hs(vec2(floor(atan(vO.z,vO.y)*14.),1.));}
+vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(uCam-vW);vec3 c;
+if(uUnlit>.5)c=b+uEm;else{
+vec3 L=-uLDir;float nl=max(dot(N,L),0.);float sh=uShadow>.5&&nl>0.?shd(nl):1.;vec3 am=mix(uGnd,uSky,N.y*.5+.5);float d=nl*sh;
+float sp=pow(max(dot(N,normalize(L+V)),0.),uShin)*uSpec*sh;
+vec3 l0=uPL0-vW;float a0=1./(1.+dot(l0,l0)/(uPR0*uPR0));vec3 n0=normalize(l0);
+vec3 l1=uPL1-vW;float a1=1./(1.+dot(l1,l1)/(uPR1*uPR1));vec3 n1=normalize(l1);
+vec3 pl=uPC0*max(dot(N,n0),0.)*a0+uPC1*max(dot(N,n1),0.)*a1;
+float ps=(pow(max(dot(N,normalize(n0+V)),0.),uShin)*a0+pow(max(dot(N,normalize(n1+V)),0.),uShin)*a1)*uSpec;
+c=b*(am+d*uLCol+pl)+sp*uLCol+ps*(uPC0+uPC1)*.5+uEm+uRimC*pow(1.-max(dot(N,V),0.),3.)*uRim;}
+float ds=length(uCam-vW);float f=1.-exp(-ds*ds*uFog*uFog);c=mix(c,uFogC,clamp(f,0.,1.));
+gl_FragColor=vec4(c,uOp);}`;
+  const DVS = 'attribute vec3 aP;uniform mat4 uM,uLVP;void main(){gl_Position=uLVP*uM*vec4(aP,1.);}';
+  const DFS = 'precision highp float;void main(){vec4 e=fract(vec4(1.,255.,65025.,16581375.)*gl_FragCoord.z);e-=e.yzww*vec4(1./255.,1./255.,1./255.,0.);gl_FragColor=e;}';
+  const PVS = 'attribute vec3 aP;attribute vec4 aC;attribute float aS;uniform mat4 uVP;uniform float uPx;varying vec4 vC;void main(){vec4 p=uVP*vec4(aP,1.);gl_Position=p;gl_PointSize=clamp(aS*uPx/p.w,1.,120.);vC=aC;}';
+  const PFS = 'precision mediump float;varying vec4 vC;void main(){vec2 q=gl_PointCoord*2.-1.;float r=dot(q,q);if(r>1.)discard;float k=1.-r;gl_FragColor=vec4(vC.rgb,vC.a*k*k);}';
+  function create(canvas, opts = {}) {
+    let gl = null;
+    try { gl = canvas.getContext('webgl', { antialias: true, alpha: false, preserveDrawingBuffer: !!opts.preserve, powerPreference: 'high-performance' }) || canvas.getContext('experimental-webgl'); } catch (e) {}
+    if (!gl) return null;
+    const uint = gl.getExtension('OES_element_index_uint');
+    const prog = (vs, fs) => {
+      const p = gl.createProgram();
+      [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]].forEach(([t, src]) => { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); gl.attachShader(p, s); });
+      gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+      const loc = {}, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); for (let i = 0; i < n; i++) { const u = gl.getActiveUniform(p, i); loc[u.name] = gl.getUniformLocation(p, u.name); }
+      const att = {}; ['aP', 'aN', 'aC', 'aU', 'aS'].forEach(a => { att[a] = gl.getAttribLocation(p, a); });
+      return { p, loc, att };
+    };
+    let P, D, PT;
+    try { P = prog(VS, FS); D = prog(DVS, DFS); PT = prog(PVS, PFS); } catch (e) { console.warn('3D', e.message); return null; }
+    const S3 = {
+      gl, canvas, nodes: [], cam: { pos: [0, 5, 10], target: [0, 0, 0], fov: 45, near: .1, far: 400 },
+      light: { dir: norm([-.4, -1, -.3]), color: [1, 1, 1] }, sky: [.4, .45, .55], ground: [.15, .12, .1],
+      pl: [{ pos: [0, 0, 0], color: [0, 0, 0], range: 1 }, { pos: [0, 0, 0], color: [0, 0, 0], range: 1 }],
+      fog: { color: [0, 0, 0], density: 0 }, clear: [0, 0, 0], shadow: null, dpr: 1, w: 1, h: 1, vp: M.ident(), time: 0
+    };
+    const tex1 = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+    S3.mesh = g => {
+      const big = g.p.length / 3 > 65535 && uint;
+      const buf = (data, T, target = gl.ARRAY_BUFFER) => { const b = gl.createBuffer(); gl.bindBuffer(target, b); gl.bufferData(target, new T(data), gl.STATIC_DRAW); return b; };
+      return { p: buf(g.p, Float32Array), n: buf(g.n, Float32Array), c: buf(g.c, Float32Array), u: buf(g.u, Float32Array), i: buf(g.i, big ? Uint32Array : Uint16Array, gl.ELEMENT_ARRAY_BUFFER), count: g.i.length, type: big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, geo: g };
+    };
+    S3.updateMesh = (m, g) => { gl.bindBuffer(gl.ARRAY_BUFFER, m.p); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(g.p), gl.DYNAMIC_DRAW); gl.bindBuffer(gl.ARRAY_BUFFER, m.n); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(g.n), gl.DYNAMIC_DRAW); };
+    S3.texture = (src) => {
+      const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+      const pot = !(src.width & (src.width - 1)) && !(src.height & (src.height - 1));
+      if (pot) { gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); const af = gl.getExtension('EXT_texture_filter_anisotropic'); if (af) gl.texParameterf(gl.TEXTURE_2D, af.TEXTURE_MAX_ANISOTROPY_EXT, 4); }
+      else { gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); }
+      return t;
+    };
+    S3.mat = o => Object.assign({ color: [1, 1, 1], em: [0, 0, 0], spec: .25, shin: 24, op: 1, unlit: false, pat: 0, patS: 1, rim: 0, rimC: [1, 1, 1], tex: null, fog: true, ds: false, add: false, bg: false, shadow: true, dw: true }, o);
+    S3.node = (mesh, mat, o = {}) => Object.assign({ mesh, mat, pos: [0, 0, 0], rot: [0, 0, 0], scl: [1, 1, 1], visible: true, children: [], cast: true, world: null }, o);
+    S3.add = (n, parent) => { (parent ? parent.children : S3.nodes).push(n); n.parent = parent || null; return n; };
+    S3.remove = n => { const arr = n.parent ? n.parent.children : S3.nodes, k = arr.indexOf(n); if (k >= 0) arr.splice(k, 1); };
+    S3.resize = () => {
+      const r = canvas.getBoundingClientRect(), dpr = Math.min(opts.maxDpr || 2, window.devicePixelRatio || 1);
+      S3.w = Math.max(1, r.width); S3.h = Math.max(1, r.height); S3.dpr = dpr;
+      canvas.width = Math.round(S3.w * dpr); canvas.height = Math.round(S3.h * dpr);
+    };
+    S3.setShadow = (size, center, extent) => {
+      if (!size) { S3.shadow = null; return; }
+      const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const fb = gl.createFramebuffer(), rb = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, rb); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, size, size);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      S3.shadow = { size, tex: t, fb, center, extent, vp: M.ident() };
+    };
+    const world = (list, parent, out) => list.forEach(n => { if (!n.visible) return; const m = M.compose(n.pos, n.rot, n.scl); n.world = parent ? M.mul(parent, m) : m; if (n.mesh) out.push(n); if (n.children.length) world(n.children, n.world, out); });
+    const bind = (pr, m) => {
+      const a = pr.att;
+      [['aP', m.p, 3], ['aN', m.n, 3], ['aC', m.c, 3], ['aU', m.u, 2]].forEach(([k, b, s]) => { if (a[k] < 0) return; gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(a[k]); gl.vertexAttribPointer(a[k], s, gl.FLOAT, false, 0, 0); });
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.i);
+    };
+    let ptBuf = null;
+    S3.updateCam = () => { const cam = S3.cam; S3.view = M.lookAt(cam.pos, cam.target, cam.up || [0, 1, 0]); S3.proj = M.persp(cam.fov * Math.PI / 180, S3.w / S3.h, cam.near, cam.far); S3.vp = M.mul(S3.proj, S3.view); };
+    S3.render = (points) => {
+      const cam = S3.cam; S3.updateCam();
+      const list = []; world(S3.nodes, null, list);
+      [0, 1, 2, 3, 4, 5, 6, 7].forEach(i => gl.disableVertexAttribArray(i));
+      if (S3.shadow && S3.shadow.dirty !== false) {
+        const sh = S3.shadow; if (!sh.always) sh.dirty = false;
+        const c = sh.center, L = S3.light.dir, e = sh.extent;
+        const lv = M.lookAt([c[0] - L[0] * e * 2, c[1] - L[1] * e * 2, c[2] - L[2] * e * 2], c, Math.abs(L[1]) > .99 ? [0, 0, 1] : [0, 1, 0]);
+        sh.vp = M.mul(M.ortho(-e, e, -e, e, .1, e * 4), lv);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, sh.fb); gl.viewport(0, 0, sh.size, sh.size); gl.clearColor(1, 1, 1, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.depthMask(true); gl.disable(gl.CULL_FACE);
+        gl.useProgram(D.p); gl.uniformMatrix4fv(D.loc.uLVP, false, sh.vp);
+        list.forEach(n => { if (!n.cast || n.mat.op < 1 || n.mat.unlit) return; bind(D, n.mesh); gl.uniformMatrix4fv(D.loc.uM, false, n.world); gl.drawElements(gl.TRIANGLES, n.mesh.count, n.mesh.type, 0); });
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        [0, 1, 2, 3].forEach(i => gl.disableVertexAttribArray(i));
+      }
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(S3.clear[0], S3.clear[1], S3.clear[2], 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.enable(gl.DEPTH_TEST);
+      gl.useProgram(P.p); const U = P.loc;
+      gl.uniformMatrix4fv(U.uVP, false, S3.vp); gl.uniform3fv(U.uCam, cam.pos); gl.uniform3fv(U.uSky, S3.sky); gl.uniform3fv(U.uGnd, S3.ground);
+      gl.uniform3fv(U.uLDir, S3.light.dir); gl.uniform3fv(U.uLCol, S3.light.color); gl.uniform3fv(U.uFogC, S3.fog.color);
+      gl.uniform3fv(U.uPL0, S3.pl[0].pos); gl.uniform3fv(U.uPC0, S3.pl[0].color); gl.uniform1f(U.uPR0, S3.pl[0].range);
+      gl.uniform3fv(U.uPL1, S3.pl[1].pos); gl.uniform3fv(U.uPC1, S3.pl[1].color); gl.uniform1f(U.uPR1, S3.pl[1].range);
+      if (U.uTime) gl.uniform1f(U.uTime, S3.time);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, S3.shadow ? S3.shadow.tex : tex1); gl.uniform1i(U.uSM, 1); gl.uniform1f(U.uSMs, S3.shadow ? S3.shadow.size : 1);
+      gl.uniformMatrix4fv(U.uLVP, false, S3.shadow ? S3.shadow.vp : M.ident());
+      gl.uniform1i(U.uTex, 0);
+      const bgs = list.filter(n => n.mat.bg), op = list.filter(n => !n.mat.bg && n.mat.op >= 1 && !n.mat.add), tr = list.filter(n => !n.mat.bg && (n.mat.op < 1 || n.mat.add));
+      const cpos = cam.pos;
+      tr.forEach(n => { const w = n.world; n._d = (w[12] - cpos[0]) ** 2 + (w[13] - cpos[1]) ** 2 + (w[14] - cpos[2]) ** 2; }); tr.sort((a, b) => b._d - a._d);
+      const draw = n => {
+        const m = n.mat; bind(P, n.mesh);
+        gl.uniformMatrix4fv(U.uM, false, n.world); gl.uniformMatrix3fv(U.uNM, false, M.normalMat(n.world));
+        gl.uniform3fv(U.uCol, m.color); gl.uniform3fv(U.uEm, m.em); gl.uniform1f(U.uSpec, m.spec); gl.uniform1f(U.uShin, m.shin); gl.uniform1f(U.uOp, m.op);
+        gl.uniform1f(U.uFog, m.fog ? S3.fog.density : 0); gl.uniform1f(U.uRim, m.rim); gl.uniform3fv(U.uRimC, m.rimC); gl.uniform1f(U.uUnlit, m.unlit ? 1 : 0);
+        gl.uniform1f(U.uPat, m.pat); gl.uniform1f(U.uPatS, m.patS); gl.uniform1f(U.uShadow, S3.shadow && m.shadow ? 1 : 0);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, m.tex || tex1); gl.uniform1f(U.uTexOn, m.tex ? 1 : 0);
+        if (m.ds) gl.disable(gl.CULL_FACE); else { gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); }
+        gl.drawElements(gl.TRIANGLES, n.mesh.count, n.mesh.type, 0);
+      };
+      gl.depthMask(false); gl.disable(gl.BLEND); bgs.forEach(draw);
+      gl.depthMask(true); op.forEach(draw);
+      gl.enable(gl.BLEND); gl.depthMask(false);
+      tr.forEach(n => { gl.blendFunc(gl.SRC_ALPHA, n.mat.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA); if (n.mat.dw) gl.depthMask(!n.mat.add); draw(n); gl.depthMask(false); });
+      [0, 1, 2, 3].forEach(i => gl.disableVertexAttribArray(i));
+      if (points && points.length) {
+        const data = new Float32Array(points.length * 8);
+        points.forEach((p, k) => { data.set([p.p[0], p.p[1], p.p[2], p.c[0], p.c[1], p.c[2], p.c[3], p.s], k * 8); });
+        if (!ptBuf) ptBuf = gl.createBuffer();
+        gl.useProgram(PT.p); gl.bindBuffer(gl.ARRAY_BUFFER, ptBuf); gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+        const a = PT.att; gl.enableVertexAttribArray(a.aP); gl.vertexAttribPointer(a.aP, 3, gl.FLOAT, false, 32, 0); gl.enableVertexAttribArray(a.aC); gl.vertexAttribPointer(a.aC, 4, gl.FLOAT, false, 32, 12); gl.enableVertexAttribArray(a.aS); gl.vertexAttribPointer(a.aS, 1, gl.FLOAT, false, 32, 28);
+        gl.uniformMatrix4fv(PT.loc.uVP, false, S3.vp); gl.uniform1f(PT.loc.uPx, canvas.height / 2);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE); gl.drawArrays(gl.POINTS, 0, points.length);
+        [a.aP, a.aC, a.aS].forEach(i => gl.disableVertexAttribArray(i));
+      }
+      gl.depthMask(true); gl.disable(gl.BLEND);
+    };
+    S3.project = p => { const v = M.xf(S3.vp, [p[0], p[1], p[2], 1]); return { x: (v[0] / v[3] * .5 + .5) * S3.w, y: (1 - (v[1] / v[3] * .5 + .5)) * S3.h, w: v[3] }; };
+    S3.ray = (x, y) => {
+      const inv = M.invert(S3.vp), nx = x / S3.w * 2 - 1, ny = 1 - y / S3.h * 2;
+      const a = M.xf(inv, [nx, ny, -1, 1]), b = M.xf(inv, [nx, ny, 1, 1]);
+      const o = [a[0] / a[3], a[1] / a[3], a[2] / a[3]], e = [b[0] / b[3], b[1] / b[3], b[2] / b[3]];
+      return { o, d: norm(sub(e, o)) };
+    };
+    S3.tick = now => { if (S3._lt) { const dt = Math.min(200, now - S3._lt); S3._ema = S3._ema ? S3._ema * .94 + dt * .06 : dt; if (!S3._born) S3._born = now; if (S3._ema > 40 && !S3._low && now - S3._born > 3000) { S3._low = true; opts.maxDpr = 1; S3.resize(); } } S3._lt = now; };
+    S3.dispose = () => { try { const ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext(); } catch (e) {} };
+    S3.resize();
+    return S3;
+  }
+  const supported = (() => { let ok = null; return () => { if (ok !== null) return ok; try { const c = document.createElement('canvas'); const g = c.getContext('webgl'); ok = !!g; const e = g && g.getExtension('WEBGL_lose_context'); if (e) e.loseContext(); } catch (e) { ok = false; } return ok; }; })();
+  return { M, G, create, hex, norm, supported };
+})();
+const GFX3D_KEY = 'hp-gfx3d';
+function gfx3d() { if (!M3.supported()) return false; try { return localStorage.getItem(GFX3D_KEY) !== '0'; } catch (e) { return true; } }
+function setGfx3d(on) { try { localStorage.setItem(GFX3D_KEY, on ? '1' : '0'); } catch (e) {} }
+function gfxToggleBtn(game) {
+  if (!M3.supported()) return '';
+  const on = gfx3d();
+  return `<button onclick="setGfx3d(${!on});openGame('${game}')" class="btn-ghost !py-1 !px-2.5 !text-[10px]" title="Cambia la calidad gráfica"><i class="fa-solid ${on ? 'fa-image' : 'fa-cube'}"></i> <span class="hidden sm:inline">${on ? 'Gráficos clásicos' : 'Gráficos 3D'}</span><span class="sm:hidden">${on ? '2D' : '3D'}</span></button>`;
+}
+
+/* ---------------- AJEDREZ MÁGICO 3D ---------------- */
+const C3 = { R: null, raf: 0, state: null, anims: [], frags: [], sparks: [], meshes: null, mats: null, ov: [], az: 0, el: .92, dist: 11.5, drag: null, candles: [], last: 0, frame: 0 };
+function c3Arc(cy, r, a0, a1, n) { const o = []; for (let k = 0; k <= n; k++) { const a = (a0 + (a1 - a0) * k / n) * Math.PI / 180; o.push([Math.cos(a) * r, cy + Math.sin(a) * r]); } return o; }
+function c3Base(rb) { return [[0, 0], [rb, 0], [rb, 0], [rb, .05], [rb * .93, .08], [rb * .95, .11], [rb * .97, .13], [rb * .78, .16], [rb * .7, .19]]; }
+function c3Meshes(R) {
+  const G = M3.G, at = G.at, L = (p, s = 40) => G.lathe(p, s);
+  const pawn = L([...c3Base(.34), [.17, .3], [.12, .42], [.2, .45], [.21, .47], [.2, .49], [.11, .5], ...c3Arc(.61, .13, -60, 90, 10)]);
+  const rookBody = L([...c3Base(.37), [.26, .26], [.23, .6], [.3, .64], [.31, .67], [.3, .72], [.28, .74], [.28, .78], [.2, .78], [.2, .74], [0, .74]]);
+  const merlons = []; for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; merlons.push([G.box(.13, .12, .1), at(Math.cos(a) * .24, .84, Math.sin(a) * .24, 0, -a)]); }
+  const rook = G.merge([[rookBody], ...merlons]);
+  const head = G.extrude([[-.2, .36], [.2, .36], [.21, .5], [.14, .6], [.27, .66], [.37, .74], [.38, .82], [.33, .87], [.2, .88], [.12, .95], [.07, 1.04], [.02, 1.1], [-.03, 1.02], [-.08, 1.08], [-.11, .99], [-.2, .92], [-.27, .78], [-.29, .62], [-.25, .48]], .3);
+  const mane = []; for (let k = 0; k < 6; k++) mane.push([G.box(.07, .1, .3), at(-.24 + k * .02, .58 + k * .07, 0, 0, 0, .5 + k * .1)]);
+  const knight = G.merge([[L([...c3Base(.37), [.25, .26], [.22, .36], [0, .38]])], [head], ...mane, [G.sphere(.035, 10, 8), at(.17, .86, .14)], [G.sphere(.035, 10, 8), at(.17, .86, -.14)]]);
+  const bishop = G.merge([[L([...c3Base(.35), [.16, .3], [.11, .56], [.19, .59], [.2, .61], [.19, .63], [.1, .65], [.13, .7], [.17, .78], [.165, .86], [.12, .95], [.06, 1.0], [0, 1.02]])], [G.sphere(.05, 14, 10), at(0, 1.06, 0)], [G.box(.03, .2, .3), at(.06, .86, 0, 0, 0, -.6)]]);
+  const crown = []; for (let k = 0; k < 9; k++) { const a = k / 9 * Math.PI * 2; crown.push([G.sphere(.045, 10, 8), at(Math.cos(a) * .2, 1.07, Math.sin(a) * .2)]); }
+  const queen = G.merge([[L([...c3Base(.39), [.19, .32], [.13, .74], [.24, .79], [.25, .81], [.24, .83], [.14, .86], [.17, .94], [.21, 1.04], [.2, 1.06], [.13, 1.02], [.06, 1.05], [0, 1.06]])], ...crown, [G.sphere(.07, 14, 10), at(0, 1.13, 0)]]);
+  const king = G.merge([[L([...c3Base(.4), [.2, .33], [.14, .8], [.25, .86], [.26, .88], [.25, .9], [.15, .93], [.19, 1.04], [.2, 1.09], [.15, 1.13], [0, 1.14]])], [G.box(.07, .3, .07), at(0, 1.27, 0)], [G.box(.22, .07, .07), at(0, 1.3, 0)]]);
+  const M = { p: pawn, r: rook, n: knight, b: bishop, q: queen, k: king };
+  const out = {}; Object.keys(M).forEach(k => out[k] = R.mesh(M[k]));
+  out.frag = R.mesh(G.box(.11, .11, .11));
+  out.quad = R.mesh(G.plane(1, 1, 1, 1));
+  out.dot = R.mesh(G.cyl(.15, .15, .02, 24));
+  out.ring = R.mesh(G.torus(.38, .04, 32, 8));
+  return out;
+}
+function c3BoardTexture() {
+  const N = 1024, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
+  const m = N * .4 / 8.8, sq = (N - 2 * m) / 8, R = rng(42);
+  const fr = x.createLinearGradient(0, 0, N, N); fr.addColorStop(0, '#4a2511'); fr.addColorStop(.5, '#2c1408'); fr.addColorStop(1, '#43210f'); x.fillStyle = fr; x.fillRect(0, 0, N, N);
+  for (let i = 0; i < 260; i++) { x.strokeStyle = `rgba(${R() < .5 ? '0,0,0' : '120,70,35'},${.08 + R() * .12})`; x.lineWidth = .6 + R() * 1.4; const y = R() * N; x.beginPath(); x.moveTo(0, y); for (let k = 0; k <= 8; k++) x.lineTo(k * N / 8, y + Math.sin(k * 1.3 + i) * 6); x.stroke(); }
+  for (let r = 0; r < 8; r++) for (let cc = 0; cc < 8; cc++) {
+    const dark = (r + cc) % 2 === 1, X = m + cc * sq, Y = m + r * sq;
+    x.save(); x.beginPath(); x.rect(X, Y, sq, sq); x.clip();
+    const g = x.createLinearGradient(X, Y, X + sq, Y + sq);
+    if (dark) { g.addColorStop(0, '#8a5530'); g.addColorStop(1, '#5e3519'); } else { g.addColorStop(0, '#f1dcb2'); g.addColorStop(1, '#d9bb88'); }
+    x.fillStyle = g; x.fillRect(X, Y, sq, sq);
+    const vert = (r + cc) % 2 === 0;
+    for (let i = 0; i < 22; i++) {
+      x.strokeStyle = dark ? `rgba(40,18,6,${.12 + R() * .2})` : `rgba(150,100,50,${.08 + R() * .14})`; x.lineWidth = .5 + R() * 1.6;
+      const o = R() * sq; x.beginPath();
+      for (let k = 0; k <= 10; k++) { const t = k / 10 * sq, w = Math.sin(k * .9 + i * 2.1) * 2.5 + Math.sin(k * 2.3 + i) * 1.2; vert ? (k ? x.lineTo(X + o + w, Y + t) : x.moveTo(X + o + w, Y + t)) : (k ? x.lineTo(X + t, Y + o + w) : x.moveTo(X + t, Y + o + w)); }
+      x.stroke();
+    }
+    x.restore();
+  }
+  x.strokeStyle = '#d4a94a'; x.lineWidth = 4; x.strokeRect(m - 4, m - 4, N - 2 * m + 8, N - 2 * m + 8);
+  x.strokeStyle = 'rgba(212,169,74,.5)'; x.lineWidth = 1.5; x.strokeRect(m - 12, m - 12, N - 2 * m + 24, N - 2 * m + 24);
+  x.fillStyle = '#e9c46a'; x.font = `700 ${Math.round(m * .5)}px Cinzel, Georgia, serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+  for (let k = 0; k < 8; k++) { x.fillText('abcdefgh'[k], m + (k + .5) * sq, N - m / 2); x.fillText(String(8 - k), m / 2, m + (k + .5) * sq); }
+  return c;
+}
+function c3SkyGeo(top, mid, bot) {
+  const g = M3.G.sphere(80, 32, 16);
+  for (let v = 0; v < g.p.length / 3; v++) { const y = g.p[v * 3 + 1] / 80, t = Math.max(0, y), b = Math.max(0, -y); const c = mid.map((m, i) => m * (1 - t - b) + top[i] * t + bot[i] * b); g.c[v * 3] = c[0]; g.c[v * 3 + 1] = c[1]; g.c[v * 3 + 2] = c[2]; }
+  return g;
+}
+function c3Mount() {
+  const stage = $('chStage'); if (!stage) return false;
+  stage.outerHTML = `<div id="c3wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-amber-800/50 shadow-2xl shadow-black/70" style="aspect-ratio:1/1;max-height:78vh"><canvas id="c3" class="block w-full h-full" style="touch-action:none;cursor:pointer"></canvas>
+    <div class="absolute bottom-2 left-2 right-2 flex justify-between items-end pointer-events-none"><span class="text-[10px] text-amber-100/70 bg-black/40 rounded-full px-2 py-0.5">Arrastra para girar el tablero</span><button onclick="c3ResetView()" class="pointer-events-auto btn-ghost !py-1 !px-2 !text-[10px]"><i class="fa-solid fa-camera-rotate"></i> Centrar</button></div></div>`;
+  const btn = [...document.querySelectorAll('#gameBody button')].find(b => /Vista/.test(b.textContent)); if (btn) btn.outerHTML = gfxToggleBtn('chess');
+  const R = M3.create($('c3'), { maxDpr: 2 }); if (!R) { setGfx3d(false); return false; }
+  c3Destroy(true);
+  C3.R = R; C3.meshes = c3Meshes(R); C3.az = 0; C3.dist = 14; C3.el = .9;
+  const G = M3.G, mat = R.mat;
+  C3.mats = {
+    w: mat({ color: [.94, .89, .77], spec: .55, shin: 70, rim: .18, rimC: [1, .92, .7] }),
+    b: mat({ color: [.085, .07, .07], spec: 1, shin: 120, rim: .4, rimC: [.55, .55, .8] }),
+    sel: mat({ color: [1, .82, .25], unlit: true, op: .5, add: true, fog: false }),
+    last: mat({ color: [.95, .75, .2], unlit: true, op: .28, fog: false }),
+    chk: mat({ color: [1, .15, .1], unlit: true, op: .75, add: true, fog: false }),
+    dot: mat({ color: [.2, .9, .55], unlit: true, op: .75, fog: false }),
+    cap: mat({ color: [1, .3, .2], unlit: true, op: .85, add: true, fog: false })
+  };
+  R.clear = [.03, .02, .06]; R.light.dir = M3.norm([-.45, -1, -.55]); R.light.color = [1.02, .93, .8]; R.sky = [.3, .28, .42]; R.ground = [.12, .09, .08];
+  R.fog = { color: [.04, .03, .08], density: .022 };
+  R.setShadow(window.innerWidth < 700 ? 1024 : 2048, [0, 0, 0], 6.4);
+  R.add(R.node(R.mesh(c3SkyGeo([.02, .02, .07], [.16, .1, .26], [.02, .01, .03])), mat({ unlit: true, bg: true, fog: false, ds: true }), { cast: false }));
+  R.add(R.node(R.mesh(G.cyl(8.5, 8.2, .6, 64)), mat({ color: [.17, .17, .22], pat: 4, spec: .9, shin: 90 }), { pos: [0, -.9, 0], cast: false }));
+  R.add(R.node(R.mesh(G.box(9.4, .34, 9.4)), mat({ color: [.42, .22, .1], pat: 1, patS: .5, spec: .5, shin: 50 }), { pos: [0, -.17, 0] }));
+  R.add(R.node(R.mesh(G.plane(9.2, 9.2, 1, 1)), mat({ tex: R.texture(c3BoardTexture()), spec: .35, shin: 60 }), { pos: [0, .001, 0], cast: false }));
+  C3.candles = [];
+  const candleG = R.mesh(G.cyl(.085, .1, .8, 16)), flameG = R.mesh(G.sphere(.07, 12, 8));
+  const wax = mat({ color: [.95, .9, .78], spec: .2, em: [.12, .08, .03] }), flame = mat({ color: [1, .7, .25], unlit: true, add: true, op: .95, fog: false });
+  for (let k = 0; k < 7; k++) {
+    const a = k / 7 * Math.PI * 2 + .3, rr = 7 + (k % 2) * 1.6, y = 2.6 + (k % 3) * .7;
+    const grp = R.add(R.node(null, null, { pos: [Math.cos(a) * rr, y, Math.sin(a) * rr] }));
+    R.add(R.node(candleG, wax, { cast: false }), grp); const f = R.add(R.node(flameG, flame, { pos: [0, .9, 0], scl: [1, 1.9, 1], cast: false }), grp);
+    C3.candles.push({ grp, f, y, ph: k * 1.7 });
+  }
+  C3.stars = Array.from({ length: 160 }, (_, i) => { const a = Math.random() * Math.PI * 2, e = .15 + Math.random() * 1.2, r = 60; return { p: [Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r], s: 1.6 + Math.random() * 2.4, ph: Math.random() * 6 }; });
+  C3.ov = [];
+  const cv = $('c3');
+  cv.addEventListener('pointerdown', e => { C3.drag = { x: e.clientX, y: e.clientY, az: C3.az, el: C3.el, moved: false, id: e.pointerId }; cv.setPointerCapture && cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => { const d = C3.drag; if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y; if (Math.hypot(dx, dy) > 7) d.moved = true; if (d.moved) { C3.az = d.az - dx * .008; C3.el = Math.max(.42, Math.min(1.42, d.el + dy * .006)); } });
+  cv.addEventListener('pointerup', e => { const d = C3.drag; C3.drag = null; if (d && !d.moved) c3Pick(e); });
+  cv.addEventListener('pointercancel', () => { C3.drag = null; });
+  cv.addEventListener('wheel', e => { e.preventDefault(); C3.dist = Math.max(9, Math.min(20, C3.dist + e.deltaY * .01)); }, { passive: false });
+  C3.state = null; C3.anims = []; C3.frags = []; C3.sparks = [];
+  cancelAnimationFrame(C3.raf); C3.raf = requestAnimationFrame(c3Loop);
+  return true;
+}
+function c3ResetView() { C3.az = 0; C3.el = .9; C3.dist = 14; }
+function c3Destroy(keepNothing) { cancelAnimationFrame(C3.raf); if (C3.R) C3.R.dispose(); C3.R = null; C3.state = null; }
+const c3XZ = (r, c) => [c - 3.5, r - 3.5];
+function c3Rebuild() {
+  const R = C3.R; if (!R) return;
+  if (C3.state) C3.state.flat().forEach(s => s && R.remove(s.node));
+  C3.frags.forEach(f => R.remove(f.node)); C3.frags = []; C3.anims = [];
+  C3.state = CH.board.map((row, r) => row.map((p, c) => p ? { p, node: c3PieceNode(p, r, c) } : null));
+}
+function c3PieceNode(p, r, c) {
+  const R = C3.R, t = p.toLowerCase(), w = isW(p), [x, z] = c3XZ(r, c);
+  return R.add(R.node(C3.meshes[t], w ? C3.mats.w : C3.mats.b, { pos: [x, 0, z], rot: [0, t === 'n' ? (w ? Math.PI : 0) : (w ? 0 : Math.PI), 0] }));
+}
+function c3Sync() {
+  if (!C3.R) return;
+  const mv = CH.anim;
+  if (!C3.state || !mv) c3Rebuild();
+  else {
+    const S = C3.state, moving = S[mv.fr][mv.fc];
+    if (!moving) c3Rebuild();
+    else {
+      const capAt = mv.ep ? [mv.fr, mv.tc] : [mv.tr, mv.tc], cap = S[capAt[0]][capAt[1]];
+      if (cap && cap !== moving) { c3Explode(cap); S[capAt[0]][capAt[1]] = null; }
+      S[mv.tr][mv.tc] = moving; S[mv.fr][mv.fc] = null;
+      c3Animate(moving, mv.fr, mv.fc, mv.tr, mv.tc, moving.p.toLowerCase() === 'n' ? .9 : .45, () => { if (mv.promo) { moving.p = isW(moving.p) ? 'Q' : 'q'; moving.node.mesh = C3.meshes.q; c3Sparks(c3XZ(mv.tr, mv.tc), [1, .85, .3], 40); } c3Check(); });
+      if (mv.castle) { const row = mv.fr, [a, b] = mv.castle === 'k' ? [7, 5] : [0, 3], rook = S[row][a]; if (rook) { S[row][b] = rook; S[row][a] = null; c3Animate(rook, row, a, row, b, .7); } }
+    }
+  }
+  c3Overlays();
+}
+function c3Check() {
+  if (!C3.state) return;
+  const bad = CH.board.some((row, r) => row.some((p, c) => (p || null) !== (C3.state[r][c] ? C3.state[r][c].p : null)));
+  if (bad) { c3Rebuild(); c3Overlays(); }
+}
+function c3Animate(s, fr, fc, tr, tc, h, done) {
+  const [x0, z0] = c3XZ(fr, fc), [x1, z1] = c3XZ(tr, tc);
+  C3.anims = C3.anims.filter(a => a.s !== s);
+  C3.anims.push({ s, x0, z0, x1, z1, h, t0: performance.now(), dur: 420 + Math.hypot(x1 - x0, z1 - z0) * 40, done });
+}
+function c3Explode(s) {
+  const R = C3.R, n = s.node, [x, , z] = n.pos; R.remove(n);
+  for (let k = 0; k < 18; k++) {
+    const a = Math.random() * Math.PI * 2, sp = .02 + Math.random() * .05;
+    C3.frags.push({ node: R.add(R.node(C3.meshes.frag, n.mat, { pos: [x + (Math.random() - .5) * .3, .2 + Math.random() * .8, z + (Math.random() - .5) * .3], rot: [Math.random() * 6, Math.random() * 6, 0] })), v: [Math.cos(a) * sp, .05 + Math.random() * .07, Math.sin(a) * sp], spin: [(Math.random() - .5) * .3, (Math.random() - .5) * .3], life: 1 });
+  }
+  c3Sparks([x, z], [1, .7, .25], 50);
+  if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+}
+function c3Sparks([x, z], col, n) { for (let k = 0; k < n; k++) { const a = Math.random() * Math.PI * 2, sp = .02 + Math.random() * .08; C3.sparks.push({ p: [x, .4 + Math.random() * .6, z], v: [Math.cos(a) * sp, .03 + Math.random() * .08, Math.sin(a) * sp], life: 1, col }); } }
+function c3Overlays() {
+  const R = C3.R; C3.ov.forEach(n => R.remove(n)); C3.ov = [];
+  const q = (mesh, mat, r, c, y = .012, s = 1) => { const [x, z] = c3XZ(r, c); C3.ov.push(R.add(R.node(mesh, mat, { pos: [x, y, z], scl: [s, 1, s], cast: false }))); };
+  if (CH.last) { q(C3.meshes.quad, C3.mats.last, CH.last.fr, CH.last.fc); q(C3.meshes.quad, C3.mats.last, CH.last.tr, CH.last.tc); }
+  if (CH.sel) {
+    q(C3.meshes.quad, C3.mats.sel, CH.sel[0], CH.sel[1], .014);
+    CH.moves.filter(m => m.fr === CH.sel[0] && m.fc === CH.sel[1]).forEach(m => CH.board[m.tr][m.tc] || m.ep ? q(C3.meshes.ring, C3.mats.cap, m.tr, m.tc, .03) : q(C3.meshes.dot, C3.mats.dot, m.tr, m.tc, .01));
+  }
+  const k = findKing(CH.board, CH.turn); if (k && attacked(CH.board, k[0], k[1], CH.turn === 'w' ? 'b' : 'w')) q(C3.meshes.quad, C3.mats.chk, k[0], k[1], .016, 1);
+}
+function c3Pick(e) {
+  const R = C3.R; if (!R) return; const rc = $('c3').getBoundingClientRect(), mx = e.clientX - rc.left, my = e.clientY - rc.top;
+  let best = null, bd = 1e9; const sqPx = (() => { const a = R.project([0, 0, 0]), b = R.project([1, 0, 0]); return Math.hypot(a.x - b.x, a.y - b.y); })();
+  if (C3.state) C3.state.forEach((row, r) => row.forEach((s, c) => { if (!s) return; const h = { p: .35, r: .45, n: .5, b: .55, q: .6, k: .65 }[s.p.toLowerCase()], pr = R.project([s.node.pos[0], h, s.node.pos[2]]); const d = Math.hypot(pr.x - mx, pr.y - my); if (d < sqPx * .55 && d < bd && (colorOf(s.p) === CH.my)) { bd = d; best = [r, c]; } }));
+  if (!best) { const ray = R.ray(mx, my); if (ray.d[1] < 0) { const t = -ray.o[1] / ray.d[1], x = ray.o[0] + ray.d[0] * t, z = ray.o[2] + ray.d[2] * t, c = Math.floor(x + 4), r = Math.floor(z + 4); if (r >= 0 && r < 8 && c >= 0 && c < 8) best = [r, c]; } }
+  if (best) chessClick(best[0], best[1]);
+}
+function c3Loop(now) {
+  const R = C3.R; if (!R) return;
+  if (!document.body.contains(R.canvas)) { c3Destroy(); return; }
+  C3.raf = requestAnimationFrame(c3Loop);
+  const busy = C3.anims.length || C3.frame < 4 || C3.frags.length || C3.sparks.length || C3.drag;
+  C3.frame++; if (!busy && C3.frame % 2) return;
+  R.tick(now); const t = now / 1000;
+  const asp = R.w / R.h, dist = C3.dist * Math.max(1, 1.12 / asp), az = C3.az + (CH.my === 'b' ? Math.PI : 0);
+  R.cam.fov = 36; R.cam.target = [.35 * Math.sin(az), -.3, .35 * Math.cos(az)]; R.cam.pos = [Math.sin(az) * Math.cos(C3.el) * dist, Math.sin(C3.el) * dist, Math.cos(az) * Math.cos(C3.el) * dist];
+  C3.candles.forEach((c, i) => { c.grp.pos[1] = c.y + Math.sin(t * .8 + c.ph) * .18; const fl = 1 + Math.sin(t * 17 + c.ph) * .08 + Math.sin(t * 29 + i) * .06; c.f.scl = [fl, 1.9 * fl, fl]; });
+  const c0 = C3.candles[0], c1 = C3.candles[3], fl = .9 + Math.sin(t * 13) * .1;
+  if (c0) { R.pl[0] = { pos: [c0.grp.pos[0], c0.grp.pos[1] + 1, c0.grp.pos[2]], color: [1.1 * fl, .6 * fl, .25 * fl], range: 5 }; R.pl[1] = { pos: [c1.grp.pos[0], c1.grp.pos[1] + 1, c1.grp.pos[2]], color: [.9, .5, .2], range: 5 }; }
+  C3.anims = C3.anims.filter(a => {
+    const k = Math.min(1, (now - a.t0) / a.dur), e = k < .5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+    a.s.node.pos = [a.x0 + (a.x1 - a.x0) * e, Math.sin(Math.PI * k) * a.h, a.z0 + (a.z1 - a.z0) * e];
+    if (k >= 1) { a.s.node.pos[1] = 0; if (a.done) a.done(); return false; }
+    return true;
+  });
+  if (C3.state) C3.state.forEach((row, r) => row.forEach((s, c) => { if (!s || C3.anims.some(a => a.s === s)) return; const sel = CH.sel && CH.sel[0] === r && CH.sel[1] === c; s.node.pos[1] += ((sel ? .18 + Math.sin(t * 4) * .03 : 0) - s.node.pos[1]) * .3; s.node.mat = isW(s.p) ? C3.mats.w : C3.mats.b; }));
+  C3.frags = C3.frags.filter(f => { f.v[1] -= .004; f.node.pos = [f.node.pos[0] + f.v[0], Math.max(.05, f.node.pos[1] + f.v[1]), f.node.pos[2] + f.v[2]]; if (f.node.pos[1] <= .05) { f.v[1] *= -.35; f.v[0] *= .7; f.v[2] *= .7; } f.node.rot[0] += f.spin[0]; f.node.rot[1] += f.spin[1]; f.life -= .012; const s = Math.max(.01, f.life); f.node.scl = [s, s, s]; if (f.life <= 0) { R.remove(f.node); return false; } return true; });
+  C3.sparks = C3.sparks.filter(s => { s.v[1] -= .002; s.p = [s.p[0] + s.v[0], s.p[1] + s.v[1], s.p[2] + s.v[2]]; s.life -= .018; return s.life > 0; });
+  const pts = C3.stars.map(s => ({ p: s.p, s: s.s, c: [1, .95, .85, .35 + Math.sin(t * 2 + s.ph) * .25] }));
+  C3.candles.forEach(c => pts.push({ p: [c.grp.pos[0], c.grp.pos[1] + .92, c.grp.pos[2]], s: 1.6, c: [1, .6, .2, .5] }));
+  C3.sparks.forEach(s => pts.push({ p: s.p, s: .25 * s.life + .05, c: [s.col[0], s.col[1], s.col[2], s.life] }));
+  if (R.shadow && (busy || C3.anims.length || C3.frags.length || C3.frame < 3 || C3.frame % 6 === 0)) R.shadow.dirty = true;
+  R.render(pts);
+}
+/* integración con la lógica existente del ajedrez */
+const _v6ChessRender = chessRender;
+chessRender = function () {
+  if (C3.R && $('c3')) {
+    c3Sync(); CH.anim = null; chessBars();
+    const mv = $('chMoves'); if (mv) mv.innerHTML = CH.hist.length ? CH.hist.map((h, i) => (i % 2 === 0 ? `<span class="text-stone-600">${i / 2 + 1}.</span>` : '') + `<span class="${i === CH.hist.length - 1 ? 'text-amber-300' : ''}">${h}</span>`).join(' ') : 'Toca una pieza y después la casilla a donde quieres moverla. Arrastra para girar la vista.';
+    return;
+  }
+  _v6ChessRender();
+};
+const _v6ChessInit = chessInit;
+chessInit = function () { c3Destroy(); _v6ChessInit(); if (!gameState.online && gfx3d() && c3Mount()) chessRender(); else if (!gameState.online) { const btn = [...document.querySelectorAll('#gameBody button')].find(b => /Vista/.test(b.textContent)); if (btn) btn.insertAdjacentHTML('afterend', gfxToggleBtn('chess')); } };
+const _v6ChessStart = GR.chess.start;
+GR.chess.start = function (o) { c3Destroy(); _v6ChessStart(o); if (gfx3d() && c3Mount()) chessRender(); };
+
+/* ---------------- ESCOBA VOLADORA 3D ---------------- */
+const B3 = { R: null, raf: 0, towers: [], snitches: [], rider: null, ghost: null, bg: [], sparks: [], debris: [], t: 0 };
+const b3X = lx => lx / 40, b3Y = ly => (400 - ly) / 40;
+function b3RiderBuild(R, col, ghost) {
+  const G = M3.G, at = G.at, mat = R.mat;
+  const gm = o => ghost ? mat({ color: [.55, .85, 1], em: [.08, .2, .3], op: .42, spec: .2, rim: .8, rimC: [.6, .9, 1] }) : mat(o);
+  const grp = R.add(R.node(null, null));
+  const body = R.add(R.node(null, null), grp);
+  R.add(R.node(R.mesh(G.cyl(.045, .055, 2.4, 10)), gm({ color: [.5, .3, .14], pat: 1, patS: 2.5, spec: .5, shin: 40 }), { pos: [1.2, 0, 0], rot: [0, 0, Math.PI / 2] }), body);
+  R.add(R.node(R.mesh(G.cyl(.06, .36, .95, 18)), gm({ color: [.85, .62, .3], pat: 6, spec: .1 }), { pos: [-1.1, 0, 0], rot: [0, 0, -Math.PI / 2], scl: [1, 1, .85] }), body);
+  R.add(R.node(R.mesh(G.cyl(.075, .075, .1, 12)), gm({ color: [.35, .2, .08] }), { pos: [-.12, 0, 0], rot: [0, 0, Math.PI / 2] }), body);
+  const robe = gm({ color: [.1, .09, .11], spec: .35, rim: .9, rimC: [.55, .6, 1] });
+  R.add(R.node(R.mesh(G.cyl(.17, .3, .75, 14)), robe, { pos: [.05, .05, 0], rot: [0, 0, -.35] }), body);
+  R.add(R.node(R.mesh(G.cyl(.07, .08, .7, 10)), robe, { pos: [.1, .05, .14], rot: [0, 0, -1.9] }), body);
+  R.add(R.node(R.mesh(G.cyl(.07, .08, .7, 10)), robe, { pos: [.1, .05, -.14], rot: [0, 0, -1.9] }), body);
+  R.add(R.node(R.mesh(G.cyl(.05, .06, .62, 10)), robe, { pos: [.28, .55, .17], rot: [0, 0, -2.2] }), body);
+  R.add(R.node(R.mesh(G.sphere(.17, 18, 14)), gm({ color: [.93, .74, .58], spec: .2 }), { pos: [.36, .98, 0] }), body);
+  R.add(R.node(R.mesh(G.sphere(.18, 16, 10)), gm({ color: [.13, .09, .06], spec: .3 }), { pos: [.32, 1.04, 0], scl: [1, .8, 1.05] }), body);
+  if (!ghost) R.add(R.node(R.mesh(G.torus(.045, .008, 12, 6)), mat({ color: [.1, .1, .1], spec: 1 }), { pos: [.52, .98, .07], rot: [0, Math.PI / 2, 0] }), body);
+  const scarf = []; for (let k = 0; k < 6; k++) scarf.push(R.add(R.node(R.mesh(G.box(.16, .07, .16)), gm({ color: M3.hex(k % 2 ? col.c2 : col.c1), spec: .1 }), { pos: [.25 - k * .15, .8, 0] }), body));
+  const capeGeo = M3.G.plane(1, 1, 6, 4); const cape = R.add(R.node(R.mesh(capeGeo), gm({ color: M3.hex(col.c1), spec: .3, ds: true, rim: .25 }), { cast: false }), body);
+  return { grp, body, scarf, cape, capeGeo };
+}
+function b3Cape(r, t, speed) {
+  const g = r.capeGeo, sx = 6, sz = 4, p = [];
+  for (let z = 0; z <= sz; z++) for (let x = 0; x <= sx; x++) {
+    const u = x / sx, v = z / sz, len = u * 1.25;
+    p.push(.2 - len, .78 - u * .35 + Math.sin(t * 9 - u * 5 + v) * .09 * u * (1 + speed * .1), (v - .5) * (.42 + u * .2) + Math.sin(t * 7 - u * 4) * .05 * u);
+  }
+  g.p = p; M3.G.normals(g); r.R.updateMesh(r.cape.mesh, g);
+  r.scarf.forEach((s, k) => { s.pos = [.25 - k * .15, .8 + Math.sin(t * 10 - k) * .03 * k, Math.sin(t * 8 - k * .8) * .04 * k]; });
+}
+function b3CastleGeo() {
+  const G = M3.G, at = G.at, stone = [], roofs = [], wins = [], R = rng(5);
+  const tower = (x, z, r, h, rh) => { stone.push([G.cyl(r, r * 1.08, h, 16), at(x, 0, z)]); roofs.push([G.cyl(0, r * 1.25, rh, 16), at(x, h, z)]); for (let y = 1.2; y < h - .6; y += 1.6) wins.push([G.box(.12, .3, .05), at(x, y, z + r)]); };
+  stone.push([G.box(14, 5, 4), at(0, 2.5, 0)]); stone.push([G.box(6, 7.5, 3), at(-2, 3.75, -1)]); stone.push([G.box(26, 2.2, 1.2), at(0, 1.1, 2.5)]);
+  roofs.push([G.cyl(0, 4.4, 2.6, 4), at(-2, 7.5, -1, 0, Math.PI / 4, 0, 1, 1, .5)]); roofs.push([G.cyl(0, 9.9, 2.4, 4), at(0, 5, 0, 0, Math.PI / 4, 0, 1, 1, .3)]);
+  tower(-7, 0, 1, 9, 3.2); tower(7, 0, 1, 8, 3); tower(-12, 2, .8, 6, 2.4); tower(12, 2, .8, 6.5, 2.4); tower(2.5, -1.5, 1.3, 12, 4.2); tower(-4.5, 1.5, .6, 7, 2.2); tower(4.8, 1.7, .55, 6, 2);
+  for (let i = 0; i < 26; i++) wins.push([G.box(.14, .32, .05), at(-6.5 + (i % 13) * 1.05, 1.2 + Math.floor(i / 13) * 1.8, 2.02)]);
+  for (let i = 0; i < 6; i++) wins.push([G.box(.16, .5, .05), at(-3.6 + i * .65, 4.8, .52)]);
+  return { stone: G.merge(stone), roofs: G.merge(roofs), wins: G.merge(wins) };
+}
+function b3HillsGeo() {
+  const G = M3.G, at = G.at, trees = [], R = rng(9);
+  const hill = G.plane(120, 14, 60, 6, (x, z) => Math.max(0, (Math.sin(x * .13) * 1.2 + Math.sin(x * .41 + 1) * .5 + 1.4) * (1 - Math.abs(z) / 7)));
+  for (let i = 0; i < 70; i++) { const x = -60 + R() * 120, z = -5 + R() * 9, s = .6 + R() * .9; trees.push([G.cyl(0, .5 * s, 1.8 * s, 7), at(x, .3 + Math.max(0, (Math.sin(x * .13) * 1.2 + Math.sin(x * .41 + 1) * .5 + 1.4) * (1 - Math.abs(z) / 7)), z)]); }
+  return { hill, trees: G.merge(trees) };
+}
+function b3Mount() {
+  const old = $('broomCanvas'); if (!old || $('broom3d')) return !!$('broom3d');
+  old.insertAdjacentHTML('beforebegin', '<canvas id="broom3d" class="absolute inset-0 block w-full h-full" style="touch-action:none"></canvas>');
+  old.style.opacity = '0'; old.style.pointerEvents = 'none';
+  const cv = $('broom3d'), R = M3.create(cv, { maxDpr: 1.75 });
+  if (!R) { cv.remove(); old.style.opacity = ''; old.style.pointerEvents = ''; setGfx3d(false); return false; }
+  b3Destroy(); B3.R = R; B3.sparks = []; B3.debris = [];
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); broomFlap(); });
+  const G = M3.G, mat = R.mat, col = broomColors();
+  R.clear = [.02, .02, .06]; R.light.dir = M3.norm([-.35, -.55, -.75]); R.light.color = [.72, .78, 1]; R.sky = [.2, .22, .42]; R.ground = [.05, .04, .09];
+  R.fog = { color: [.08, .06, .17], density: .011 }; R.cam.far = 260; R.cam.fov = 45;
+  B3.sky = R.add(R.node(R.mesh(c3SkyGeo([.01, .02, .08], [.32, .17, .42], [.04, .03, .08])), mat({ unlit: true, bg: true, fog: false, ds: true }), { cast: false, scl: [2, 2, 2] }));
+  B3.moon = R.add(R.node(R.mesh(G.sphere(4, 24, 16)), mat({ color: [1, .97, .85], unlit: true, fog: false }), { cast: false }));
+  B3.mount = R.add(R.node(R.mesh(G.plane(500, 30, 120, 3, (x, z) => z < 0 ? Math.max(0, 9 + Math.sin(x * .05) * 6 + Math.sin(x * .17) * 3 + Math.sin(x * .43) * 1.2) * (-z / 15) : 0)), mat({ color: [.09, .07, .17], spec: 0, fog: false }), { cast: false }));
+  const cg = b3CastleGeo(), stoneM = R.mesh(cg.stone), roofM = R.mesh(cg.roofs), winM = R.mesh(cg.wins);
+  const stoneMat = mat({ color: [.42, .4, .45], pat: 2, patS: 2, spec: .05 }), roofMat = mat({ color: [.16, .18, .26], spec: .6, shin: 40 }), winMat = mat({ color: [1, .78, .35], unlit: true });
+  B3.castles = [0, 1, 2].map(() => { const g = R.add(R.node(null, null, { scl: [1.25, 1.25, 1.25] })); R.add(R.node(stoneM, stoneMat), g); R.add(R.node(roofM, roofMat), g); R.add(R.node(winM, winMat), g); return g; });
+  const hg = b3HillsGeo(), hillM = R.mesh(hg.hill), treeM = R.mesh(hg.trees);
+  B3.hills = [0, 1].map(() => { const g = R.add(R.node(null, null)); R.add(R.node(hillM, mat({ color: [.07, .14, .1], spec: 0 })), g); R.add(R.node(treeM, mat({ color: [.04, .1, .07], spec: 0 })), g); return g; });
+  B3.lake = R.add(R.node(R.mesh(G.plane(400, 120, 1, 1)), mat({ color: [.04, .07, .16], spec: 1.6, shin: 160 }), { cast: false }));
+  /* torres obstáculo */
+  const cylM = R.mesh(G.cyl(.75, .75, 1, 20, false)), roofT = R.mesh(G.cyl(0, .95, 1, 20)), rockM = R.mesh(G.cyl(0, .95, 1, 9)), baseM = R.mesh(G.cyl(1, 1.3, 1, 10));
+  const cren = []; for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; cren.push([G.box(.22, .22, .2), G.at(Math.cos(a) * .82, .11, Math.sin(a) * .82, 0, -a)]); } cren.push([G.cyl(.86, .86, .1, 20)]);
+  const crenM = R.mesh(G.merge(cren)), winT = R.mesh(G.box(.2, .38, .08)), flagM = R.mesh(G.box(.6, .34, .02)), poleM = R.mesh(G.cyl(.02, .02, .7, 6));
+  const towerStone = mat({ color: [.6, .58, .56], pat: 2, patS: 2.6, spec: .08, rim: .15, rimC: [.6, .65, 1] }), slate = mat({ color: [.2, .23, .32], spec: .7, shin: 50 }), rock = mat({ color: [.3, .27, .25], pat: 5, spec: .05 }), glow = mat({ color: [1, .75, .35], unlit: true });
+  const flag = mat({ color: M3.hex(col.c1), spec: .2, ds: true }), gold = mat({ color: [.95, .75, .25], spec: 1, shin: 80 });
+  B3.towers = Array.from({ length: 9 }, () => {
+    const g = R.add(R.node(null, null, { visible: false }));
+    const n = { g, bot: R.add(R.node(cylM, towerStone), g), base: R.add(R.node(baseM, rock), g), crenB: R.add(R.node(crenM, towerStone), g), roof: R.add(R.node(roofT, slate), g), pole: R.add(R.node(poleM, gold), g), flag: R.add(R.node(flagM, flag), g), w1: R.add(R.node(winT, glow), g), w2: R.add(R.node(winT, glow), g), top: R.add(R.node(cylM, towerStone), g), crenT: R.add(R.node(crenM, towerStone), g), rock: R.add(R.node(rockM, rock), g), w3: R.add(R.node(winT, glow), g) };
+    return n;
+  });
+  const snBall = R.mesh(G.sphere(.17, 18, 12)), wingM = R.mesh(G.sphere(.5, 12, 6)), goldM = mat({ color: [1, .78, .2], spec: 1.4, shin: 90, em: [.25, .16, .02], rim: .6, rimC: [1, .9, .5] }), wingMat = mat({ color: [1, 1, 1], op: .78, spec: .5, em: [.3, .3, .3] });
+  B3.snitches = Array.from({ length: 6 }, () => { const g = R.add(R.node(null, null, { visible: false })); R.add(R.node(snBall, goldM), g); const w1 = R.add(R.node(wingM, wingMat, { scl: [.8, .05, .26] }), g), w2 = R.add(R.node(wingM, wingMat, { scl: [.8, .05, .26] }), g); return { g, w1, w2 }; });
+  const rb = b3RiderBuild(R, col, false); rb.R = R; B3.rider = rb;
+  const gb = b3RiderBuild(R, col, true); gb.R = R; gb.grp.visible = false; B3.ghost = gb;
+  B3.stars = Array.from({ length: 220 }, () => { const a = Math.random() * Math.PI - Math.PI, e = .08 + Math.random() * 1.1; return { d: [Math.cos(a) * Math.cos(e), Math.sin(e), Math.sin(a) * Math.cos(e) - .3], s: 2 + Math.random() * 3, ph: Math.random() * 6 }; });
+  return true;
+}
+function b3Destroy() { if (B3.R) B3.R.dispose(); B3.R = null; }
+function b3Draw() {
+  const R = B3.R, st = gameState, b = st.br; if (!R) return;
+  if (!document.body.contains(R.canvas)) { b3Destroy(); return; }
+  R.tick(performance.now()); const r = R.canvas.getBoundingClientRect(); if (Math.abs(r.width - R.w) > 1 || Math.abs(r.height - R.h) > 1) R.resize();
+  const t = b ? b.t / 60 : (st.brIdleT || 0) / 60; B3.t = t;
+  const camL = b ? b.cam : (st.brIdleT || 0) * 1.2, PX = b3X(camL + BR_PX), PY = b ? b3Y(b.y) : 5 + Math.sin(t * 2) * .35;
+  const tgtY = 5 + (PY - 5) * .18;
+  R.cam.target = [PX + 3.6, tgtY, 0]; R.cam.pos = [PX + 2.6, tgtY + 1.4, 13.2];
+  const cx = R.cam.pos[0];
+  B3.sky.pos = [cx, 0, 0]; B3.moon.pos = [cx - 38, 52, -150];
+  B3.mount.pos = [cx * .92, -.6, -110];
+  const P = 75; B3.castles.forEach((c, i) => { let rel = ((i * P - cx * .45) % (3 * P) + 3 * P) % (3 * P) - P; c.pos = [cx + rel, -.4, -46]; });
+  B3.hills.forEach((h, i) => { let rel = ((i * 120 - cx * .2) % 240 + 240) % 240 - 120; h.pos = [cx + rel, -.6, -20]; });
+  B3.lake.pos = [cx, -.5, -40];
+  const col = broomColors();
+  /* torres */
+  const towers = b ? b.towers : [];
+  B3.towers.forEach((n, i) => {
+    const tw = towers[i]; n.g.visible = !!tw; if (!tw) return;
+    const X = b3X(tw.x + 30), yb = b3Y(tw.top + tw.gap + 34), ya = b3Y(tw.top + tw.gap), y1 = b3Y(tw.top - 34), yr = b3Y(tw.top);
+    n.g.pos = [X, 0, 0];
+    n.base.pos = [0, -.6, 0]; n.base.scl = [1, .9, 1];
+    n.bot.pos = [0, -.5, 0]; n.bot.scl = [1, Math.max(.05, yb + .5), 1];
+    n.crenB.pos = [0, yb - .02, 0]; n.roof.pos = [0, yb + .2, 0]; n.roof.scl = [1, Math.max(.2, ya - yb - .2), 1];
+    n.pole.pos = [0, ya - .05, 0]; n.flag.visible = tw.ban; n.pole.visible = tw.ban;
+    n.flag.pos = [.32, ya + .45, 0]; n.flag.rot = [0, Math.sin(t * 6 + i) * .3, 0]; n.flag.mat.color = M3.hex(col.c1);
+    n.w1.visible = yb > 1.4; n.w1.pos = [0, yb * .45, .73]; n.w2.visible = yb > 3; n.w2.pos = [0, yb * .78, .73];
+    n.top.visible = y1 < 12; n.top.pos = [0, y1, 0]; n.top.scl = [1, 14 - y1, 1];
+    n.crenT.visible = false; n.rock.pos = [0, y1 + .02, 0]; n.rock.rot = [Math.PI, i, 0]; n.rock.scl = [1, Math.max(.2, y1 - yr), 1];
+    n.w3.visible = y1 < 9; n.w3.pos = [0, y1 + 1.1, .73];
+  });
+  const sns = b ? b.snitches : [];
+  B3.snitches.forEach((n, i) => {
+    const s = sns[i]; n.g.visible = !!s; if (!s) return;
+    n.g.pos = [b3X(s.x), b3Y(s.y + Math.sin(b.t / 6 + s.ph) * 6), .1]; n.g.rot = [0, t * 2 + i, 0];
+    const f = Math.sin(t * 40 + i) * .7; n.w1.pos = [0, .05, .42]; n.w1.rot = [f, 0, 0]; n.w2.pos = [0, .05, -.42]; n.w2.rot = [-f, 0, 0];
+  });
+  /* jinete */
+  const rd = B3.rider, rot = b ? -Math.max(-.5, Math.min(.6, b.vy / 10)) : Math.sin(t * 2) * .06, alive = !b || b.alive;
+  rd.grp.visible = alive || (b && b.shake > .5); rd.grp.pos = [PX, PY - .12, 0]; rd.grp.scl = [.85, .85, .85]; rd.grp.rot = [Math.sin(t * 3) * .05, 0, rot];
+  b3Cape(rd, t, b ? b.speed || 3 : 2);
+  R.pl[0] = { pos: [PX + 1.4, PY + .7, 1.6], color: [1.3, 1, .6], range: 3.6 };
+  const nearSn = sns.find(s => s.x - camL > 0 && s.x - camL < 600);
+  R.pl[1] = nearSn ? { pos: [b3X(nearSn.x), b3Y(nearSn.y), .6], color: [1, .8, .3], range: 2.2 } : { pos: [0, 0, 0], color: [0, 0, 0], range: 1 };
+  const rv = st.brRival, gh = B3.ghost;
+  gh.grp.visible = !!(b && rv && st.online);
+  if (gh.grp.visible) { gh.grp.pos = [b3X(rv.cam + BR_PX), b3Y(rv.y) - .12, -1.2]; gh.grp.scl = [.85, .85, .85]; gh.grp.rot = [0, 0, Math.sin(t * 2) * .05]; b3Cape(gh, t + 1, 3); }
+  /* partículas */
+  if (b && b.alive && Math.random() < .9) B3.sparks.push({ p: [PX - 1.5, PY - .05 + (Math.random() - .5) * .25, (Math.random() - .5) * .3], v: [-.02 - Math.random() * .03, (Math.random() - .5) * .01, (Math.random() - .5) * .01], life: 1, c: M3.hex(col.c2) });
+  if (b && b.parts) b.parts.forEach(p => { if (p.c === '#facc15' && !p.b3) { p.b3 = 1; B3.sparks.push({ p: [b3X(p.x), b3Y(p.y), 0], v: [p.vx * .012, -p.vy * .012, (Math.random() - .5) * .05], life: 1, c: [1, .85, .3] }); } });
+  B3.sparks = B3.sparks.filter(s => { s.p = [s.p[0] + s.v[0], s.p[1] + s.v[1], s.p[2] + s.v[2]]; s.life -= .022; return s.life > 0; }).slice(-220);
+  const pts = B3.stars.map(s => ({ p: [cx + s.d[0] * 140, s.d[1] * 140, s.d[2] * 140], s: s.s * 1.6, c: [1, 1, .95, .45 + Math.sin(t * 3 + s.ph) * .3] }));
+  pts.push({ p: B3.moon.pos, s: 60, c: [1, .95, .8, .35] });
+  sns.forEach((s, i) => { if (B3.snitches[i] && B3.snitches[i].g.visible) pts.push({ p: B3.snitches[i].g.pos, s: 1.5, c: [1, .85, .3, .55] }); });
+  B3.sparks.forEach(s => pts.push({ p: s.p, s: .16 * s.life + .04, c: [s.c[0], s.c[1], s.c[2], s.life] }));
+  pts.push({ p: [PX + 1.2, PY + .55, .3], s: .6, c: [1, .85, .5, .6] });
+  R.render(pts);
+}
+const _v6BroomSetup = broomSetup;
+broomSetup = function () { _v6BroomSetup(); b3Destroy(); if (gfx3d()) { if (b3Mount()) broomDraw(); } addGfxBtn('broom'); };
+const _v6BroomDraw = broomDraw;
+broomDraw = function () { if (B3.R && $('broom3d')) { b3Draw(); const b = gameState.br; if (b && b.shake > 0) { const c = $('broom3d'); c.style.transform = `translate(${(Math.random() - .5) * b.shake * .6}px,${(Math.random() - .5) * b.shake * .6}px)`; b.shake *= .85; if (b.shake < .5) c.style.transform = ''; } return; } _v6BroomDraw(); };
+function addGfxBtn(game) {
+  const tabs = document.querySelector('#gameBody .flex.justify-center.gap-2'); if (!tabs || tabs.querySelector('.gfx-btn')) return;
+  const html = gfxToggleBtn(game); if (html) tabs.insertAdjacentHTML('beforeend', html.replace('class="btn-ghost', 'class="gfx-btn btn-ghost'));
+}
+
+/* ---------------- ATRAPA LA SNITCH 3D ---------------- */
+const S3D = { R: null, raf: 0, trail: [], clouds: [] };
+const S3D_CAM = { pos: [0, 4.4, 17.5], target: [0, 3.6, 0], fov: 44 };
+function s3dToWorld(px, py) {
+  const st = gameState, R = S3D.R, W = st.snW || R.w, H = st.snH || R.h;
+  const dist = Math.hypot(S3D_CAM.pos[1] - S3D_CAM.target[1], S3D_CAM.pos[2] - S3D_CAM.target[2]);
+  const ray = R.ray(px / W * R.w, py / H * R.h), t = -ray.o[2] / ray.d[2];
+  return [ray.o[0] + ray.d[0] * t, ray.o[1] + ray.d[1] * t, 0, dist];
+}
+function s3dMount() {
+  const old = $('snitchCanvas'); if (!old || $('snitch3d')) return !!$('snitch3d');
+  old.insertAdjacentHTML('beforebegin', '<canvas id="snitch3d" class="absolute inset-0 block w-full h-full" style="pointer-events:none"></canvas>');
+  old.style.position = 'relative'; old.style.zIndex = '1'; old.style.opacity = '0';
+  const R = M3.create($('snitch3d'), { maxDpr: 1.75 });
+  if (!R) { $('snitch3d').remove(); old.style.opacity = ''; setGfx3d(false); return false; }
+  s3dDestroy(); S3D.R = R; S3D.trail = [];
+  const G = M3.G, at = G.at, mat = R.mat;
+  Object.assign(R.cam, { pos: S3D_CAM.pos.slice(), target: S3D_CAM.target.slice(), fov: S3D_CAM.fov, far: 300 });
+  R.clear = [.5, .7, .95]; R.light.dir = M3.norm([-.35, -1, -.45]); R.light.color = [1.15, 1.05, .9]; R.sky = [.55, .65, .85]; R.ground = [.22, .26, .14];
+  R.fog = { color: [.68, .8, .95], density: .009 };
+  R.setShadow(1024, [0, -3.4, 0], 13); R.shadow.always = true;
+  R.add(R.node(R.mesh(c3SkyGeo([.18, .4, .85], [.72, .84, .97], [.45, .55, .4])), mat({ unlit: true, bg: true, fog: false, ds: true }), { cast: false, scl: [2.5, 2.5, 2.5] }));
+  R.add(R.node(R.mesh(G.sphere(5, 20, 14)), mat({ color: [1.4, 1.3, 1.05], unlit: true, fog: false }), { pos: [55, 70, -170], cast: false }));
+  R.add(R.node(R.mesh(G.plane(240, 200, 1, 1)), mat({ color: [.3, .55, .2], pat: 3, spec: .05 }), { pos: [0, -3.9, -60], cast: false }));
+  R.add(R.node(R.mesh(G.torus(9, .08, 64, 6)), mat({ color: [1, 1, 1], unlit: true, op: .5 }), { pos: [0, -3.88, -14], scl: [1, 1, .55], cast: false }));
+  const hs = Object.values(HOUSES), stands = [], roofs = [], drapes = [];
+  for (let k = 0; k < 14; k++) {
+    const a = Math.PI * (1.12 + k / 13 * .76), rr = 46, x = Math.cos(a) * rr, z = Math.sin(a) * rr * .8 - 14, h = 10 + (k % 2) * 3, hc = hs[k % 4];
+    stands.push([G.box(6, h, 5), at(x, -4 + h / 2, z, 0, -a - Math.PI / 2)]);
+    drapes.push([G.box(6.1, 3.4, 5.1), at(x, -4 + h - 2.2, z, 0, -a - Math.PI / 2), M3.hex(hc.c1)]);
+    drapes.push([G.box(6.15, .6, 5.15), at(x, -4 + h - 4, z, 0, -a - Math.PI / 2), M3.hex(hc.c2)]);
+    roofs.push([G.cyl(0, 4.3, 4.5, 4), at(x, -4 + h, z, 0, -a - Math.PI / 4), M3.hex(hc.c1)]);
+  }
+  R.add(R.node(R.mesh(G.merge(stands)), mat({ color: [.55, .45, .35], pat: 1, patS: .4, spec: .05 }), { cast: false }));
+  R.add(R.node(R.mesh(G.merge(drapes)), mat({ spec: .2 }), { cast: false }));
+  R.add(R.node(R.mesh(G.merge(roofs)), mat({ spec: .3 }), { cast: false }));
+  const hoopGeo = [], poleGeo = [];
+  [[-6, 9], [0, 12], [6, 9]].forEach(([x, h]) => { poleGeo.push([G.cyl(.12, .16, h, 10), at(x, -4, -30)]); hoopGeo.push([G.torus(1.3, .13, 36, 10), at(x, -4 + h + 1.3, -30, Math.PI / 2, 0, 0)]); });
+  [[-10, 7], [-14, 9]].forEach(([x, h]) => { poleGeo.push([G.cyl(.1, .14, h, 10), at(x, -4, -12)]); hoopGeo.push([G.torus(1.1, .11, 36, 10), at(x, -4 + h + 1.1, -12, Math.PI / 2, .6, 0)]); });
+  const goldMat = mat({ color: [1, .8, .3], spec: 1.2, shin: 90 });
+  R.add(R.node(R.mesh(G.merge(poleGeo)), goldMat, { cast: false })); R.add(R.node(R.mesh(G.merge(hoopGeo)), goldMat, { cast: false }));
+  const cloudG = G.merge([[G.sphere(2, 14, 10)], [G.sphere(1.6, 14, 10), at(2, -.3, 0)], [G.sphere(1.5, 14, 10), at(-2, -.4, .3)], [G.sphere(1.3, 14, 10), at(.8, .9, 0)]]), cloudM = R.mesh(cloudG);
+  S3D.clouds = Array.from({ length: 7 }, (_, i) => R.add(R.node(cloudM, mat({ color: [1, 1, 1], em: [.38, .38, .4], spec: 0 }), { pos: [-60 + i * 20, 22 + (i % 3) * 5, -90 - (i % 2) * 30], scl: [2.2 + (i % 2), 1.4, 1.6], cast: false })));
+  S3D.ball = R.add(R.node(R.mesh(G.sphere(1, 24, 16)), mat({ color: [1, .78, .2], spec: 1.5, shin: 100, em: [.22, .14, .02], rim: .7, rimC: [1, .9, .55] })));
+  const wing = R.mesh(G.sphere(1, 14, 8)), wm = mat({ color: [1, 1, 1], op: .8, em: [.35, .35, .35], spec: .6 });
+  S3D.w1 = R.add(R.node(wing, wm)); S3D.w2 = R.add(R.node(wing, wm));
+  const bl = R.mesh(G.sphere(1, 22, 14)), blM = mat({ color: [.2, .19, .19], spec: 1.1, shin: 60, rim: .25, rimC: [.6, .6, .7] });
+  S3D.blud = Array.from({ length: 4 }, () => R.add(R.node(bl, blM, { visible: false })));
+  cancelAnimationFrame(S3D.raf); S3D.raf = requestAnimationFrame(s3dLoop);
+  return true;
+}
+function s3dDestroy() { cancelAnimationFrame(S3D.raf); if (S3D.R) S3D.R.dispose(); S3D.R = null; }
+function s3dLoop(now) {
+  const R = S3D.R; if (!R) return;
+  if (!document.body.contains(R.canvas)) { s3dDestroy(); return; }
+  S3D.raf = requestAnimationFrame(s3dLoop); R.tick(now);
+  const r = R.canvas.getBoundingClientRect(); if (Math.abs(r.width - R.w) > 1 || Math.abs(r.height - R.h) > 1) R.resize();
+  R.cam.pos = S3D_CAM.pos.slice(); R.cam.target = S3D_CAM.target.slice(); R.updateCam();
+  const st = gameState, t = now / 1000, W = st.snW || R.w, H = st.snH || R.h;
+  const s = st.sn || { x: W / 2, y: H * .35 + Math.sin(now / 300) * 8 };
+  const unit = (() => { const a = s3dToWorld(0, 0), b = s3dToWorld(0, H); return Math.abs(a[1] - b[1]) / H; })();
+  const p = s3dToWorld(s.x, s.y), rad = 9 * unit * 1.05;
+  S3D.ball.pos = p; S3D.ball.scl = [rad, rad, rad]; S3D.ball.rot = [t * 3, t * 2, 0];
+  const f = Math.sin(t * 38) * .8;
+  S3D.w1.pos = [p[0] + rad * 1.9, p[1] + rad * .3, p[2]]; S3D.w1.rot = [0, 0, -.35 + f]; S3D.w1.scl = [rad * 2, rad * .12, rad * .75];
+  S3D.w2.pos = [p[0] - rad * 1.9, p[1] + rad * .3, p[2]]; S3D.w2.rot = [0, 0, .35 - f]; S3D.w2.scl = [rad * 2, rad * .12, rad * .75];
+  S3D.trail.push(p.slice()); S3D.trail = S3D.trail.slice(-16);
+  (st.blud || []).forEach((b, i) => { const n = S3D.blud[i]; if (!n) return; n.visible = !!st.sn; const q = s3dToWorld(b.x, b.y), br = 15 * unit; n.pos = q; n.scl = [br, br, br]; n.rot = [t * 2 + i, t * 3, 0]; });
+  S3D.blud.forEach((n, i) => { if (!st.blud || !st.blud[i] || !st.sn) n.visible = false; });
+  S3D.clouds.forEach((c, i) => { c.pos[0] += .01 + i * .002; if (c.pos[0] > 80) c.pos[0] = -80; });
+  R.pl[0] = { pos: [p[0], p[1], p[2] + .8], color: [1, .8, .3], range: 1.5 };
+  const pts = S3D.trail.map((q, i, a) => ({ p: q, s: rad * (1 + i / a.length * 2), c: [1, .85, .3, i / a.length * .5] }));
+  pts.push({ p, s: rad * 9, c: [1, .9, .45, .45] }, { p: [55, 70, -170], s: 90, c: [1, .95, .7, .6] });
+  R.render(pts);
+}
+const _v6SnitchSetup = snitchSetup;
+snitchSetup = function () { _v6SnitchSetup(); s3dDestroy(); if (gfx3d()) s3dMount(); addGfxBtn('snitch'); };
+const _v6SnitchDraw = snitchDraw;
+snitchDraw = function (now) { if (S3D.R && $('snitch3d')) return; _v6SnitchDraw(now); };
+/* integración */
+const _v6StopAll = stopAllGames;
+stopAllGames = function () { _v6StopAll(); c3Destroy(); b3Destroy(); s3dDestroy(); };
 
 
 init();
