@@ -1,12 +1,12 @@
 <div align="center">
 
-![Hogwarts Magic Experience](og-image.jpg)
+![Hogwarts Magic Experience](img/og-image.jpg)
 
 # 🪄 Hogwarts Magic Experience
 
 **Trivia, juegos, duelos en línea, trivia en vivo y comunidad de magos de Harry Potter en una sola página web.**
 
-[🌐 Jugar ahora](https://juego-de-hogwarts.vercel.app) · [📖 Manual de usuario](Manual_de_Usuario_Hogwarts.docx) · [🔒 Privacidad](privacidad.html) · [🐛 Reportar un problema](../../issues)
+[🌐 Jugar ahora](https://juego-de-hogwarts.vercel.app) · [📖 Manual de usuario](docs/Manual_de_Usuario_Hogwarts.docx) · [🔒 Privacidad](privacidad.html) · [🐛 Reportar un problema](../../issues)
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
@@ -90,25 +90,30 @@
 ## 📁 Estructura
 
 ```
+juego-de-hogwarts/
 ├── index.html               # La aplicación completa
-├── sw.js                    # Service worker (sin internet + notificaciones)
-├── manifest.json            # Configuración de la PWA
 ├── privacidad.html          # Política de privacidad
-├── icon-192.png / icon-512.png
-├── og-image.jpg             # Vista previa al compartir el enlace
-├── supabase.sql             # 1) Ranking y duelo en línea
-├── supabase-cuentas.sql     # 2) Cuentas y progreso en la nube
-├── supabase-comunidad.sql   # 3) Copa global, torneo, amigos, encuestas y admin
+├── manifest.json            # Configuración de la PWA
+├── sw.js                    # Service worker (sin internet + notificaciones)
+├── README.md
 │
-├── musica1.mp3 … musica3.mp3            # Música de fondo
-├── sombrero.mp3                         # Música de la Ceremonia de Selección
-├── gryffindor.mp3 / slytherin.mp3 /
-│   ravenclaw.mp3 / hufflepuff.mp3       # Audio de cada casa
+├── audio/
+│   ├── musica1.mp3 … musica3.mp3        # Música de fondo
+│   ├── sombrero.mp3                     # Ceremonia de Selección
+│   └── gryffindor.mp3 · slytherin.mp3 · ravenclaw.mp3 · hufflepuff.mp3
 │
-├── pelicula1 … pelicula8                # Portadas de cada película (.jpg/.webp/.png)
-├── dueloimagen, frases, maraton         # Portadas de modos especiales
-└── hechizos, criaturas, personajes,
-    halloween, navidad                   # Portadas de las categorías nuevas (opcionales)
+├── img/
+│   ├── icon-192.png · icon-512.png      # Íconos de la app
+│   ├── og-image.jpg                     # Vista previa al compartir el enlace
+│   ├── pelicula1 … pelicula8            # Portadas de las películas (.jpg/.webp/.png)
+│   ├── dueloimagen · frases · maraton   # Portadas de modos especiales
+│   └── hechizos · criaturas · personajes · halloween · navidad   # (opcionales)
+│
+└── docs/
+    ├── supabase.sql                     # 1) Ranking y duelo en línea
+    ├── supabase-cuentas.sql             # 2) Cuentas y progreso en la nube
+    ├── supabase-comunidad.sql           # 3) Copa global, torneo, amigos, encuestas y admin
+    └── Manual_de_Usuario_Hogwarts.docx
 ```
 
 > Las imágenes y los audios son opcionales: si alguno falta, la página usa una ilustración o un sonido generado.
@@ -123,9 +128,9 @@
 ### 2. Configurar Supabase
 1. Crea un proyecto en [supabase.com](https://supabase.com).
 2. En **SQL Editor** ejecuta, **en este orden**:
-   1. [`supabase.sql`](supabase.sql)
-   2. [`supabase-cuentas.sql`](supabase-cuentas.sql)
-   3. [`supabase-comunidad.sql`](supabase-comunidad.sql)
+   1. [`supabase.sql`](docs/supabase.sql)
+   2. [`supabase-cuentas.sql`](docs/supabase-cuentas.sql)
+   3. [`supabase-comunidad.sql`](docs/supabase-comunidad.sql)
 3. Copia la *Project URL* y la *Publishable key* desde **Project Settings → API** y pégalas en `CONFIG`:
 
 ```js

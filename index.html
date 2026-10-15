@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0c0a09">
 <meta name="description" content="Trivia de las 8 películas, duelos en línea, 7 juegos mágicos, Mapa del Merodeador, Ollivanders y tu carta de Hogwarts. Por Leandro Zamora.">
 <title>Hogwarts Magic Experience - BY: LEANDRO ZAMORA</title>
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,7 +20,7 @@
 <meta property="og:title" content="Hogwarts Magic Experience · by Leandro Zamora">
 <meta property="og:description" content="¿A qué casa perteneces? Trivia de las 8 películas, duelos de magos, juegos y tu carta de Hogwarts.">
 <meta property="og:url" content="https://juego-de-hogwarts.vercel.app/">
-<meta property="og:image" content="https://juego-de-hogwarts.vercel.app/og-image.jpg">
+<meta property="og:image" content="https://juego-de-hogwarts.vercel.app/img/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_PE">
@@ -1334,17 +1334,17 @@ function renderSoundBtn() { $('soundBtn').innerHTML = S.sound ? '<i class="fa-so
 
 /* ===================================================================
    MÚSICA DE FONDO (lista de reproducción)
-   Pon junto a index.html: musica1.mp3, musica2.mp3 y musica3.mp3.
+   Pon en la carpeta audio/: musica1.mp3, musica2.mp3 y musica3.mp3.
    Puedes cambiar los nombres que se muestran en PLAYLIST.
    Suena en toda la página, pasa sola a la siguiente canción y
    arranca con el botón «Entrar al castillo» (los navegadores
    no permiten audio automático sin un clic).
 =================================================================== */
 const PLAYLIST = [
-  { file: 'musica1.mp3', name: 'Canción 1' },
-  { file: 'musica2.mp3', name: 'Canción 2' },
-  { file: 'musica3.mp3', name: 'Canción 3' },
-  { file: 'musica.mp3',  name: 'Música' }
+  { file: 'audio/musica1.mp3', name: 'Canción 1' },
+  { file: 'audio/musica2.mp3', name: 'Canción 2' },
+  { file: 'audio/musica3.mp3', name: 'Canción 3' },
+  { file: 'audio/musica.mp3',  name: 'Música' }
 ];
 const music = { el: null, idx: 0, bad: new Set(), missing: false, fadeTimer: null, ducked: false, warned: false };
 function musicEl() {
@@ -1356,7 +1356,7 @@ function musicEl() {
       music.bad.add(music.idx);
       if (music.bad.size >= PLAYLIST.length) {
         music.missing = true; renderMusicUi();
-        if (!music.warned) { music.warned = true; toast('No encontré tus canciones. Pon <b>musica1.mp3</b>, <b>musica2.mp3</b> y <b>musica3.mp3</b> junto a index.html.', '🎵'); }
+        if (!music.warned) { music.warned = true; toast('No encontré tus canciones. Pon <b>musica1.mp3</b>, <b>musica2.mp3</b> y <b>musica3.mp3</b> en la carpeta <b>audio</b>.', '🎵'); }
         return;
       }
       loadTrack(nextGood(music.idx, 1), true);
@@ -1412,7 +1412,7 @@ function setMusicVolume(v) {
   syncVolumeInputs();
 }
 function toggleBackgroundMusic() {
-  if (music.missing) { toast('Faltan tus archivos <b>musica1.mp3</b>, <b>musica2.mp3</b> y <b>musica3.mp3</b>.', '🎵'); return; }
+  if (music.missing) { toast('Faltan tus archivos <b>musica1.mp3</b>, <b>musica2.mp3</b> y <b>musica3.mp3</b> en la carpeta <b>audio</b>.', '🎵'); return; }
   const playing = music.el && !music.el.paused;
   S.musicOn = !playing; save();
   playing ? pauseMusic() : playMusic();
@@ -1449,13 +1449,13 @@ function renderMusicUi() {
 }
 /* ===================================================================
    MÚSICA DEL SOMBRERO SELECCIONADOR
-   Pon el archivo sombrero.mp3 junto a index.html. Suena en bucle
+   Pon el archivo sombrero.mp3 en la carpeta audio/. Suena en bucle
    durante la ceremonia y luego vuelve la música de fondo.
 =================================================================== */
 const hatMusic = { el: null, on: false, missing: false };
 function hatEl() {
   if (!hatMusic.el) {
-    const a = new Audio('sombrero.mp3');
+    const a = new Audio('audio/sombrero.mp3');
     a.loop = true; a.preload = 'auto'; a.volume = 0;
     a.addEventListener('error', () => { hatMusic.missing = true; });
     hatMusic.el = a;
@@ -1488,7 +1488,7 @@ function stopHatMusic(resumeBackground) {
 }
 /* ===================================================================
    AUDIO DE CADA CASA
-   Pon junto a index.html: gryffindor.mp3, slytherin.mp3,
+   Pon en la carpeta audio/: gryffindor.mp3, slytherin.mp3,
    ravenclaw.mp3 y hufflepuff.mp3 (audios de pocos segundos).
    Suena al elegir la casa a mano o cuando el sombrero la anuncia.
 =================================================================== */
@@ -1503,12 +1503,12 @@ function playHouseClip(house, after) {
   houseClip.after = after || null;
   if (!S.sound && S.musicOn === false) { finishHouseClip(); return; }
   if (music.el && !music.el.paused) { clearInterval(music.fadeTimer); fadeTo(0, 300, () => music.el.pause()); }
-  const a = new Audio(house.toLowerCase() + '.mp3');
+  const a = new Audio('audio/' + house.toLowerCase() + '.mp3');
   a.volume = Math.max(.2, (S.musicVol ?? 60) / 100);
   a.onended = finishHouseClip;
   a.onerror = () => {
     // Prueba también con mayúscula inicial (Gryffindor.mp3); si no existe, sigue sin audio
-    if (!a._alt) { a._alt = true; a.src = house + '.mp3'; a.play().catch(() => {}); }
+    if (!a._alt) { a._alt = true; a.src = 'audio/' + house + '.mp3'; a.play().catch(() => {}); }
     else finishHouseClip();
   };
   houseClip.el = a; houseClip.playing = true;
@@ -1850,7 +1850,7 @@ const MARATHON = { title: 'Modo Maratón', year: '', num: '∞', emblem: 'train'
 function photoBg(key) { const p = PHOTOS[key]; return p ? `url('${p.url}')` : 'none'; }
 
 /* ===== Imágenes propias del repositorio =====
-   Coloca junto a index.html: pelicula1.jpg … pelicula8.jpg, maraton.jpg y dueloimagen.jpg
+   Coloca en la carpeta img/: pelicula1.jpg … pelicula8.jpg, maraton.jpg y dueloimagen.jpg
    (también sirven .jpeg, .png o .webp). Si un archivo no existe, se usa el póster ilustrado. */
 const LOCAL_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'PNG'];
 const localImg = {};      // nombre -> ruta encontrada, o null si no existe
@@ -1863,8 +1863,9 @@ function findLocalImage(base, cb) {
   const img = new Image();
   const done = src => { localImg[base] = src; localWaiters[base].forEach(f => f(src)); delete localWaiters[base]; };
   img.onload = () => done(img.src);
-  img.onerror = () => { i++; if (i < LOCAL_EXTS.length) img.src = `${base}.${LOCAL_EXTS[i]}`; else done(null); };
-  img.src = `${base}.${LOCAL_EXTS[0]}`;
+  const urls = [...LOCAL_EXTS.map(e => `img/${base}.${e}`), ...LOCAL_EXTS.map(e => `${base}.${e}`)];
+  img.onerror = () => { i++; if (i < urls.length) img.src = urls[i]; else done(null); };
+  img.src = urls[0];
 }
 const posterFile = id => id === 0 ? 'maraton' : id === 9 ? 'frases' : id >= 10 ? ({ 10: 'hechizos', 11: 'criaturas', 12: 'personajes', 13: 'halloween', 14: 'navidad' })[id] : `pelicula${id}`;
 function movieBg(id, m) {
@@ -5511,7 +5512,7 @@ async function enableReminders() {
     try { await reg.periodicSync.register('desafio-diario', { minInterval: 20 * 60 * 60 * 1000 }); toast('¡Listo! Te avisaremos del desafío diario.', '🔔'); }
     catch (e) { toast('Instala la página como app para recibir el recordatorio diario.', '📱'); }
   } else toast('Tu navegador no permite recordatorios automáticos. Funciona en Chrome para Android con la app instalada.', '📱');
-  if (reg) reg.showNotification('🪄 Hogwarts Magic Experience', { body: 'Así se verán tus recordatorios del desafío diario.', icon: 'icon-192.png', badge: 'icon-192.png', tag: 'prueba' });
+  if (reg) reg.showNotification('🪄 Hogwarts Magic Experience', { body: 'Así se verán tus recordatorios del desafío diario.', icon: 'img/icon-192.png', badge: 'img/icon-192.png', tag: 'prueba' });
 }
 
 /* =====================================================================
