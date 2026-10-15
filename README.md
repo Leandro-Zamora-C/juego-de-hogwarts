@@ -35,6 +35,7 @@
 - 📸 **Foto con tu casa:** la cámara te pone la bufanda, el escudo y el marco de tu casa.
 - 🎓 **Modo Año Escolar:** 7 cursos y la Batalla de Hogwarts, con certificado descargable al graduarte.
 - 🧹 **Juegos nuevos:** Carrera de Escobas, Ajedrez Mágico contra la máquina y Escape de la Cámara Secreta.
+- 🌐 **Minijuegos en línea con código:** Ajedrez (por turnos, con piezas talladas y vista 3D), carrera de escobas con el fantasma del rival, duelo de buscadores de la snitch y memoria por turnos. Se puede invitar con un enlace por WhatsApp.
 - 🦉 **Mascota mágica:** lechuza, gato, sapo o kneazle, a la que tienes que alimentar y cuidar.
 - 🛍️ **Callejón Diagon:** Ollivanders, Sortilegios Weasley, Madame Malkin y Gringotts, que da intereses diarios.
 - 🎃 **Eventos de temporada:** Halloween, Navidad y el cumpleaños de Harry, con preguntas y títulos exclusivos.
@@ -49,6 +50,7 @@
 | 🎬 **Trivia** | **440 preguntas**: 45 por película, más las categorías Hechizos, Criaturas y Personajes, frases célebres, Modo Maratón y preguntas de evento. Cada partida usa 20 preguntas al azar. |
 | 📡 **Trivia en vivo** | Partidas multijugador en tiempo real, estilo concurso, con puntaje por velocidad y rachas. |
 | 🎲 **11 juegos** | Mapa del Merodeador, Pociones, Atrapa la Snitch, Adivina el Personaje, Ahorcado, Memoria, Quidditch, Año Escolar, Carrera de Escobas, Ajedrez Mágico y Escape de la Cámara Secreta. |
+| 🌐 **Minijuegos en línea** | Ajedrez, Escoba, Snitch y Memoria contra un amigo con código de sala o enlace de invitación. |
 | ⚔️ **Duelos** | En el mismo dispositivo, contra una IA con 3 niveles, en línea con código de sala o con un rival al azar. |
 | 🌍 **Comunidad** | Copa global, torneo semanal, amigos, perfiles públicos, encuestas y El Profeta. |
 | 👤 **Cuentas con Google** | Inicia sesión con Google y tu progreso se guarda en la nube, para seguir en cualquier dispositivo. |
