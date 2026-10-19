@@ -1,0 +1,31 @@
+HOGWARTS MAGIC EXPERIENCE · ACTUALIZACIÓN A LA VERSIÓN 7
+=========================================================
+
+Este paquete NO trae imágenes ni audios: tus fotos y canciones se quedan como están.
+
+PASOS (en tu repositorio de GitHub)
+1. Reemplaza estos archivos por los del paquete:
+   - index.html
+   - sw.js
+   - privacidad.html
+   - README.md
+2. Sube estas carpetas nuevas tal cual, con su contenido:
+   - css/   (v7.css)
+   - js/    (v7-duelo.js, v7-magia.js, preguntas-duelo-1.js, preguntas-duelo-2.js)
+3. Haz commit. Vercel publica solo en 1 o 2 minutos.
+4. Abre la página. Si ves la versión anterior, recárgala dos veces
+   (el service worker pasó a hogwarts-v12 y se actualiza solo).
+
+SUPABASE
+- No hay que ejecutar ningún SQL nuevo. El chat y las apuestas usan el mismo
+  canal en tiempo real del duelo en línea.
+- El inicio de sesión con Google ya lo tienes activo. Solo revisa que en
+  Supabase → Authentication → URL Configuration esté tu dominio
+  https://juego-de-hogwarts.vercel.app en "Site URL" y "Redirect URLs".
+- Tus llaves de Supabase ya vienen puestas en index.html, igual que antes.
+
+IMPORTANTE
+- Desde ahora nadie puede jugar sin iniciar sesión con Google. Si alguien
+  abre el enlace desde Facebook, Instagram o WhatsApp, verá un aviso para
+  abrirlo en Chrome o Safari (Google no deja iniciar sesión dentro de esas apps).
+- Las apuestas usan solo galeones del juego. Nunca dinero real.

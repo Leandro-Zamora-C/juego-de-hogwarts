@@ -442,6 +442,9 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   .ch-caps svg { width: 16px; height: 16px; filter: none; }
   .online-badge { position: absolute; top: .5rem; left: .5rem; font-size: 9px; font-weight: 700; background: rgba(14,116,144,.9); color: #e0f2fe; padding: .1rem .5rem; border-radius: 999px; }
 </style>
+<link rel="stylesheet" href="css/v7.css">
+<script defer src="js/v7-duelo.js"></script>
+<script defer src="js/v7-magia.js"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -673,7 +676,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
             <p class="text-amber-400 font-bold text-xs sm:text-sm tracking-wider">BY: LEANDRO ZAMORA</p>
           </div>
           <p class="text-stone-200 text-xs sm:text-base leading-relaxed max-w-2xl">
-            220 preguntas de las 8 películas, 7 juegos mágicos, duelos contra la IA o en línea, el Mapa del Merodeador, hechizos que se trazan con el dedo, tienda, ranking y tu propia varita.
+            Más de 800 preguntas para el duelo y la trivia de las 8 películas, 7 juegos mágicos, duelos contra la IA o en línea, el Mapa del Merodeador, hechizos que se trazan con el dedo, tienda, ranking y tu propia varita.
           </p>
           <div class="flex flex-col sm:flex-row gap-2.5">
             <button onclick="switchTab('movies')" class="btn-gold"><i class="fa-solid fa-gamepad"></i> Jugar Trivia</button>
@@ -946,7 +949,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       </div>
       <div class="text-center bg-stone-900/90 border border-amber-600/40 p-2.5 rounded-xl font-bold text-amber-300 text-xs font-wizard flex justify-between items-center px-4">
         <span>Ronda <span id="duelRound">1</span> · Turno: <span id="currentDuelPlayer" class="text-red-400">Mago 1</span></span>
-        <span class="font-mono text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 text-[11px]">⏱ <span id="duelTimeLeft">12</span>s</span>
+        <span class="font-mono text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 text-[11px]">⏱ <span id="duelTimeLeft">25</span>s</span>
       </div>
       <div class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
         <p id="duelMovie" class="text-center text-[10px] uppercase tracking-widest text-amber-500 font-bold"></p>

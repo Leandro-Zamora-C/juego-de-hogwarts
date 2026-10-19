@@ -14,11 +14,26 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-4.0-7c3aed)
+![Versión](https://img.shields.io/badge/versión-7.0-7c3aed)
 
 </div>
 
 ---
+
+## 🆕 Versión 7
+
+- **Cuenta de Google obligatoria** para jugar. Quien ya jugaba ve un aviso y su progreso del dispositivo pasa a su cuenta al iniciar sesión.
+- **Duelos más largos**: de 20 a 30 segundos por pregunta (local y en línea), crítico si respondes en menos de 5 s.
+- **Más de 800 preguntas** en el duelo, con dificultad (fácil, normal, experto), 10 temas y sin repetir preguntas.
+- **Comodines**: Giratiempo (+10 s), 50/50 y Pista de Dumbledore.
+- **Duelo en línea con chat** (mensajes rápidos, burbujas sobre el mago y filtro de malas palabras) y **apuestas de galeones** (solo dinero del juego). Revancha con un toque.
+- **Apuestas contra la IA**: mientras más difícil la IA, más ganas.
+- **Gráficos**: Gran Salón en 3D con velas flotantes, varita 3D en Ollivanders, patronus de luz, rayos animados en el duelo, efectos en ajedrez, escoba y snitch, antorchas, estela de la varita y texturas de pergamino y piedra.
+- **Animaciones**: sombrero que habla, transición mágica entre salas, Copa de las Casas animada, notificaciones con lechuza, aciertos que brillan y errores que se queman, reloj de arena.
+- **Sonido**: ambiente por sala (fuego, viento, campanitas) y sonidos de hechizos. Vibración en el celular.
+- **Experiencia**: recorrido guiado, accesos rápidos grandes, perfil completo (foto de Google, año, varita, patronus, vitrina de trofeos e historial de duelos), años de 1.º a 7.º y 11 logros nuevos.
+- **Ajustes**: tema claro, tamaño de letra, calidad gráfica automática, sonido ambiente, vibración, estela y transiciones.
+- **Rendimiento**: las preguntas se cargan solo al abrir el duelo y las escenas 3D se pausan cuando no se ven.
 
 ## ✨ Novedades de la versión 4
 
@@ -96,6 +111,11 @@ juego-de-hogwarts/
 ├── manifest.json            # Configuración de la PWA
 ├── sw.js                    # Service worker (sin internet + notificaciones)
 ├── README.md
+├── css/v7.css               # Estilos de la versión 7
+├── js/
+│   ├── v7-duelo.js          # Duelo: tiempo, comodines, chat, apuestas, revancha
+│   ├── v7-magia.js          # Cuenta obligatoria, 3D, efectos, sonido, perfil, tutorial
+│   └── preguntas-duelo-1.js · preguntas-duelo-2.js   # 397 preguntas nuevas
 │
 ├── audio/
 │   ├── musica1.mp3 … musica3.mp3        # Música de fondo
