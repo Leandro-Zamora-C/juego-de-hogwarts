@@ -137,7 +137,8 @@
   /* =====================================================================
      CUENTA DE GOOGLE OBLIGATORIA
   ===================================================================== */
-  const gate = { el: null, checked: false, offlineOk: false };
+  // Sin cuenta se puede explorar (elegir casa, varita, carta, biblioteca…); para JUGAR hay que iniciar sesión.
+  const gate = { el: null, checked: false, offlineOk: false, explore: false };
   const needGate = () => typeof authEnabled === 'function' && authEnabled() && !cloud.user && !gate.offlineOk;
   function gateHTML(state) {
     const prov = (CONFIG.AUTH_PROVIDERS || ['google']).filter(p => PROVIDERS[p]);
@@ -146,11 +147,13 @@
     if (state === 'offline') return `<div class="box"><div class="crest">🌧️</div><h2>Sin conexión</h2><p>Para entrar la primera vez necesitas internet, así iniciamos sesión con tu cuenta de Google y tu progreso queda guardado.</p><button class="gbtn" onclick="V7.gateCheck()"><i class="fa-solid fa-rotate"></i> Reintentar</button></div>`;
     return `<div class="box">
       <div class="crest">🏰</div>
-      <h2>${wasUser ? 'Vuelve a entrar a Hogwarts' : 'Inicia sesión para jugar'}</h2>
-      <p>${wasUser ? 'Inicia sesión otra vez para seguir con tu progreso.' : 'Desde esta versión, todos los juegos necesitan tu cuenta de Google. Así tu progreso queda guardado y puedes jugar en cualquier celular o computadora.'}</p>
+      <h2>${state === 'play' ? 'Inicia sesión para jugar' : wasUser ? 'Vuelve a entrar a Hogwarts' : '¡Bienvenido/a a Hogwarts!'}</h2>
+      <p>${state === 'play' ? 'Para jugar y guardar tus puntos necesitas tu cuenta de Google. Así tu progreso no se pierde y puedes jugar en cualquier celular o computadora.' : wasUser ? 'Inicia sesión otra vez para seguir con tu progreso.' : 'Para jugar necesitas iniciar sesión con tu cuenta de Google: así tu progreso queda guardado. Si solo quieres mirar, puedes explorar sin cuenta.'}</p>
       ${had && !wasUser ? `<div class="prog">📦 <b>Tu progreso de este dispositivo no se pierde:</b><br>${esc(S.house || 'Sin casa')} · ${S.xp || 0} XP · ${S.points || 0} puntos · ${S.gold || 0} galeones · ${(S.ach || []).length} logros<br><span style="opacity:.8">Se pasará a tu cuenta al iniciar sesión.</span></div>` : ''}
       ${inApp ? `<div class="warn">⚠️ Estás dentro de Facebook, Instagram u otra app. Google no deja iniciar sesión aquí.<br><b>Toca ⋮ o ··· y elige «Abrir en el navegador»</b> (Chrome o Safari).<br><button onclick="V7.copyLink()" style="margin-top:6px;text-decoration:underline">Copiar el enlace</button></div>` : ''}
       ${prov.map(p => `<button class="gbtn" ${inApp && p === 'google' ? 'disabled style="opacity:.45"' : ''} onclick="V7.gateLogin('${p}')">${PROVIDERS[p].icon}<span>${PROVIDERS[p].label}</span></button>`).join('')}
+      <button onclick="V7.explore()" style="margin-top:10px;width:100%;padding:10px 16px;border-radius:14px;border:1px solid rgba(245,196,81,.45);color:#fde68a;font-weight:700;font-size:14px;background:rgba(255,255,255,.04)">${state === 'play' ? '← Seguir explorando' : '👀 Continuar sin cuenta (solo explorar)'}</button>
+      ${state === 'play' ? '' : '<p class="note">Sin cuenta puedes elegir tu casa con el Sombrero, crear tu varita y recorrer el castillo. Para jugar te pediremos iniciar sesión.</p>'}
       <p id="v7GateMsg" class="note"></p>
       <p class="note">Solo usamos tu nombre, foto y correo para guardar tu progreso. <a href="privacidad.html" target="_blank" rel="noopener" style="text-decoration:underline">Política de privacidad</a></p>
     </div>`;
@@ -190,16 +193,23 @@
   let afterDone = false;
   function afterGate() {
     if (afterDone) { return; } afterDone = true;
-    setTimeout(() => { if (S.house && !opt().tutDone && !needGate()) V.tutorial(); }, 1200);
+    setTimeout(() => { if (S.house && !opt().tutDone && (!needGate() || gate.explore)) V.tutorial(); }, 1200);
   }
-  const guard = () => { if (gate.checked && needGate()) { showGate('login'); return true; } return false; };
+  // guard(): para acciones de JUGAR. guardNav(): para moverse por la página (permitido explorando).
+  const guard = () => { if (gate.checked && needGate()) { showGate('play'); sfx('tick'); return true; } return false; };
+  const guardNav = () => { if (gate.checked && needGate() && !gate.explore) { showGate('login'); return true; } return false; };
+  V.explore = () => {
+    const first = !gate.explore; gate.explore = true; hideGate();
+    if (first) toast('Estás explorando sin cuenta. Para jugar, inicia sesión con Google.', '👀');
+    afterGate();
+  };
 
   /* =====================================================================
      SWITCHTAB: puerta, transición, ambiente, perfil
   ===================================================================== */
   const _switch = switchTab;
   switchTab = function (tab) {
-    if (guard()) return;
+    if (guardNav()) return;
     const changing = tab !== currentTab;
     if (changing && opt().trans && !reduced() && veilReady) {
       veil.style.setProperty('--vx', lastPt[0] + 'px'); veil.style.setProperty('--vy', lastPt[1] + 'px');
@@ -214,7 +224,12 @@
   };
   let veilReady = false; setTimeout(() => { veilReady = true; }, 1500);
   const _openGame = openGame;
-  openGame = function (id) { if (guard()) return; return _openGame(id); };
+  // Todo lo que es JUGAR pide la cuenta: juegos, trivia, duelos, salas en línea, trivia en vivo,
+  // desafío diario, clases y exámenes, y trazar hechizos.
+  ['openGame', 'startQuiz', 'startDuel', 'onlineCreateRoom', 'onlineJoinRoom', 'joinRoom', 'findRival', 'liveHost', 'liveJoin', 'answerDaily', 'schoolClass', 'schoolExam', 'analyzeGesture'].forEach(name => {
+    const f = window[name]; if (typeof f !== 'function') return;
+    window[name] = function () { if (guard()) return; return f.apply(this, arguments); };
+  });
 
   /* =====================================================================
      AÑOS EN HOGWARTS (1.º a 7.º) Y LOGROS NUEVOS
