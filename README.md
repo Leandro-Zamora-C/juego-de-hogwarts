@@ -14,15 +14,30 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-7.0-7c3aed)
+![Versión](https://img.shields.io/badge/versión-8.0-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 7
+## 🆕 Versión 8
 
-- **Cuenta de Google obligatoria** para jugar. Quien ya jugaba ve un aviso y su progreso del dispositivo pasa a su cuenta al iniciar sesión.
+- **🎲 Ludo Mágico** con las cuatro casas: tablero 3D (o clásico 2D), contra la IA, varios en el mismo celular o **en línea con amigos de 2, 3 o 4 jugadores**. Reglas: sale con 6, el 6 repite, comer o llegar a la meta da otro tiro, estrellas seguras.
+- **19 juegos en línea con amigos**: Ajedrez, Ludo, Memoria, Escoba, Snitch, Duelo y 13 juegos nuevos (los dos juegan la misma partida y gana el mejor puntaje).
+- **Sala de Juegos ordenada**: Ajedrez, Ludo y Memoria primero, y **15 juegos nuevos**: Quidditch 3D, Trivia Mixta (imagen, verdadero o falso, ordenar sucesos, ¿quién lo dijo?), Snap Explosivo, Laberinto del Torneo, Defensa Contra las Artes Oscuras, Bosque Prohibido, Lago Negro, Gobstones, Encantamientos al Ritmo, Clase de Vuelo, Pociones Avanzadas, Herbología (tu planta crece con los días), Adivina el Retrato, Escape del Mes y Adivinación.
+- **Colección**: 60 cromos de ranas de chocolate (con intercambio entre amigos), libro de 36 hechizos, bestiario de 30 criaturas, medallas por película, diario de Tom Riddle (un capítulo por semana), sala común decorable y avatar de mago.
+- **Progreso diario**: misiones diarias y semanales, premio por entrar cada día con cofre al día 7, títulos que se ganan con logros, efectos de varita, Gringotts a plazo fijo y diploma de 7.º año.
+- **Mapa del castillo**: escaleras que cambian (premio escondido cada día), Sala de los Menesteres, retratos que hablan, fantasmas, clima mágico y lechucería para enviar cartas a tus amigos.
+- **Comunidad**: reta a un amigo con 10 preguntas aunque no estén conectados al mismo tiempo, club de tu casa con reacciones y casa ganadora del mes.
+- **Gráficos y ambiente**: exterior de Hogwarts en 3D, magos 3D en el duelo, modo cine, narrador con voz y música por sala.
+- **Accesibilidad**: menús en inglés, modo para daltónicos, mejor soporte para lectores de pantalla y ventana «cómo se juega» en cada juego.
+- **Administrador**: estadísticas de uso con gráficos, preguntas nuevas sin tocar el código, reportes de preguntas, anuncios, modo mantenimiento y respaldo en Excel.
+- **Rendimiento**: estilos ya preparados (`css/tailwind.css`) y juegos que se cargan solo al abrirlos.
+- **Pruebas automáticas** en GitHub (pestaña «Actions») cada vez que subes cambios.
+
+## Versión 7
+
+- **Cuenta de Google obligatoria para jugar.** Al entrar se puede elegir «Continuar sin cuenta» para explorar (Sombrero Seleccionador, varita, carta, biblioteca), pero los juegos, la trivia y los duelos piden iniciar sesión. Quien ya jugaba ve un aviso y su progreso del dispositivo pasa a su cuenta.
 - **Duelos más largos**: de 20 a 30 segundos por pregunta (local y en línea), crítico si respondes en menos de 5 s.
 - **Más de 800 preguntas** en el duelo, con dificultad (fácil, normal, experto), 10 temas y sin repetir preguntas.
 - **Comodines**: Giratiempo (+10 s), 50/50 y Pista de Dumbledore.
@@ -111,11 +126,22 @@ juego-de-hogwarts/
 ├── manifest.json            # Configuración de la PWA
 ├── sw.js                    # Service worker (sin internet + notificaciones)
 ├── README.md
-├── css/v7.css               # Estilos de la versión 7
+├── css/tailwind.css         # Estilos preparados (carga rápida)
+├── css/v7.css · css/v8.css  # Estilos de las versiones 7 y 8
 ├── js/
 │   ├── v7-duelo.js          # Duelo: tiempo, comodines, chat, apuestas, revancha
 │   ├── v7-magia.js          # Cuenta obligatoria, 3D, efectos, sonido, perfil, tutorial
-│   └── preguntas-duelo-1.js · preguntas-duelo-2.js   # 397 preguntas nuevas
+│   ├── preguntas-duelo-1.js · preguntas-duelo-2.js   # 397 preguntas nuevas
+│   ├── v8-nucleo.js         # Base de la v8: misiones, Sala de Juegos, «cómo se juega»
+│   ├── v8-ludo.js           # Ludo Mágico (se carga al abrirlo)
+│   ├── v8-juegos.js         # 15 minijuegos nuevos (se cargan al abrirlos)
+│   ├── v8-coleccion.js      # Cromos, hechizos, bestiario, avatar, sala común, diario
+│   ├── v8-progreso.js       # Misiones, premio diario, tiendas, retos, club
+│   ├── v8-mundo.js          # Mapa del castillo, fantasmas, retratos, cartas, eventos
+│   └── v8-sistema.js        # 3D, idioma, accesibilidad, narrador, panel de admin
+├── supabase-v8.sql          # Tablas nuevas de la versión 8
+├── tests/                   # Pruebas automáticas
+├── .github/workflows/       # Hace que GitHub ejecute las pruebas
 │
 ├── audio/
 │   ├── musica1.mp3 … musica3.mp3        # Música de fondo

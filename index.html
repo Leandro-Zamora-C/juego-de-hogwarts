@@ -25,13 +25,18 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_PE">
 <meta name="twitter:card" content="summary_large_image">
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- Estilos ya preparados (carga rápida). Tailwind se completa después de abrir la página. -->
+<link rel="stylesheet" href="css/tailwind.css">
 <script>
-window.tailwind = window.tailwind || {};
-tailwind.config = { darkMode: 'class', theme: { extend: {
+window.HP_TW = { darkMode: 'class', theme: { extend: {
   fontFamily: { serif: ['Cinzel','Georgia','serif'], hand: ['Caveat','cursive'], sans: ['Montserrat','sans-serif'] },
   colors: { amber: { 50: 'rgb(var(--amber-50) / <alpha-value>)', 100: 'rgb(var(--amber-100) / <alpha-value>)', 200: 'rgb(var(--amber-200) / <alpha-value>)', 300: 'rgb(var(--amber-300) / <alpha-value>)', 400: 'rgb(var(--amber-400) / <alpha-value>)', 500: 'rgb(var(--amber-500) / <alpha-value>)', 600: 'rgb(var(--amber-600) / <alpha-value>)', 700: 'rgb(var(--amber-700) / <alpha-value>)', 800: 'rgb(var(--amber-800) / <alpha-value>)', 900: 'rgb(var(--amber-900) / <alpha-value>)', 950: 'rgb(var(--amber-950) / <alpha-value>)' } }
 } } };
+addEventListener('load', () => setTimeout(() => {
+  const s = document.createElement('script'); s.src = 'https://cdn.tailwindcss.com';
+  s.onload = () => { try { tailwind.config = window.HP_TW; } catch (e) {} };
+  document.head.appendChild(s);
+}, 1200));
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,6 +450,12 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 <link rel="stylesheet" href="css/v7.css">
 <script defer src="js/v7-duelo.js"></script>
 <script defer src="js/v7-magia.js"></script>
+<link rel="stylesheet" href="css/v8.css">
+<script defer src="js/v8-nucleo.js"></script>
+<script defer src="js/v8-coleccion.js"></script>
+<script defer src="js/v8-progreso.js"></script>
+<script defer src="js/v8-mundo.js"></script>
+<script defer src="js/v8-sistema.js"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -1048,7 +1059,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <div id="gamesHubWrap" class="space-y-4">
       <div class="text-center space-y-1 max-w-2xl mx-auto">
         <h2 class="text-2xl sm:text-3xl font-bold text-amber-400 font-wizard">Sala de Juegos 🎲</h2>
-        <p class="text-stone-300 text-xs">Siete juegos mágicos. Cada partida te da XP y galeones para la tienda.</p>
+        <p class="text-stone-300 text-xs">Más de 25 juegos mágicos. Ajedrez, Ludo y Memoria se juegan en línea con tus amigos.</p>
       </div>
       <div id="gamesHub" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </div>

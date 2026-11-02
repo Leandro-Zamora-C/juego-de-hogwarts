@@ -198,6 +198,7 @@
   // guard(): para acciones de JUGAR. guardNav(): para moverse por la página (permitido explorando).
   const guard = () => { if (gate.checked && needGate()) { showGate('play'); sfx('tick'); return true; } return false; };
   const guardNav = () => { if (gate.checked && needGate() && !gate.explore) { showGate('login'); return true; } return false; };
+  V.guardPlay = guard;
   V.explore = () => {
     const first = !gate.explore; gate.explore = true; hideGate();
     if (first) toast('Estás explorando sin cuenta. Para jugar, inicia sesión con Google.', '👀');

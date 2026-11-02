@@ -1,9 +1,9 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v12';
-const CORE = ['./', './index.html', './manifest.json', './css/v7.css', './js/v7-duelo.js', './js/v7-magia.js', './js/preguntas-duelo-1.js', './js/preguntas-duelo-2.js', './img/icon-192.png', './img/icon-512.png'];
-const OPTIONAL = ['./audio/musica1.mp3', './audio/musica2.mp3', './audio/musica3.mp3', './audio/musica.mp3', './audio/sombrero.mp3',
+const VERSION = 'hogwarts-v13';
+const CORE = ['./', './index.html', './manifest.json', './css/tailwind.css', './css/v7.css', './css/v8.css', './js/v7-duelo.js', './js/v7-magia.js', './js/v8-nucleo.js', './js/v8-coleccion.js', './js/v8-progreso.js', './js/v8-mundo.js', './js/v8-sistema.js', './js/preguntas-duelo-1.js', './js/preguntas-duelo-2.js', './img/icon-192.png', './img/icon-512.png'];
+const OPTIONAL = ['./js/v8-ludo.js', './js/v8-juegos.js', './privacidad.html','./audio/musica1.mp3', './audio/musica2.mp3', './audio/musica3.mp3', './audio/musica.mp3', './audio/sombrero.mp3',
   './audio/gryffindor.mp3', './audio/slytherin.mp3', './audio/ravenclaw.mp3', './audio/hufflepuff.mp3',
   ...['dueloimagen', 'frases', 'maraton', 'hechizos', 'criaturas', 'personajes', 'halloween', 'navidad', 'pelicula1', 'pelicula2', 'pelicula3', 'pelicula4', 'pelicula5', 'pelicula6', 'pelicula7', 'pelicula8']
     .flatMap(n => [`./img/${n}.jpg`, `./img/${n}.webp`, `./img/${n}.png`])];
