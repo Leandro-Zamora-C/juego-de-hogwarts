@@ -1,3 +1,13 @@
+NOVEDADES 9 · GRÁFICOS Y CELULAR
+==========================================================
+Para subirla: haz solo el PASO 2 y el PASO 4 de abajo. NO hace falta Supabase.
+- Ícono nuevo (castillo bajo la luna) en img/app/. Al compartir el enlace se ve
+  img/app/compartir.jpg. WhatsApp guarda la vista previa vieja unos días: si
+  no cambia de inmediato, es normal.
+- Si ya instalaste la app en tu celular, desinstálala y vuelve a instalarla
+  para ver el ícono nuevo.
+- Calidad gráfica «Ultra» en Ajustes. En celulares sencillos baja sola.
+
 NOVEDADES 8.1 (si ya subiste la versión 8)
 ==========================================================
 - Cromos uno por uno en Honeydukes: Común 400, Raro 1.200, Legendario 3.500

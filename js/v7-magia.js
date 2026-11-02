@@ -17,11 +17,11 @@
   let autoQ = (() => {
     const mem = navigator.deviceMemory || 4, cores = navigator.hardwareConcurrency || 4, save = navigator.connection && navigator.connection.saveData;
     if (save || mem <= 2 || cores <= 2) return 'low';
-    if (matchMedia('(pointer: coarse)').matches) return 'med';
-    return 'high';
+    if (matchMedia('(pointer: coarse)').matches) return mem >= 6 && cores >= 8 ? 'high' : 'med';
+    return mem >= 8 && cores >= 8 ? 'ultra' : 'high';
   })();
   V.quality = () => { const q = opt().quality; return q === 'auto' ? autoQ : q; };
-  const DPR = { low: 1, med: 1.5, high: 2 };
+  const DPR = { low: 1, med: 1.5, high: 2, ultra: 3 };
   const _create = M3.create;
   M3.create = function (canvas, o) { o = Object.assign({}, o || {}); o.maxDpr = Math.min(o.maxDpr || 2, DPR[V.quality()] || 1.5); return _create(canvas, o); };
   V.vib = () => opt().vib && !!navigator.vibrate;
@@ -39,7 +39,7 @@
     ambient.update();
   }
   V.apply = applyV7;
-  V.set = (k, v) => { opt()[k] = v; save(); applyV7(); if (k === 'quality') toast('Calidad gráfica: ' + ({ auto: 'automática', low: 'baja', med: 'media', high: 'alta' })[v] + '. Se aplica al abrir cada juego 3D.', '⚙️'); };
+  V.set = (k, v) => { opt()[k] = v; save(); applyV7(); if (k === 'quality') toast('Calidad gráfica: ' + ({ auto: 'automática', low: 'baja', med: 'media', high: 'alta', ultra: 'ultra' })[v] + '. Se aplica al abrir cada juego 3D.', '⚙️'); };
   const _applySettings = applySettings;
   applySettings = function () { _applySettings(); try { applyV7(); } catch (e) {} };
   const _renderSettings = renderSettings;
@@ -52,7 +52,7 @@
     box.insertAdjacentHTML('beforeend', `<div class="pt-3 mt-2 border-t border-amber-900/40"><p class="text-[10px] uppercase tracking-widest text-amber-500 font-bold">Versión 7</p>
       ${row('Tema', 'Oscuro (castillo) o claro (pergamino).', sel('theme', [['dark', '🌙 Oscuro'], ['light', '📜 Claro']]))}
       ${row('Tamaño de letra', 'Para leer más cómodo.', sel('font', [[1, 'Normal'], [2, 'Grande'], [3, 'Muy grande']]))}
-      ${row('Calidad gráfica', 'Automática según tu celular o computadora.', sel('quality', [['auto', `Automática (${({ low: 'baja', med: 'media', high: 'alta' })[autoQ]})`], ['low', 'Baja (ahorra batería)'], ['med', 'Media'], ['high', 'Alta']]))}
+      ${row('Calidad gráfica', 'Automática según tu celular o computadora.', sel('quality', [['auto', `Automática (${({ low: 'baja', med: 'media', high: 'alta', ultra: 'ultra' })[autoQ]})`], ['low', 'Baja (ahorra batería)'], ['med', 'Media'], ['high', 'Alta'], ['ultra', 'Ultra (máxima nitidez)']]))}
       ${sw('ambient', 'Sonido ambiente', 'Fuego, viento y campanitas según la sala.')}
       ${sw('vib', 'Vibración', 'El celular vibra con los hechizos y respuestas.')}
       ${sw('trail', 'Estela de la varita', 'Chispas que siguen a tu dedo o al mouse.')}

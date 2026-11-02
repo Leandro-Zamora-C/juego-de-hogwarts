@@ -123,7 +123,7 @@
   async function askNotif() { if (!('Notification' in window)) { toast('Tu navegador no permite notificaciones.', '🔕'); opt().notif = false; save(); return; } const p = await Notification.requestPermission(); if (p !== 'granted') { opt().notif = false; save(); toast('No diste permiso para notificaciones.', '🔕'); } else V8.notify('🦉 ¡Listo!', 'Así te avisaremos de retos y cartas.'); }
   V8.notify = async (title, body) => {
     if (!opt().notif || !('Notification' in window) || Notification.permission !== 'granted') return;
-    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) reg.showNotification(title, { body, icon: 'img/icon-192.png', badge: 'img/icon-192.png', tag: title }); else new Notification(title, { body, icon: 'img/icon-192.png' }); } catch (e) {}
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) reg.showNotification(title, { body, icon: 'img/app/icon-192.png', badge: 'img/app/icon-192.png', tag: title }); else new Notification(title, { body, icon: 'img/app/icon-192.png' }); } catch (e) {}
   };
   // recordatorio de racha si la página queda abierta de noche
   setInterval(() => { const h = new Date().getHours(), s = st(); if (h >= 19 && s.daily && s.daily.last !== V8.day() && s.daily.streak > 2 && document.hidden && s.lastStreakNote !== V8.day()) { s.lastStreakNote = V8.day(); save(); V8.notify('🔥 ¡No pierdas tu racha!', `Llevas ${s.daily.streak} días seguidos. Entra a reclamar tu premio de hoy.`); } }, 600000);

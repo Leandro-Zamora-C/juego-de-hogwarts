@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0c0a09">
+<meta name="theme-color" content="#12091c">
 <meta name="description" content="Trivia de las 8 películas, duelos en línea, 7 juegos mágicos, Mapa del Merodeador, Ollivanders y tu carta de Hogwarts. Por Leandro Zamora.">
 <title>Hogwarts Magic Experience - BY: LEANDRO ZAMORA</title>
-<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
-<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="img/app/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/app/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="img/app/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,11 +21,14 @@
 <meta property="og:title" content="Hogwarts Magic Experience · by Leandro Zamora">
 <meta property="og:description" content="¿A qué casa perteneces? Trivia de las 8 películas, duelos de magos, juegos y tu carta de Hogwarts.">
 <meta property="og:url" content="https://juego-de-hogwarts.vercel.app/">
-<meta property="og:image" content="https://juego-de-hogwarts.vercel.app/img/og-image.jpg">
+<meta property="og:image" content="https://juego-de-hogwarts.vercel.app/img/app/compartir.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="Hogwarts Magic Experience: castillo bajo la luna y una varita mágica">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_PE">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://juego-de-hogwarts.vercel.app/img/app/compartir.jpg">
 <!-- Estilos ya preparados (carga rápida). Tailwind se completa después de abrir la página. -->
 <link rel="stylesheet" href="css/tailwind.css">
 <script>
@@ -451,11 +455,14 @@ addEventListener('load', () => setTimeout(() => {
 <script defer src="js/v7-duelo.js"></script>
 <script defer src="js/v7-magia.js"></script>
 <link rel="stylesheet" href="css/v8.css">
+<link rel="stylesheet" href="css/v9.css">
 <script defer src="js/v8-nucleo.js"></script>
 <script defer src="js/v8-coleccion.js"></script>
 <script defer src="js/v8-progreso.js"></script>
 <script defer src="js/v8-mundo.js"></script>
 <script defer src="js/v8-sistema.js"></script>
+<script defer src="js/v9-graficos.js"></script>
+<script defer src="js/v9-app.js"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -465,12 +472,9 @@ addEventListener('load', () => setTimeout(() => {
 <div id="loader" class="fixed inset-0 z-[300] flex flex-col items-center justify-center text-center px-6"
      style="background: radial-gradient(ellipse at center, #1c1410 0%, #050404 75%);">
   <div class="loader-inner space-y-5 max-w-md w-full">
-    <div class="loader-wand mx-auto w-24 h-24">
-      <svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="lg1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="rgb(var(--amber-400))"/><stop offset="1" stop-color="rgb(var(--amber-400))" stop-opacity="0"/></radialGradient></defs>
-        <circle cx="78" cy="22" r="18" fill="url(#lg1)"><animate attributeName="r" values="12;20;12" dur="1.4s" repeatCount="indefinite"/></circle>
-        <path d="M18 86 L74 26 L78 30 L22 90 Z" fill="#5b3a1e" stroke="#2a1a0c" stroke-width="1.5"/><path d="M18 86 L30 74 L34 78 L22 90 Z" fill="#3b2410"/>
-      </svg>
-    </div>
+    <svg class="v9-loadcastle" viewBox="200 180 600 660" aria-hidden="true"><defs><linearGradient id="v9lcG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1d45"/><stop offset="1" stop-color="#0a0612"/></linearGradient></defs>
+      <circle class="moon" cx="650" cy="280" r="70"/>
+      <g class="fill"><rect x="300" y="470" width="70" height="330"/><rect x="430" y="400" width="110" height="400"/><rect x="610" y="440" width="80" height="360"/><rect x="380" y="560" width="50" height="240"/><rect x="540" y="540" width="70" height="260"/><rect x="690" y="580" width="60" height="220"/><rect x="250" y="600" width="50" height="200"/><path d="M290 470 L335 360 L380 470Z"/><path d="M418 400 L485 250 L552 400Z"/><path d="M598 440 L650 330 L702 440Z"/><path d="M374 560 L405 500 L436 560Z"/><path d="M534 540 L575 470 L616 540Z"/><path d="M684 580 L720 520 L756 580Z"/><path d="M244 600 L275 545 L306 600Z"/><path d="M200 690 h40 v-24 h24 v24 h40 v-24 h24 v24 h40 v-24 h24 v24 H560 v-24 h24 v24 h40 v-24 h24 v24 h40 v-24 h24 v24 h52 V820 H200Z"/></g><g class="ln"><rect x="300" y="470" width="70" height="330"/><rect x="430" y="400" width="110" height="400"/><rect x="610" y="440" width="80" height="360"/><rect x="380" y="560" width="50" height="240"/><rect x="540" y="540" width="70" height="260"/><rect x="690" y="580" width="60" height="220"/><rect x="250" y="600" width="50" height="200"/><path d="M290 470 L335 360 L380 470Z"/><path d="M418 400 L485 250 L552 400Z"/><path d="M598 440 L650 330 L702 440Z"/><path d="M374 560 L405 500 L436 560Z"/><path d="M534 540 L575 470 L616 540Z"/><path d="M684 580 L720 520 L756 580Z"/><path d="M244 600 L275 545 L306 600Z"/><path d="M200 690 h40 v-24 h24 v24 h40 v-24 h24 v24 h40 v-24 h24 v24 H560 v-24 h24 v24 h40 v-24 h24 v24 h40 v-24 h24 v24 h52 V820 H200Z"/></g><path class="win" style="animation-delay:2.20s" d="M325 542 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.28s" d="M325 602 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.36s" d="M475 472 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.44s" d="M495 472 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.52s" d="M485 542 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.60s" d="M485 622 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.68s" d="M640 522 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.76s" d="M650 592 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.84s" d="M400 632 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:2.92s" d="M565 622 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:3.00s" d="M715 652 v-14 a8 8 0 0 1 16 0 v14z"/><path class="win" style="animation-delay:3.08s" d="M270 672 v-14 a8 8 0 0 1 16 0 v14z"/></svg>
     <h1 class="hp-text-logo text-3xl sm:text-5xl font-black uppercase">HARRY POTTER</h1>
     <p class="font-wizard text-amber-200 text-sm sm:text-base tracking-wider">Hogwarts Magic Experience</p>
     <p id="loaderPhrase" class="font-handwriting text-2xl sm:text-3xl text-amber-100/90 min-h-[4.5rem]">Juro solemnemente que mis intenciones no son buenas…</p>
@@ -5526,7 +5530,7 @@ async function enableReminders() {
     try { await reg.periodicSync.register('desafio-diario', { minInterval: 20 * 60 * 60 * 1000 }); toast('¡Listo! Te avisaremos del desafío diario.', '🔔'); }
     catch (e) { toast('Instala la página como app para recibir el recordatorio diario.', '📱'); }
   } else toast('Tu navegador no permite recordatorios automáticos. Funciona en Chrome para Android con la app instalada.', '📱');
-  if (reg) reg.showNotification('🪄 Hogwarts Magic Experience', { body: 'Así se verán tus recordatorios del desafío diario.', icon: 'img/icon-192.png', badge: 'img/icon-192.png', tag: 'prueba' });
+  if (reg) reg.showNotification('🪄 Hogwarts Magic Experience', { body: 'Así se verán tus recordatorios del desafío diario.', icon: 'img/app/icon-192.png', badge: 'img/app/icon-192.png', tag: 'prueba' });
 }
 
 /* =====================================================================
@@ -7483,7 +7487,7 @@ uniform mat4 uM,uVP,uLVP;uniform mat3 uNM;varying vec3 vW,vN,vC,vO;varying vec2 
 void main(){vec4 w=uM*vec4(aP,1.);vW=w.xyz;vO=aP;vN=uNM*aN;vC=aC;vU=aU;vL=uLVP*w;gl_Position=uVP*w;}`;
   const FS = `precision highp float;
 uniform vec3 uCol,uEm,uSky,uGnd,uLDir,uLCol,uCam,uFogC,uRimC,uPL0,uPC0,uPL1,uPC1;
-uniform float uSpec,uShin,uOp,uFog,uRim,uUnlit,uPat,uPatS,uShadow,uTexOn,uSMs,uPR0,uPR1,uTime;
+uniform float uSpec,uShin,uOp,uFog,uRim,uUnlit,uPat,uPatS,uShadow,uTexOn,uSMs,uPR0,uPR1,uTime,uEnv;
 uniform sampler2D uTex,uSM;varying vec3 vW,vN,vC,vO;varying vec2 vU;varying vec4 vL;
 float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float ns(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hs(i),hs(i+vec2(1.,0.)),f.x),mix(hs(i+vec2(0.,1.)),hs(i+vec2(1.,1.)),f.x),f.y);}
@@ -7498,6 +7502,8 @@ else if(uPat>2.5&&uPat<3.5){b*=.86+.12*step(.5,fract(vW.x*.18))+.12*fb(vW.xz*3.)
 else if(uPat>3.5&&uPat<4.5){float v=sin(vW.x*2.+vW.z*1.3+fb(vW.xz*1.6)*7.);b*=.8+.22*smoothstep(-.2,1.,v);}
 else if(uPat>4.5&&uPat<5.5){b*=.6+.6*fb(vO.xy*5.+vO.zz*3.);}
 else if(uPat>5.5&&uPat<6.5){b*=.75+.35*hs(vec2(floor(atan(vO.z,vO.y)*14.),1.));}
+else if(uPat>6.5&&uPat<7.5){vec3 q=vO*uPatS*4.;float v=abs(sin(q.x*1.7+q.y*3.1+fb(q.xy*1.3+q.zz)*6.));float vein=1.-smoothstep(0.,.09,v);b*=.97+.06*fb(q.xz*6.);b=mix(b,b*vec3(.55,.56,.6),vein*.75);}
+else if(uPat>7.5&&uPat<8.5){vec3 q=vO*uPatS*4.;float v=abs(sin(q.y*2.3+q.x*1.1+fb(q.xz*1.7+q.yy)*5.));b+=vec3(.05,.04,.09)*(1.-smoothstep(0.,.12,v));}
 vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(uCam-vW);vec3 c;
 if(uUnlit>.5)c=b+uEm;else{
 vec3 L=-uLDir;float nl=max(dot(N,L),0.);float sh=uShadow>.5&&nl>0.?shd(nl):1.;vec3 am=mix(uGnd,uSky,N.y*.5+.5);float d=nl*sh;
@@ -7506,7 +7512,8 @@ vec3 l0=uPL0-vW;float a0=1./(1.+dot(l0,l0)/(uPR0*uPR0));vec3 n0=normalize(l0);
 vec3 l1=uPL1-vW;float a1=1./(1.+dot(l1,l1)/(uPR1*uPR1));vec3 n1=normalize(l1);
 vec3 pl=uPC0*max(dot(N,n0),0.)*a0+uPC1*max(dot(N,n1),0.)*a1;
 float ps=(pow(max(dot(N,normalize(n0+V)),0.),uShin)*a0+pow(max(dot(N,normalize(n1+V)),0.),uShin)*a1)*uSpec;
-c=b*(am+d*uLCol+pl)+sp*uLCol+ps*(uPC0+uPC1)*.5+uEm+uRimC*pow(1.-max(dot(N,V),0.),3.)*uRim;}
+c=b*(am+d*uLCol+pl)+sp*uLCol+ps*(uPC0+uPC1)*.5+uEm+uRimC*pow(1.-max(dot(N,V),0.),3.)*uRim;
+if(uEnv>0.){vec3 R=reflect(-V,N);float fr=.04+.96*pow(1.-max(dot(N,V),0.),5.);vec3 env=mix(uGnd*.6,uSky*1.25,smoothstep(-.3,.6,R.y))+uLCol*pow(max(dot(R,L),0.),24.)*.6+(uPC0+uPC1)*.15;c+=env*uEnv*(.25+fr)*mix(vec3(1.),b,.35);}}
 float ds=length(uCam-vW);float f=1.-exp(-ds*ds*uFog*uFog);c=mix(c,uFogC,clamp(f,0.,1.));
 gl_FragColor=vec4(c,uOp);}`;
   const DVS = 'attribute vec3 aP;uniform mat4 uM,uLVP;void main(){gl_Position=uLVP*uM*vec4(aP,1.);}';
@@ -7590,7 +7597,8 @@ gl_FragColor=vec4(c,uOp);}`;
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         [0, 1, 2, 3].forEach(i => gl.disableVertexAttribArray(i));
       }
-      gl.viewport(0, 0, canvas.width, canvas.height);
+      const postOn = !!(S3.post && S3.post.begin());
+      if (!postOn) gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(S3.clear[0], S3.clear[1], S3.clear[2], 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.enable(gl.DEPTH_TEST);
       gl.useProgram(P.p); const U = P.loc;
@@ -7610,7 +7618,7 @@ gl_FragColor=vec4(c,uOp);}`;
         gl.uniformMatrix4fv(U.uM, false, n.world); gl.uniformMatrix3fv(U.uNM, false, M.normalMat(n.world));
         gl.uniform3fv(U.uCol, m.color); gl.uniform3fv(U.uEm, m.em); gl.uniform1f(U.uSpec, m.spec); gl.uniform1f(U.uShin, m.shin); gl.uniform1f(U.uOp, m.op);
         gl.uniform1f(U.uFog, m.fog ? S3.fog.density : 0); gl.uniform1f(U.uRim, m.rim); gl.uniform3fv(U.uRimC, m.rimC); gl.uniform1f(U.uUnlit, m.unlit ? 1 : 0);
-        gl.uniform1f(U.uPat, m.pat); gl.uniform1f(U.uPatS, m.patS); gl.uniform1f(U.uShadow, S3.shadow && m.shadow ? 1 : 0);
+        gl.uniform1f(U.uPat, m.pat); gl.uniform1f(U.uPatS, m.patS); if (U.uEnv) gl.uniform1f(U.uEnv, m.env || 0); gl.uniform1f(U.uShadow, S3.shadow && m.shadow ? 1 : 0);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, m.tex || tex1); gl.uniform1f(U.uTexOn, m.tex ? 1 : 0);
         if (m.ds) gl.disable(gl.CULL_FACE); else { gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); }
         gl.drawElements(gl.TRIANGLES, n.mesh.count, n.mesh.type, 0);
@@ -7631,6 +7639,7 @@ gl_FragColor=vec4(c,uOp);}`;
         [a.aP, a.aC, a.aS].forEach(i => gl.disableVertexAttribArray(i));
       }
       gl.depthMask(true); gl.disable(gl.BLEND);
+      if (postOn) S3.post.end();
     };
     S3.project = p => { const v = M.xf(S3.vp, [p[0], p[1], p[2], 1]); return { x: (v[0] / v[3] * .5 + .5) * S3.w, y: (1 - (v[1] / v[3] * .5 + .5)) * S3.h, w: v[3] }; };
     S3.ray = (x, y) => {
@@ -7722,8 +7731,8 @@ function c3Mount() {
   C3.R = R; C3.meshes = c3Meshes(R); C3.az = 0; C3.dist = 14; C3.el = .9;
   const G = M3.G, mat = R.mat;
   C3.mats = {
-    w: mat({ color: [.94, .89, .77], spec: .55, shin: 70, rim: .18, rimC: [1, .92, .7] }),
-    b: mat({ color: [.085, .07, .07], spec: 1, shin: 120, rim: .4, rimC: [.55, .55, .8] }),
+    w: mat({ color: [.95, .92, .86], spec: .9, shin: 110, rim: .14, rimC: [1, .92, .7], pat: 7, patS: 1.6, env: .35 }),
+    b: mat({ color: [.05, .045, .06], spec: 1.4, shin: 160, rim: .35, rimC: [.55, .55, .85], pat: 8, patS: 1.4, env: .6 }),
     sel: mat({ color: [1, .82, .25], unlit: true, op: .5, add: true, fog: false }),
     last: mat({ color: [.95, .75, .2], unlit: true, op: .28, fog: false }),
     chk: mat({ color: [1, .15, .1], unlit: true, op: .75, add: true, fog: false }),

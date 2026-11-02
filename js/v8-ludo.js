@@ -139,13 +139,27 @@
     [8, 21, 34, 47].forEach(i => { const c = PATH[i]; starParts.push([starG, M3.M.mul(G.at(c[0] - 7, .13, c[1] - 7), G.at(0, 0, 0, Math.PI / 2, 0, 0))]); });
     R.add(R.node(R.mesh(G.merge(starParts)), mat({ color: [.98, .78, .25], spec: 1.2, shin: 80 }), { cast: false }));
     // fichas: peones como los del ajedrez
-    const pawn = G.merge([[G.lathe([[0, 0], [.3, 0], [.31, .05], [.28, .09], [.2, .13], [.14, .26], [.11, .42], [.17, .47], [.17, .5], [.11, .53], [0, .53]], 20)], [G.sphere(.15, 16, 12), G.at(0, .62, 0)]]);
-    const pawnM = R.mesh(pawn);
+    // figuras talladas: pedestal + animal de cada casa (mira hacia +z)
+    const ped = G.lathe([[0, 0], [.32, 0], [.33, .05], [.3, .09], [.22, .13], [.17, .22], [.15, .3], [.21, .34], [.22, .37], [0, .37]], 28);
+    const lt = [1.35, 1.3, 1.25], dk = [.55, .55, .55];
+    const FIG = {
+      Gryffindor: G.merge([[ped], [G.sphere(.2, 20, 14), G.at(0, .62, 0, 0, 0, 0, 1, 1, .8)], [G.torus(.2, .085, 22, 10), G.at(0, .62, -.02, Math.PI / 2, 0, 0)], [G.sphere(.15, 18, 12), G.at(0, .62, .07), lt], [G.sphere(.075, 12, 10), G.at(0, .58, .2), lt], [G.sphere(.035, 8, 6), G.at(0, .6, .27), dk], [G.sphere(.06, 10, 8), G.at(-.13, .78, .02)], [G.sphere(.06, 10, 8), G.at(.13, .78, .02)], [G.sphere(.024, 8, 6), G.at(-.06, .68, .2), dk], [G.sphere(.024, 8, 6), G.at(.06, .68, .2), dk]]),
+      Slytherin: G.merge([[ped], [G.torus(.17, .07, 22, 10), G.at(0, .45, 0)], [G.torus(.13, .062, 20, 10), G.at(0, .55, 0)], [G.torus(.09, .055, 18, 10), G.at(0, .64, 0)], [G.cyl(.05, .06, .2, 12), G.at(0, .66, .02)], [G.sphere(.1, 16, 12), G.at(0, .86, .06, 0, 0, 0, 1, .75, 1.35)], [G.sphere(.022, 8, 6), G.at(-.06, .9, .14), [2, 1.8, .4]], [G.sphere(.022, 8, 6), G.at(.06, .9, .14), [2, 1.8, .4]], [G.box(.015, .01, .1), G.at(0, .85, .24), [1.6, .3, .3]]]),
+      Hufflepuff: G.merge([[ped], [G.sphere(.19, 18, 12), G.at(0, .55, 0, 0, 0, 0, 1, .85, 1.05)], [G.sphere(.15, 18, 12), G.at(0, .72, .1, 0, 0, 0, 1, .9, 1.3)], [G.box(.07, .05, .34), G.at(0, .82, .1), lt], [G.sphere(.05, 10, 8), G.at(0, .7, .3), dk], [G.sphere(.045, 10, 8), G.at(-.11, .82, .0)], [G.sphere(.045, 10, 8), G.at(.11, .82, .0)], [G.sphere(.022, 8, 6), G.at(-.07, .76, .22), dk], [G.sphere(.022, 8, 6), G.at(.07, .76, .22), dk]]),
+      Ravenclaw: G.merge([[ped], [G.sphere(.15, 18, 12), G.at(0, .55, 0, 0, 0, 0, .9, 1.25, .9)], [G.box(.34, .05, .16), G.at(-.2, .66, -.03, 0, 0, .55)], [G.box(.34, .05, .16), G.at(.2, .66, -.03, 0, 0, -.55)], [G.box(.22, .04, .12), G.at(-.33, .78, -.04, 0, 0, .9)], [G.box(.22, .04, .12), G.at(.33, .78, -.04, 0, 0, -.9)], [G.sphere(.1, 16, 12), G.at(0, .78, .03), lt], [G.cyl(0, .045, .1, 10), G.at(0, .76, .12, Math.PI / 2, 0, 0), [1.6, 1.3, .4]], [G.sphere(.02, 8, 6), G.at(-.05, .81, .1), dk], [G.sphere(.02, 8, 6), G.at(.05, .81, .1), dk]])
+    };
+    const figM = {}; Object.keys(FIG).forEach(k => figM[k] = R.mesh(FIG[k]));
+    // velas reales en las esquinas de la mesa
+    const candleG = R.mesh(G.cyl(.14, .17, 1.2, 16)), flameG = R.mesh(G.sphere(.11, 12, 8));
+    const wax = mat({ color: [.95, .9, .78], spec: .2, em: [.14, .09, .03] }), fl = mat({ color: [1, .7, .25], unlit: true, add: true, op: .95, fog: false });
+    L.flames = [[-8.9, -8.9], [8.9, -8.9], [8.9, 8.9], [-8.9, 8.9]].map(([x, z]) => { R.add(R.node(candleG, wax, { pos: [x, -.05, z] })); return R.add(R.node(flameG, fl, { pos: [x, 1.32, z], scl: [1, 1.9, 1], cast: false })); });
+    R.pl[1] = { pos: [-8.9, 1.6, 8.9], color: [.9, .55, .25], range: 9 };
     L.p3 = []; L.mats = [];
     L.G.players.forEach((pl, pi) => {
       const sm = SEATS[pl.seat], m = mat({ color: hex(sm.color).map(v => Math.min(1, v * 1.1)), spec: .9, shin: 60, rim: .35, rimC: hex(sm.light) });
       L.mats[pi] = m;
-      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); return R.add(R.node(pawnM, m, { pos: [w[0], .12, w[1]], scl: [1.1, 1.1, 1.1] })); });
+      m.env = .45; m.spec = 1.1; m.shin = 90;
+      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); return R.add(R.node(figM[sm.house] || figM.Gryffindor, m, { pos: [w[0], .12, w[1]], scl: [1.15, 1.15, 1.15] })); });
     });
     return R;
   }
@@ -297,6 +311,7 @@
     const d = $('ludoDice'); if (!d || !n) return;
     const [rx, ry] = FACE[n], extra = spin ? 720 : 0;
     d.style.transition = spin && !V8.reduced() ? 'transform .9s cubic-bezier(.2,.8,.25,1)' : 'none';
+    if (spin && !V8.reduced()) { const w = d.parentElement; w.classList.remove('v9-throw'); void w.offsetWidth; w.classList.add('v9-throw'); if (window.V9 && V9.buzz) V9.buzz([20, 40, 20]); }
     d.style.transform = `rotateX(${rx + extra}deg) rotateY(${ry + extra}deg)`;
   }
 
@@ -447,12 +462,13 @@
     R.cam.pos = [Math.sin(az) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(az) * Math.cos(el) * d]; R.cam.target = [0, 0, 0];
     const pts = [], t = now / 1000;
     L.G.players.forEach((pl, pi) => L.p3[pi].forEach((n, k) => {
-      const p = piecePos(pi, k); n.pos = [p[0], .12 + p[2], p[1]];
+      const p = piecePos(pi, k); n.pos = [p[0], .12 + p[2], p[1]]; n.rot = [0, Math.atan2(R.cam.pos[0] - p[0], R.cam.pos[2] - p[1]), 0];
       const mov = L.canAct && !L.busy && L.G.turn === pi && L.opts.includes(k);
       if (mov) pts.push({ p: [p[0], .25, p[1]], c: [1, .9, .5, .45 + .35 * Math.sin(t * 6)], s: .9 }, { p: [p[0], 1.05 + Math.sin(t * 5) * .08, p[1]], c: [1, .95, .7, .9], s: .22 });
     }));
     L.mats.forEach((m, pi) => { m.em = L.G.turn === pi && L.G.phase !== 'over' ? [.05 + .04 * Math.sin(t * 4), .04, .02] : [0, 0, 0]; });
-    if (L.hop && R.shadow) R.shadow.dirty = true;
+    if (R.shadow) R.shadow.dirty = true;
+    if (L.flames) { L.flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 2) * .08 + Math.sin(t * 23 + i) * .05; f.scl = [k, 1.9 * k, k]; }); R.pl[1].color = [.9 * (1 + Math.sin(t * 11) * .08), .55, .25]; R.pl[0].color = [.6 + Math.sin(t * 7) * .04, .45, .25]; }
     // velas flotantes alrededor
     for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + t * .05, rr = 10.5; pts.push({ p: [Math.cos(a) * rr, 3.2 + Math.sin(t + i) * .3, Math.sin(a) * rr], c: [1, .7, .3, .8], s: .35 }, { p: [Math.cos(a) * rr, 3.2 + Math.sin(t + i) * .3, Math.sin(a) * rr], c: [1, .55, .2, .15], s: 1.6 }); }
     R.render(pts);
@@ -485,6 +501,7 @@
         : '<p class="text-center text-xs text-stone-400"><i class="fa-solid fa-hourglass-half"></i> Esperando a que el anfitrión empiece…</p>'}
       <button onclick="V8L.leave()" class="btn-ghost w-full !text-xs">Salir de la sala</button></div>`;
   }
+  V8.ludoUrl = () => `${(CONFIG.SITE_URL || (location.origin + location.pathname)).replace(/\?.*$/, '')}?ludo=${NET.code}`;
   V8.ludoShare = () => {
     const url = `${(CONFIG.SITE_URL || (location.origin + location.pathname)).replace(/\?.*$/, '')}?ludo=${NET.code}`, txt = `🎲 ¡Juguemos Ludo Mágico en Hogwarts! Entra aquí (sala ${NET.code}):`;
     if (navigator.share) navigator.share({ title: 'Ludo Mágico', text: txt, url }).catch(() => {}); else window.open('https://wa.me/?text=' + encodeURIComponent(txt + ' ' + url), '_blank');

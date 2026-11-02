@@ -1,8 +1,8 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v14';
-const CORE = ['./', './index.html', './manifest.json', './css/tailwind.css', './css/v7.css', './css/v8.css', './js/v7-duelo.js', './js/v7-magia.js', './js/v8-nucleo.js', './js/v8-coleccion.js', './js/v8-progreso.js', './js/v8-mundo.js', './js/v8-sistema.js', './js/preguntas-duelo-1.js', './js/preguntas-duelo-2.js', './img/icon-192.png', './img/icon-512.png'];
+const VERSION = 'hogwarts-v15';
+const CORE = ['./', './index.html', './manifest.json', './css/tailwind.css', './css/v7.css', './css/v8.css', './css/v9.css', './js/v7-duelo.js', './js/v7-magia.js', './js/v8-nucleo.js', './js/v8-coleccion.js', './js/v8-progreso.js', './js/v8-mundo.js', './js/v8-sistema.js', './js/v9-graficos.js', './js/v9-app.js', './js/preguntas-duelo-1.js', './js/preguntas-duelo-2.js', './img/app/icon-192.png', './img/app/icon-512.png', './img/app/maskable-512.png', './img/app/favicon-32.png'];
 const OPTIONAL = ['./js/v8-ludo.js', './js/v8-juegos.js', './privacidad.html','./audio/musica1.mp3', './audio/musica2.mp3', './audio/musica3.mp3', './audio/musica.mp3', './audio/sombrero.mp3',
   './audio/gryffindor.mp3', './audio/slytherin.mp3', './audio/ravenclaw.mp3', './audio/hufflepuff.mp3',
   ...['dueloimagen', 'frases', 'maraton', 'hechizos', 'criaturas', 'personajes', 'halloween', 'navidad', 'pelicula1', 'pelicula2', 'pelicula3', 'pelicula4', 'pelicula5', 'pelicula6', 'pelicula7', 'pelicula8']
@@ -92,7 +92,7 @@ self.addEventListener('periodicsync', event => {
   if (event.tag !== 'desafio-diario') return;
   event.waitUntil(self.registration.showNotification('🪄 ¡Nuevo desafío diario!', {
     body: 'Hay una pregunta nueva esperándote. Acierta y gana 25 puntos para tu casa.',
-    icon: 'img/icon-192.png', badge: 'img/icon-192.png', tag: 'desafio-diario', renotify: false
+    icon: 'img/app/icon-192.png', badge: 'img/app/icon-192.png', tag: 'desafio-diario', renotify: false
   }));
 });
 self.addEventListener('notificationclick', event => {
