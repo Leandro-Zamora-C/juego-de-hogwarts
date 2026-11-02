@@ -276,3 +276,69 @@ html.v8-cb .text-emerald-300, html.v8-cb .text-emerald-400 { color: #93c5fd !imp
 .v8-onbar { text-align: center; font-size: 12px; color: #d6d3d1; padding: 6px 12px; border-radius: 999px; background: rgba(30,58,138,.35); border: 1px solid rgba(96,165,250,.4); }
 .v8-onbar b { color: #fde68a; }
 .v8-gamecard > div:first-child:has(.v8-ph) > span.drop-shadow-lg { opacity: 0; }
+
+/* ===== v8.1 · revelado de cromos ===== */
+.v8-rv { --c: #d97706; position: relative; display: flex; flex-direction: column; align-items: center; min-height: 430px; padding-top: 14px; overflow: hidden; perspective: 900px; }
+.v8-rv.r-r { --c: #cbd5e1; } .v8-rv.r-l { --c: #facc15; }
+.v8-rv .rays { position: absolute; top: 40px; left: 50%; width: 520px; height: 520px; margin-left: -260px; border-radius: 50%; opacity: 0; transform: scale(.3);
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 55%, transparent) 0 8deg, transparent 8deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 15%, transparent 65%); mask: radial-gradient(circle, #000 15%, transparent 65%); pointer-events: none; }
+.v8-rv .glow { position: absolute; top: 120px; left: 50%; width: 260px; height: 260px; margin-left: -130px; border-radius: 50%; background: radial-gradient(circle, var(--c), transparent 70%); opacity: 0; filter: blur(10px); pointer-events: none; }
+.v8-rv .box { position: absolute; top: 120px; z-index: 3; width: 150px; height: 110px; border-radius: 12px; background: linear-gradient(160deg, #6b2d0c, #3b1505); border: 3px solid #d4a017; box-shadow: 0 10px 30px #0008, inset 0 0 0 4px #7c2d12; display: flex; align-items: center; justify-content: center; }
+.v8-rv .box::after { content: 'Ranas de Chocolate'; position: absolute; bottom: 8px; font: 700 10px/1 Georgia, serif; color: #fde68a; letter-spacing: .5px; }
+.v8-rv .lid { position: absolute; top: -18px; left: -6px; right: -6px; height: 26px; border-radius: 10px 10px 4px 4px; background: linear-gradient(#92400e, #5a230a); border: 3px solid #d4a017; transform-origin: 0 100%; }
+.v8-rv .pack { font-size: 54px; margin-top: -10px; }
+.v8-rv.shake .box { animation: v8BoxShake .25s ease-in-out 4 alternate, v8BoxGlow 1.2s ease-in forwards; }
+.v8-rv.open .lid { animation: v8Lid .6s cubic-bezier(.3,1.4,.5,1) forwards; }
+.v8-rv.open .pack { animation: v8Hop .8s ease-in forwards; }
+.v8-rv.open .box { animation: v8BoxOut .6s .25s ease-in forwards; }
+.v8-rv.open .glow { animation: v8Glow 1.6s ease-out forwards; }
+.v8-rv.open .rays { animation: v8Rays 1s ease-out forwards, v8Spin 14s 1s linear infinite; }
+.v8-rv .flip { position: relative; z-index: 4; width: 210px; height: 290px; margin-top: 30px; transform-style: preserve-3d; transform: rotateY(0) scale(.2) translateY(140px); opacity: 0; }
+.v8-rv.buy .flip { opacity: 1; transform: rotateY(0) scale(.8); animation: v8Float 1s ease-in-out infinite alternate; }
+.v8-rv.open .flip { animation: v8Rise .7s cubic-bezier(.2,1.3,.4,1) forwards; }
+.v8-rv.show .flip { animation: v8FlipIn 1s cubic-bezier(.3,1.25,.4,1) forwards; }
+.v8-rv .face { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.v8-rv .face.front { transform: rotateY(180deg); }
+.v8-rv .face.front .v8-card { box-shadow: 0 0 40px color-mix(in srgb, var(--c) 70%, transparent), 0 14px 30px #000a; }
+.v8-cardback { width: 200px; height: 280px; border-radius: 14px; background: radial-gradient(circle at 50% 40%, #7f1d1d, #2a0a0a 75%); border: 4px solid #d4a017; box-shadow: 0 12px 30px #000a, inset 0 0 0 6px #450a0a; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.v8-cardback span { font: 700 84px/1 Georgia, serif; color: #fbbf24; text-shadow: 0 0 18px #f59e0b; }
+.v8-cardback i { position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, #fff6 50%, transparent 60%); animation: v8Sheen 1.6s linear infinite; }
+.v8-rv .sparks { position: absolute; top: 260px; left: 50%; z-index: 5; pointer-events: none; }
+.v8-rv .sparks i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); animation: v8Spark 1.1s ease-out forwards; }
+.v8-rv .info { position: relative; z-index: 6; margin-top: auto; text-align: center; opacity: 0; transform: translateY(14px); transition: .5s .6s; }
+.v8-rv.show .info { opacity: 1; transform: none; }
+.v8-rv .badge { display: inline-block; padding: 3px 12px; border-radius: 99px; font-weight: 800; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #1c1917; background: var(--c); box-shadow: 0 0 16px var(--c); }
+.v8-rv .info p { font-size: 13px; margin-top: 6px; }
+.v8-rv.r-l.show .rays { filter: drop-shadow(0 0 12px #facc15); }
+@keyframes v8BoxShake { from { transform: rotate(-6deg) translateY(0); } to { transform: rotate(6deg) translateY(-6px); } }
+@keyframes v8BoxGlow { to { box-shadow: 0 0 50px var(--c), inset 0 0 0 4px #7c2d12; } }
+@keyframes v8Lid { to { transform: rotate(-120deg) translate(-10px, -20px); opacity: 0; } }
+@keyframes v8Hop { 40% { transform: translateY(-90px) scale(1.2); } 100% { transform: translateY(-220px) scale(.4) rotate(40deg); opacity: 0; } }
+@keyframes v8BoxOut { to { transform: translateY(160px) scale(.7); opacity: 0; } }
+@keyframes v8Glow { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; transform: scale(1.4); } 100% { opacity: .55; transform: scale(1.1); } }
+@keyframes v8Rays { to { opacity: .9; transform: scale(1); } }
+@keyframes v8Spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes v8Rise { to { opacity: 1; transform: rotateY(0) scale(.85) translateY(0); } }
+@keyframes v8Float { to { transform: rotateY(-12deg) scale(.82) translateY(-6px); } }
+@keyframes v8FlipIn { 0% { opacity: 1; transform: rotateY(0) scale(.85); } 60% { transform: rotateY(200deg) scale(1.08); } 100% { opacity: 1; transform: rotateY(180deg) scale(1); } }
+@keyframes v8Spark { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(.2); opacity: 0; } }
+@keyframes v8Sheen { from { transform: translateX(-60%); } to { transform: translateX(60%); } }
+@media (prefers-reduced-motion: reduce) { .v8-rv * { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+.reduce-motion .v8-rv * { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+
+/* tienda de cromos uno por uno */
+.v8-shopcard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform .2s; }
+.v8-shopcard:hover { transform: translateY(-4px); }
+.v8-shopcard .pr { font-size: 11px; font-weight: 800; color: #fcd34d; background: #0009; border: 1px solid #fcd34d66; padding: 1px 8px; border-radius: 99px; }
+.v8-shopcard .pr.no { color: #a8a29e; border-color: #57534e; }
+.v8-rv .face.front { opacity: 0; }
+.v8-rv.show .face.back { animation: v8FaceOut 1s linear forwards; }
+.v8-rv.show .face.front { animation: v8FaceIn 1s linear forwards; }
+@keyframes v8FaceOut { 0%, 32% { opacity: 1; } 33%, 100% { opacity: 0; } }
+@keyframes v8FaceIn { 0%, 32% { opacity: 0; } 33%, 100% { opacity: 1; } }
+/* giro robusto: media vuelta, cambio de cara y media vuelta (sin depender de backface) */
+.v8-rv .face, .v8-rv .face.front { transform: none; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.v8-rv.show .flip { animation: v8Flip2 1s cubic-bezier(.3,1.2,.4,1) forwards; }
+@keyframes v8Flip2 { 0% { opacity: 1; transform: rotateY(0) scale(.85); } 33% { transform: rotateY(90deg) scale(.95); } 33.1% { transform: rotateY(-90deg) scale(.95); } 75% { transform: rotateY(12deg) scale(1.08); } 100% { opacity: 1; transform: rotateY(0) scale(1); } }
+.v8-shopcard { width: 100%; align-items: stretch; } .v8-shopcard > .v8-card { width: 100%; } .v8-shopcard .pr { align-self: center; }

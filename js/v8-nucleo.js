@@ -7,7 +7,7 @@
 (() => {
   const V8 = window.V8 = window.V8 || {};
   const V = window.V7 || {};
-  V8.version = '8.0';
+  V8.version = '8.1';
 
   /* ---------- estado ---------- */
   V8.st = () => {
@@ -91,7 +91,7 @@
   V8.load = file => loaded[file] || (loaded[file] = loadScript(file + '?v=' + V8.version).catch(e => { delete loaded[file]; throw e; }));
 
   const MAIN = ['chess', 'ludo', 'memory'];
-  const ORDER = ['chess', 'ludo', 'memory', 'q3d', 'broom', 'snitch', 'mixta', 'snap', 'laberinto', 'dcao', 'bosque', 'lago', 'gobstones', 'ritmo', 'vuelo', 'caldero', 'herbologia', 'retrato', 'escape2', 'adivinacion', 'school', 'quidditch', 'map', 'potions', 'guess', 'hangman', 'escape'];
+  const ORDER = ['chess', 'ludo', 'memory', 'broom', 'snitch', 'quidditch', 'school', 'escape', 'potions', 'guess', 'hangman', 'map', 'q3d', 'mixta', 'snap', 'laberinto', 'dcao', 'bosque', 'lago', 'gobstones', 'ritmo', 'vuelo', 'caldero', 'herbologia', 'retrato', 'escape2', 'adivinacion', 'school', 'quidditch', 'map', 'potions', 'guess', 'hangman', 'escape'];
   const sortGames = () => GAMES.sort((a, b) => { const ia = ORDER.indexOf(a.id), ib = ORDER.indexOf(b.id); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
 
   const _open = openGame; // ya protegido por la cuenta (v7)
@@ -127,8 +127,10 @@
       </div>
       <div class="p-3 space-y-1"><h3 class="font-wizard font-bold text-amber-300 text-sm">${g.name}</h3><p class="text-[11px] text-stone-400 leading-snug">${g.desc}</p></div></button>`;
     const main = GAMES.filter(g => MAIN.includes(g.id)), rest = GAMES.filter(g => !MAIN.includes(g.id));
+    const classic = rest.filter(g => !V8.games[g.id]), fresh = rest.filter(g => V8.games[g.id]);
     $('gamesHub').innerHTML = `<div class="col-span-full v8-hubhead">⭐ Principales · se juegan en línea con amigos</div>${main.map(g => card(g).replace('v8-gamecard', 'v8-gamecard v8-main')).join('')}
-      <div class="col-span-full v8-hubhead">🎮 Más juegos mágicos <span>${rest.length}</span></div>${rest.map(card).join('')}`;
+      <div class="col-span-full v8-hubhead">🎮 Juegos clásicos <span>${classic.length}</span></div>${classic.map(card).join('')}
+      <div class="col-span-full v8-hubhead">✨ Juegos nuevos <span>${fresh.length}</span></div>${fresh.map(card).join('')}`;
   };
 
   /* =====================================================================

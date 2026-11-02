@@ -1,0 +1,93 @@
+NOVEDADES 8.1 (si ya subiste la versión 8)
+==========================================================
+- Cromos uno por uno en Honeydukes: Común 400, Raro 1.200, Legendario 3.500
+  galeones. En el álbum, toca un cromo que te falta para comprarlo.
+- Nueva animación al abrir ranas y comprar cromos (caja que tiembla, rayos de
+  luz, giro de carta y explosión dorada en los legendarios).
+- Sala de Juegos ordenada: Principales, luego Juegos clásicos y al final
+  Juegos nuevos.
+Para subirla: haz solo el PASO 2 y el PASO 4. NO hace falta Supabase otra vez.
+
+HOGWARTS MAGIC EXPERIENCE · GUÍA PARA SUBIR LA VERSIÓN 8
+==========================================================
+
+Este paquete NO trae imágenes ni audios: tus fotos y canciones de las
+carpetas img/ y audio/ se quedan como están. Todo lo nuevo (cromos, avatar,
+mapa, juegos) está dibujado con código, así que no necesitas descargar nada.
+
+------------------------------------------------------------------
+PASO 1 · Antes de subir: tu correo en privacidad.html
+------------------------------------------------------------------
+Abre privacidad.html con el Bloc de notas, busca TU-CORREO@ejemplo.com
+(aparece 2 veces en la misma línea) y cámbialo por tu correo. Guarda.
+(Si prefieres no tocarlo, simplemente no subas privacidad.html.)
+
+------------------------------------------------------------------
+PASO 2 · Subir los archivos a GitHub
+------------------------------------------------------------------
+1. Descomprime el zip en tu computadora.
+2. En tu repositorio: Add file → Upload files.
+3. Arrastra TODO lo que hay dentro de la carpeta descomprimida:
+     - carpetas:  css   js   img   tests   .github
+   La carpeta img solo trae las imágenes nuevas (personajes, juegos,
+   criaturas, castillo): se SUMAN a tu carpeta img actual, no borran tus fotos.
+     - archivos:  index.html  sw.js  manifest.json  privacidad.html  README.md  supabase-v8.sql
+   Los archivos con el mismo nombre se reemplazan solos. No se borra nada.
+   La carpeta .github empieza con punto: si no la ves, en el Explorador de
+   Windows activa Vista → Mostrar → Elementos ocultos.
+4. Escribe «Versión 8» y toca Commit changes.
+
+------------------------------------------------------------------
+PASO 3 · Supabase (una sola vez, 2 minutos)
+------------------------------------------------------------------
+1. Entra a supabase.com → tu proyecto → SQL Editor → New query.
+2. Abre supabase-v8.sql con el Bloc de notas, copia TODO, pégalo y toca Run.
+   Debe decir «Success». Se puede ejecutar dos veces sin problema.
+3. Si todavía no te agregaste como administrador, ejecuta también (con tu correo):
+     insert into public.admins (email) values ('tucorreo@gmail.com') on conflict do nothing;
+
+Esto activa: retos a un amigo, cartas por lechuza, club de tu casa, copa
+del mes, preguntas de la comunidad, reportes, anuncios, mantenimiento,
+estadísticas y respaldo. El Ludo en línea y el cambio de cromos usan el
+mismo Realtime que ya tienes para los duelos: no necesitan nada más.
+
+------------------------------------------------------------------
+PASO 4 · Probar
+------------------------------------------------------------------
+1. Espera 1 o 2 minutos a que Vercel publique.
+2. Abre la página y recárgala DOS veces (la primera descarga la versión nueva).
+   O pruébala en una ventana de incógnito.
+3. Para probar el Ludo en línea: abre la página en tu celular y en la
+   computadora (o en dos navegadores), Juegos → Ludo Mágico → En línea con
+   amigos → crea la sala en uno y únete con el código en el otro.
+4. En GitHub, pestaña «Actions»: verás «Pruebas del juego» en verde ✅.
+   Si sale en rojo ❌, toca para ver qué archivo tiene el problema.
+
+------------------------------------------------------------------
+TU PANEL DE ADMINISTRADOR (pestaña Admin, solo con tu correo)
+------------------------------------------------------------------
+- 📈 Uso: jugadores por día, juegos más jugados y cuántos vuelven.
+- ⭐ Preguntas: agrega preguntas nuevas sin tocar el código.
+- 🚩 Reportes: preguntas que los jugadores marcaron como incorrectas.
+- 📢 Anuncio y mantenimiento: un aviso para todos o «Hogwarts en reparación».
+- 💾 Respaldo: descarga el progreso de todos en un archivo que abre Excel.
+
+------------------------------------------------------------------
+TUS IMÁGENES YA ESTÁN INCLUIDAS
+------------------------------------------------------------------
+Las fotos que me mandaste ya están recortadas, convertidas a .jpg livianos
+y puestas en img/personajes, img/juegos, img/criaturas e img/castillo.
+Se usan en: cromos, Adivina el Retrato, Biblioteca (personajes y bestiario),
+bestiario de la Colección, mapa del castillo, Sala de Juegos (incluido el
+Ajedrez) y el fondo del Ludo.
+Si después consigues más (por ejemplo hechizos o retratos), mira
+IMAGENES-OPCIONALES.txt para ver la carpeta y el nombre de cada una.
+
+------------------------------------------------------------------
+JUEGOS EN LÍNEA CON AMIGOS
+------------------------------------------------------------------
+Ajedrez, Ludo (2 a 4), Memoria, Escoba, Snitch, Duelo y 13 juegos nuevos:
+Quidditch 3D, Trivia Mixta, Snap, Laberinto, Defensa, Bosque Prohibido,
+Lago Negro, Gobstones, Ritmo, Clase de Vuelo, Pociones Avanzadas, Adivina
+el Retrato y Escape del Mes. En los nuevos, los dos juegan la MISMA
+partida al mismo tiempo y gana quien saque más puntos.

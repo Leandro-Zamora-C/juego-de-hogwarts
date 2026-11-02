@@ -1,0 +1,185 @@
+TUS IMÁGENES (OPCIONALES) · VERSIÓN 8
+=====================================
+
+Todo lo nuevo ya se ve con dibujos e íconos. Si quieres poner tus propias
+imágenes, guárdalas en estas carpetas con estos nombres exactos (en
+minúsculas). Pueden ser .jpg o .png. Las que no pongas siguen con el dibujo.
+Tamaño recomendado: cuadradas, unos 400 × 400 píxeles (pesan poco).
+
+img/personajes/   → cromos de ranas y «Adivina el Retrato»
+  dumbledore.jpg  (Albus Dumbledore)
+  merlin.jpg  (Merlín)
+  godric.jpg  (Godric Gryffindor)
+  salazar.jpg  (Salazar Slytherin)
+  rowena.jpg  (Rowena Ravenclaw)
+  helga.jpg  (Helga Hufflepuff)
+  flamel.jpg  (Nicolas Flamel)
+  newt.jpg  (Newt Scamander)
+  harry.jpg  (Harry Potter)
+  hermione.jpg  (Hermione Granger)
+  ron.jpg  (Ron Weasley)
+  mcgonagall.jpg  (Minerva McGonagall)
+  snape.jpg  (Severus Snape)
+  hagrid.jpg  (Rubeus Hagrid)
+  sirius.jpg  (Sirius Black)
+  lupin.jpg  (Remus Lupin)
+  luna.jpg  (Luna Lovegood)
+  neville.jpg  (Neville Longbottom)
+  dobby.jpg  (Dobby)
+  moody.jpg  (Alastor Moody)
+  tonks.jpg  (Nymphadora Tonks)
+  cedric.jpg  (Cedric Diggory)
+  ginny.jpg  (Ginny Weasley)
+  fredgeorge.jpg  (Fred y George)
+  voldemort.jpg  (Lord Voldemort)
+  ollivander.jpg  (Garrick Ollivander)
+  flitwick.jpg  (Filius Flitwick)
+  sprout.jpg  (Pomona Sprout)
+  slughorn.jpg  (Horace Slughorn)
+  trelawney.jpg  (Sybill Trelawney)
+  lockhart.jpg  (Gilderoy Lockhart)
+  hooch.jpg  (Madame Hooch)
+  pomfrey.jpg  (Madame Pomfrey)
+  filch.jpg  (Argus Filch)
+  molly.jpg  (Molly Weasley)
+  arthur.jpg  (Arthur Weasley)
+  kingsley.jpg  (Kingsley Shacklebolt)
+  cho.jpg  (Cho Chang)
+  fleur.jpg  (Fleur Delacour)
+  krum.jpg  (Viktor Krum)
+  draco.jpg  (Draco Malfoy)
+  lucius.jpg  (Lucius Malfoy)
+  bellatrix.jpg  (Bellatrix Lestrange)
+  umbridge.jpg  (Dolores Umbridge)
+  pettigrew.jpg  (Peter Pettigrew)
+  grindelwald.jpg  (Gellert Grindelwald)
+  bagshot.jpg  (Bathilda Bagshot)
+  bowman.jpg  (Bowman Wright)
+  paracelso.jpg  (Paracelso)
+  circe.jpg  (Circe)
+  morgana.jpg  (Morgana)
+  cliodna.jpg  (Cliodna)
+  agrippa.jpg  (Agrippa)
+  uric.jpg  (Uric el Raro)
+  hengist.jpg  (Hengist de Woodcroft)
+  nearly.jpg  (Nick Casi Decapitado)
+  fraile.jpg  (El Fraile Gordo)
+  dama.jpg  (La Dama Gris)
+  baron.jpg  (El Barón Sanguinario)
+  myrtle.jpg  (Myrtle la Llorona)
+
+img/juegos/       → portada de cada juego nuevo en la Sala de Juegos
+  ludo.jpg
+  q3d.jpg
+  mixta.jpg
+  snap.jpg
+  laberinto.jpg
+  dcao.jpg
+  bosque.jpg
+  lago.jpg
+  gobstones.jpg
+  ritmo.jpg
+  vuelo.jpg
+  caldero.jpg
+  herbologia.jpg
+  retrato.jpg
+  escape2.jpg
+  adivinacion.jpg
+
+img/criaturas/    → bestiario
+  hipogrifo.jpg  (Hipogrifo)
+  thestral.jpg  (Thestral)
+  unicornio.jpg  (Unicornio)
+  centauro.jpg  (Centauro)
+  acromantula.jpg  (Acromántula)
+  fenix.jpg  (Fénix)
+  bowtruckle.jpg  (Bowtruckle)
+  niffler.jpg  (Escarbato)
+  kneazle.jpg  (Kneazle)
+  grindylow.jpg  (Grindylow)
+  sirena.jpg  (Sirena del lago)
+  calamar.jpg  (Calamar gigante)
+  kelpie.jpg  (Kelpie)
+  plimpy.jpg  (Plimpy)
+  murtlap.jpg  (Murtlap)
+  boggart.jpg  (Boggart)
+  dementor.jpg  (Dementor)
+  duendecillo.jpg  (Duendecillo de Cornualles)
+  gorro.jpg  (Gorro rojo)
+  hinkypunk.jpg  (Hinkypunk)
+  inferi.jpg  (Inferius)
+  dragon.jpg  (Colacuerno húngaro)
+  escreguto.jpg  (Escreguto de cola explosiva)
+  esfinge.jpg  (Esfinge)
+  basilisco.jpg  (Basilisco)
+  mandragora.jpg  (Mandrágora)
+  snitch.jpg  (Snidget dorado)
+  elfo.jpg  (Elfo doméstico)
+  duende.jpg  (Duende de Gringotts)
+  gnomo.jpg  (Gnomo de jardín)
+
+img/hechizos/     → libro de hechizos
+  lumos.jpg  (Lumos)
+  nox.jpg  (Nox)
+  expelliarmus.jpg  (Expelliarmus)
+  expectopatronum.jpg  (Expecto Patronum)
+  wingardiumleviosa.jpg  (Wingardium Leviosa)
+  alohomora.jpg  (Alohomora)
+  accio.jpg  (Accio)
+  protego.jpg  (Protego)
+  riddikulus.jpg  (Riddikulus)
+  stupefy.jpg  (Stupefy)
+  petrificustotalus.jpg  (Petrificus Totalus)
+  obliviate.jpg  (Obliviate)
+  reparo.jpg  (Reparo)
+  incendio.jpg  (Incendio)
+  aguamenti.jpg  (Aguamenti)
+  lumosmaxima.jpg  (Lumos Maxima)
+  episkey.jpg  (Episkey)
+  rictusempra.jpg  (Rictusempra)
+  tarantallegra.jpg  (Tarantallegra)
+  silencio.jpg  (Silencio)
+  sonorus.jpg  (Sonorus)
+  muffliato.jpg  (Muffliato)
+  finiteincantatem.jpg  (Finite Incantatem)
+  engorgio.jpg  (Engorgio)
+  reducio.jpg  (Reducio)
+  impedimenta.jpg  (Impedimenta)
+  confundo.jpg  (Confundo)
+  diffindo.jpg  (Diffindo)
+  locomotor.jpg  (Locomotor)
+  orchideous.jpg  (Orchideous)
+  avis.jpg  (Avis)
+  serpensortia.jpg  (Serpensortia)
+  homenumrevelio.jpg  (Homenum Revelio)
+  morsmordre.jpg  (Morsmordre)
+  sectumsempra.jpg  (Sectumsempra)
+  prioriincantatem.jpg  (Priori Incantatem)
+
+img/castillo/     → lugares del mapa del castillo
+  salon.jpg  (Gran Salón)
+  biblio.jpg  (Biblioteca)
+  mazmorras.jpg  (Mazmorras)
+  astronomia.jpg  (Torre de Astronomía)
+  dcao.jpg  (Aula de Defensa)
+  sala.jpg  (Sala común)
+  lechuceria.jpg  (Lechucería)
+  retratos.jpg  (Galería de retratos)
+  invernaderos.jpg  (Invernaderos)
+  lago.jpg  (Lago Negro)
+  bosque.jpg  (Bosque Prohibido)
+  quidditch.jpg  (Campo de Quidditch)
+  laberinto.jpg  (Laberinto del Torneo)
+  cabana.jpg  (Cabaña de Hagrid)
+  menesteres.jpg  (Sala de los Menesteres)
+
+img/retratos/     → galería de retratos
+  1.jpg  (Sir Cadogan)
+  2.jpg  (La Dama Gorda)
+  3.jpg  (Phineas Nigellus)
+  4.jpg  (Violeta)
+  5.jpg  (Armando Dippet)
+  6.jpg  (Dilys Derwent)
+
+Cómo subirlas: en GitHub entra a la carpeta img → Add file → Upload files,
+y arrastra la carpeta (por ejemplo «personajes») con sus imágenes dentro.

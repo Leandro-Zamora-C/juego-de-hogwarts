@@ -131,18 +131,68 @@
     return V8.pick(CARDS.filter(c => c.r === r), rng);
   }
   V8.addFrogs = (n, why) => { const s = st(); s.frogs = (s.frogs || 0) + n; save(); if (why) toast(`${why}: +${n} rana${n > 1 ? 's' : ''} de chocolate`, '🐸'); renderBadge(); };
+  /* ---------- animación para revelar un cromo (rana o compra) ---------- */
+  const PRICE = { c: 400, r: 1200, l: 3500 };
+  V8.CARD_PRICE = PRICE;
+  function afterGet(c) {
+    const s = st(), n = Object.keys(s.cards).length;
+    if (n >= 10) unlock('v8cards10'); if (n >= 30) unlock('v8cards30'); if (n >= CARDS.length) unlock('v8cardsAll'); if (c.r === 'l') unlock('v8legend');
+    renderBadge();
+  }
+  V8.reveal = (c, { frog = true, first = true, count = 1 } = {}) => {
+    const s = st(), reduce = V8.reduced();
+    const back = `<div class="v8-cardback"><span>H</span><i></i></div>`;
+    V8.sheet(frog ? '🐸 Rana de chocolate' : '🃏 Nuevo cromo', `<div class="v8-rv r-${c.r} ${frog ? 'frog' : 'buy'}" id="v8Rv">
+        <div class="rays"></div><div class="glow"></div>
+        ${frog ? '<div class="box"><div class="lid"></div><div class="pack">🐸</div></div>' : ''}
+        <div class="flip"><div class="face back">${back}</div><div class="face front">${V8.cardHTML(c, 1, true)}</div></div>
+        <div class="sparks"></div>
+        <div class="info"><span class="badge">${RAR[c.r][0]}${c.r === 'l' ? ' ✨' : ''}</span>
+          <p class="${first ? 'text-emerald-300' : 'text-stone-300'}">${first ? '¡Nuevo cromo para tu álbum!' : `Repetido (tienes ${count}). Puedes cambiarlo con un amigo o venderlo.`}</p>
+          <div class="flex gap-2 justify-center mt-2 flex-wrap">${frog && s.frogs ? `<button class="btn-gold" onclick="V8.openFrog()">Abrir otra (${s.frogs})</button>` : ''}<button class="btn-ghost" onclick="V8.closeSheet();V8.goCol('cromos')">Ver álbum</button></div></div></div>`);
+    const rv = $('v8Rv'); if (!rv) return;
+    const T = reduce ? [0, 50, 100] : frog ? [0, 1200, 1800] : [0, 300, 900];
+    sfx('spell');
+    if (frog && !reduce) { rv.classList.add('shake'); tone(220, .3, 'triangle', .05, 330, .3); tone(330, .3, 'triangle', .05, 440, .7); }
+    setTimeout(() => { if (!rv.isConnected) return; rv.classList.add('open'); sfx('zap'); if (c.r !== 'c') flash(c.r === 'l' ? 'rgba(250,204,21,.45)' : 'rgba(203,213,225,.35)', c.r === 'l'); }, T[1]);
+    setTimeout(() => {
+      if (!rv.isConnected) return; rv.classList.add('show');
+      const sp = rv.querySelector('.sparks'), n = reduce ? 0 : c.r === 'l' ? 40 : c.r === 'r' ? 24 : 12;
+      for (let i = 0; i < n; i++) { const e = document.createElement('i'); const a = Math.random() * 6.28, d = 90 + Math.random() * 120; e.style.setProperty('--x', Math.cos(a) * d + 'px'); e.style.setProperty('--y', Math.sin(a) * d + 'px'); e.style.animationDelay = Math.random() * .3 + 's'; sp.appendChild(e); }
+      sfx(c.r === 'l' ? 'levelup' : c.r === 'r' ? 'achieve' : 'correct');
+      if (c.r === 'l') { fireConfetti({ particleCount: 220, spread: 140, colors: ['#fde047', '#f59e0b', '#fff7cc'] }); setTimeout(() => fireConfetti({ particleCount: 120, spread: 160, origin: { y: .3 } }), 500); }
+      else if (c.r === 'r') fireConfetti({ particleCount: 90, spread: 90, colors: ['#e2e8f0', '#94a3b8', '#ffffff'] });
+      if (window.V8.speak) V8.speak(`¡${c.name}! Cromo ${RAR[c.r][0].toLowerCase()}.`);
+    }, T[2]);
+  };
   V8.openFrog = () => {
     const s = st(); if (!s.frogs) { toast('No tienes ranas. Cómpralas en Honeydukes o gánalas en misiones.', '🐸'); return; }
     s.frogs--; const c = drawCard(); s.cards[c.id] = (s.cards[c.id] || 0) + 1; save();
-    const first = s.cards[c.id] === 1;
     V8.emit('frog', { card: c.id, r: c.r });
-    const body = V8.sheet('🐸 Rana de chocolate', `<div class="v8-frogbox"><div class="frog">🐸</div><div class="reveal">${V8.cardHTML(c, 1, true)}</div>
-      <p class="text-center text-sm mt-3 ${first ? 'text-emerald-300' : 'text-stone-300'}">${first ? '¡Nuevo cromo para tu álbum!' : `Repetido (tienes ${s.cards[c.id]}). Puedes cambiarlo con un amigo o venderlo.`}</p>
-      <div class="flex gap-2 justify-center mt-3">${s.frogs ? `<button class="btn-gold" onclick="V8.openFrog()">Abrir otra (${s.frogs})</button>` : ''}<button class="btn-ghost" onclick="V8.closeSheet();V8.goCol('cromos')">Ver álbum</button></div></div>`);
-    void body; sfx('spell'); setTimeout(() => { sfx(c.r === 'l' ? 'levelup' : c.r === 'r' ? 'achieve' : 'correct'); if (c.r !== 'c') fireConfetti({ particleCount: c.r === 'l' ? 180 : 80, spread: 90 }); }, 900);
-    const n = Object.keys(s.cards).length; if (n >= 10) unlock('v8cards10'); if (n >= 30) unlock('v8cards30'); if (n >= CARDS.length) unlock('v8cardsAll'); if (c.r === 'l') unlock('v8legend');
-    renderBadge();
+    V8.reveal(c, { frog: true, first: s.cards[c.id] === 1, count: s.cards[c.id] });
+    afterGet(c);
   };
+  // comprar un cromo exacto (caro, para que sea especial)
+  V8.buyCard = id => {
+    const c = CARDS.find(x => x.id === id), s = st(); if (!c) return;
+    const price = PRICE[c.r], have = s.cards[id] || 0;
+    showDialog({ icon: '🃏', title: `Comprar ${esc(c.name)}`, body: `<div class="flex justify-center my-2">${V8.cardHTML(c, 1)}</div><p class="text-sm">Cromo <b>${RAR[c.r][0].toLowerCase()}</b> por <b class="text-amber-300">${price.toLocaleString('es-PE')} galeones</b>.${have ? ` <br><span class="text-[11px] text-stone-400">Ya tienes ${have}.</span>` : ''}</p><p class="text-[11px] text-stone-400 mt-1">Tienes ${(S.gold || 0).toLocaleString('es-PE')} galeones.</p>`,
+      actions: [{ label: (S.gold || 0) >= price ? `Comprar por ${price.toLocaleString('es-PE')} 🪙` : 'No te alcanza', primary: true, onClick: () => {
+        if ((S.gold || 0) < price) { toast(`Te faltan ${(price - (S.gold || 0)).toLocaleString('es-PE')} galeones. ¡Sigue jugando!`, '🪙'); return; }
+        S.gold -= price; s.cards[id] = have + 1; save(); updateWallet(); V8.emit('cardBought', { id, r: c.r }); unlock('v8buycard');
+        V8.reveal(c, { frog: false, first: !have, count: have + 1 }); afterGet(c);
+        if (currentTab === 'shop' && typeof renderShop === 'function') renderShop();
+      } }, { label: 'Cancelar' }] });
+  };
+  V8.cardShopHTML = filter => {
+    const s = st(), f = filter || V8._cardFilter || 'faltan';
+    const list = CARDS.filter(c => f === 'todos' || (f === 'faltan' && !s.cards[c.id]) || f === c.r);
+    return `<div class="space-y-2"><div class="flex flex-wrap items-center justify-between gap-2"><h3 class="font-wizard font-bold text-amber-300">🃏 Cromos uno por uno</h3>
+      <div class="flex flex-wrap gap-1.5">${[['faltan', 'Me faltan'], ['l', 'Legendarios'], ['r', 'Raros'], ['c', 'Comunes'], ['todos', 'Todos']].map(([k, l]) => `<button class="v8-chip ${f === k ? 'on' : ''}" onclick="V8._cardFilter='${k}';renderShop()">${l}</button>`).join('')}</div></div>
+      <p class="text-[11px] text-stone-400">Elige exactamente el personaje que quieres. Común ${PRICE.c} 🪙 · Raro ${PRICE.r.toLocaleString('es-PE')} 🪙 · Legendario ${PRICE.l.toLocaleString('es-PE')} 🪙.</p>
+      <div class="v8-cardgrid">${list.length ? list.map(c => `<button class="v8-shopcard" onclick="V8.buyCard('${c.id}')">${V8.cardHTML(c, s.cards[c.id] ? s.cards[c.id] : 1)}<span class="pr ${(S.gold || 0) >= PRICE[c.r] ? '' : 'no'}">🪙 ${PRICE[c.r].toLocaleString('es-PE')}</span></button>`).join('') : '<p class="text-xs text-emerald-300 col-span-full">¡Ya tienes todos los cromos de esta lista!</p>'}</div></div>`;
+  };
+
   V8.sellDup = id => { const s = st(), c = CARDS.find(x => x.id === id); if (!c || (s.cards[id] || 0) < 2) return; s.cards[id]--; save(); V8.gold(RAR[c.r][2], `Vendiste un ${c.name} repetido`); V8.goCol('cromos'); };
 
   /* ---------- intercambio de cromos con un amigo (en línea) ---------- */
@@ -371,7 +421,7 @@
     let body = '';
     if (colTab === 'cromos') body = `<div class="flex flex-wrap items-center gap-2 justify-between"><p class="text-sm text-stone-300">Álbum: <b class="text-amber-300">${nCards}/${CARDS.length}</b> cromos · Ranas sin abrir: <b class="text-emerald-300">${s.frogs || 0}</b></p>
         <div class="flex gap-2"><button class="btn-gold !py-1.5 !text-xs" onclick="V8.openFrog()" ${s.frogs ? '' : 'disabled'}>🐸 Abrir rana</button><button class="btn-ghost !py-1.5 !text-xs" onclick="V8.tradeOpen()">🔄 Cambiar con un amigo</button><button class="btn-ghost !py-1.5 !text-xs" onclick="switchTab('shop');setTimeout(()=>diagonGo('honeydukes'),200)">🛒 Comprar ranas</button></div></div>
-        <div class="v8-cardgrid mt-3">${CARDS.map(c => `<div class="relative" ${s.cards[c.id] ? `onclick="V8.cardZoom('${c.id}')"` : ''}>${V8.cardHTML(c, s.cards[c.id] || 0)}</div>`).join('')}</div>`;
+        <div class="v8-cardgrid mt-3">${CARDS.map(c => `<div class="relative" onclick="${s.cards[c.id] ? `V8.cardZoom('${c.id}')` : `V8.buyCard('${c.id}')`}">${V8.cardHTML(c, s.cards[c.id] || 0)}</div>`).join('')}</div>`;
     if (colTab === 'hechizos') body = `<p class="text-sm text-stone-300">Aprendidos: <b class="text-amber-300">${s.spells.length}/${SPELLS.length}</b>. Los aprendes al responder bien preguntas sobre ellos, al lanzarlos en el Estudio, en misiones y en los juegos.</p>
         <div class="v8-spellgrid mt-3">${SPELLS.map(sp => s.spells.includes(sp.id) ? `<div class="v8-spell">${V8.ph('hechizos', sp.id, 'top')}<span class="ic">${sp.i}</span><b>${sp.n}</b><small>🔊 ${sp.p}</small><p>${sp.u}</p><button onclick="V8.speak && V8.speak('${sp.n}')" class="text-[10px] text-amber-300 underline">Escuchar</button></div>` : `<div class="v8-spell off"><span class="ic">❔</span><b>???</b><p>Hechizo por descubrir</p></div>`).join('')}</div>`;
     if (colTab === 'bestiario') body = `<p class="text-sm text-stone-300">Criaturas descubiertas: <b class="text-amber-300">${s.beasts.length}/${BEASTS.length}</b>. Explora el Bosque Prohibido, el Lago Negro, Defensa Contra las Artes Oscuras y el Laberinto.</p>
@@ -405,7 +455,7 @@
     v8cards10: ['🐸', 'Coleccionista', 'Junta 10 cromos distintos'], v8cards30: ['🃏', 'Álbum a la mitad', 'Junta 30 cromos distintos'], v8cardsAll: ['📒', 'Álbum completo', 'Junta todos los cromos'],
     v8legend: ['🌟', '¡Legendario!', 'Consigue un cromo legendario'], v8trade: ['🔄', 'Buen trato', 'Cambia un cromo con un amigo'], v8spells10: ['📖', 'Aprendiz de hechicero', 'Aprende 10 hechizos'],
     v8spellsAll: ['📚', 'Libro completo', 'Aprende todos los hechizos'], v8beasts15: ['🐾', 'Explorador', 'Descubre 15 criaturas'], v8beastsAll: ['🐉', 'Bestiario completo', 'Descubre todas las criaturas'],
-    v8medal: ['🏅', 'Medalla de oro', 'Completa todas las preguntas de una película'], v8diary: ['📓', 'Fin del diario', 'Termina el diario de Tom Riddle'], v8avatar: ['🧙', 'Nuevo look', 'Personaliza tu avatar'],
+    v8medal: ['🏅', 'Medalla de oro', 'Completa todas las preguntas de una película'], v8diary: ['📓', 'Fin del diario', 'Termina el diario de Tom Riddle'], v8avatar: ['🧙', 'Nuevo look', 'Personaliza tu avatar'], v8buycard: ['🛒', 'Coleccionista exigente', 'Compra un cromo en Honeydukes'],
     v8room: ['🛋️', 'Decorador', 'Compra todos los muebles de la sala común'], v8diploma: ['🎓', 'Diploma en mano', 'Descarga tu diploma de Hogwarts']
   });
 })();
