@@ -1,6 +1,6 @@
 <div align="center">
 
-![Hogwarts Magic Experience](img/og-image.jpg)
+![Hogwarts Magic Experience](img/app/compartir.jpg)
 
 # 🪄 Hogwarts Magic Experience
 
@@ -14,13 +14,32 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-8.0-7c3aed)
+![Versión](https://img.shields.io/badge/versión-9.0-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 8
+## 🆕 Versión 9 · Gráficos y celular
+
+- **Ícono nuevo** (castillo bajo la luna con una varita), versión adaptable para Android, accesos directos al mantener presionado el ícono (Duelo, Ludo, Abrir rana) e **imagen nueva al compartir el enlace**.
+- **Gráficos 3D más realistas** en los 9 escenarios 3D: brillo de luces y velas, color de película, viñeta, bordes suaves y reflejos en los metales.
+- **Ajedrez** con piezas de mármol y obsidiana. **Ludo** con figuras talladas de cada casa (león, serpiente, tejón y águila), velas reales en la mesa y dado que rebota.
+- **Calidad gráfica «Ultra»** en Ajustes. En celulares sencillos baja sola para que no se trabe.
+- **Portada**: racha 🔥, ruleta diaria que se gira con el dedo, cofre cada 4 horas, galeones dobles los fines de semana y botón «Continuar donde lo dejaste».
+- **Pensado para el celular**: deslizar entre pestañas, bajar el dedo para cerrar ventanas, ventanas que salen desde abajo, menú inferior más grande y ahorro de batería automático.
+- **Controles con el celular**: dibujar la respuesta en el duelo (modo varita), inclinar el celular para moverse, agitar para revolver pociones o tirar el dado del Ludo y soplar al micrófono para bajar el fuego del caldero.
+- **Con amigos**: código QR para invitar a una sala y cámara para escanearlo, stickers en partidas en línea y ranking «Entre amigos».
+- **Para compartir**: tarjeta de mago e imagen en formato historia para estados.
+- **Detalles visuales**: pantalla de carga con un castillo que se dibuja, velas flotantes, luz según la hora del día, botones con relieve, títulos dorados, cartas que se inclinan, cromos legendarios con brillo que cambia y lechuza con las novedades.
+
+## Versión 8.1
+
+- **Cromos uno por uno** en Honeydukes (Común 400, Raro 1.200 y Legendario 3.500 galeones). En el álbum, tocar un cromo que falta permite comprarlo.
+- **Nueva animación** al abrir ranas y comprar cromos.
+- **Sala de Juegos** ordenada en Principales, Juegos clásicos y Juegos nuevos.
+
+## Versión 8
 
 - **🎲 Ludo Mágico** con las cuatro casas: tablero 3D (o clásico 2D), contra la IA, varios en el mismo celular o **en línea con amigos de 2, 3 o 4 jugadores**. Reglas: sale con 6, el 6 repite, comer o llegar a la meta da otro tiro, estrellas seguras.
 - **19 juegos en línea con amigos**: Ajedrez, Ludo, Memoria, Escoba, Snitch, Duelo y 13 juegos nuevos (los dos juegan la misma partida y gana el mejor puntaje).
@@ -99,7 +118,7 @@
 
 - **HTML5 + JavaScript** sin frameworks: toda la aplicación vive en un único `index.html`.
 - **Tailwind CSS** y **Font Awesome**.
-- **WebGL** con un motor 3D propio (luces, sombras, niebla, partículas y texturas procedurales) para el ajedrez, la escoba y la snitch.
+- **WebGL** con un motor 3D propio (luces, sombras, niebla, partículas, texturas procedurales, reflejos y posprocesado con brillo y corrección de color) para el ajedrez, el Ludo, la escoba, la snitch, el quidditch, el Gran Salón y el duelo.
 - **Canvas 2D**, que se usa para:
   - los juegos (escoba, ajedrez, snitch, quidditch);
   - el cielo nocturno;
@@ -107,7 +126,9 @@
 - **APIs del navegador:**
   - Web Audio, Speech Synthesis y Speech Recognition para el sonido, la lectura en voz alta y los hechizos por voz;
   - MediaDevices para la cámara y la linterna;
-  - DeviceMotion para usar el celular como varita;
+  - DeviceMotion y DeviceOrientation para usar el celular como varita, agitar e inclinar;
+  - BarcodeDetector (o jsQR) para escanear códigos QR;
+  - Vibration y Battery Status para la vibración y el ahorro de batería;
   - Media Session para los controles de la música.
 - **Supabase:**
   - PostgreSQL con Row Level Security;
@@ -127,7 +148,7 @@ juego-de-hogwarts/
 ├── sw.js                    # Service worker (sin internet + notificaciones)
 ├── README.md
 ├── css/tailwind.css         # Estilos preparados (carga rápida)
-├── css/v7.css · css/v8.css  # Estilos de las versiones 7 y 8
+├── css/v7.css · css/v8.css · css/v9.css   # Estilos de las versiones 7, 8 y 9
 ├── js/
 │   ├── v7-duelo.js          # Duelo: tiempo, comodines, chat, apuestas, revancha
 │   ├── v7-magia.js          # Cuenta obligatoria, 3D, efectos, sonido, perfil, tutorial
@@ -138,7 +159,9 @@ juego-de-hogwarts/
 │   ├── v8-coleccion.js      # Cromos, hechizos, bestiario, avatar, sala común, diario
 │   ├── v8-progreso.js       # Misiones, premio diario, tiendas, retos, club
 │   ├── v8-mundo.js          # Mapa del castillo, fantasmas, retratos, cartas, eventos
-│   └── v8-sistema.js        # 3D, idioma, accesibilidad, narrador, panel de admin
+│   ├── v8-sistema.js        # 3D, idioma, accesibilidad, narrador, panel de admin
+│   ├── v9-graficos.js       # Calidad Ultra y posprocesado de los juegos 3D
+│   └── v9-app.js            # Ruleta, cofre, QR, stickers, gestos, tarjeta de mago
 ├── supabase-v8.sql          # Tablas nuevas de la versión 8
 ├── tests/                   # Pruebas automáticas
 ├── .github/workflows/       # Hace que GitHub ejecute las pruebas
@@ -149,8 +172,8 @@ juego-de-hogwarts/
 │   └── gryffindor.mp3 · slytherin.mp3 · ravenclaw.mp3 · hufflepuff.mp3
 │
 ├── img/
-│   ├── icon-192.png · icon-512.png      # Íconos de la app
-│   ├── og-image.jpg                     # Vista previa al compartir el enlace
+│   ├── app/                             # Íconos de la app y compartir.jpg (vista previa del enlace)
+│   ├── personajes · criaturas · castillo · juegos   # Fotos de cromos, bestiario, mapa y portadas
 │   ├── pelicula1 … pelicula8            # Portadas de las películas (.jpg/.webp/.png)
 │   ├── dueloimagen · frases · maraton   # Portadas de modos especiales
 │   └── hechizos · criaturas · personajes · halloween · navidad   # (opcionales)
@@ -226,6 +249,10 @@ Los eventos se activan solos según la fecha. Para verlos en cualquier momento, 
 | Linterna con *Lumos* | Chrome en Android (iPhone no permite encender la linterna desde la web) |
 | Celular como varita | Android e iPhone (en iPhone pide permiso la primera vez) |
 | Recordatorio diario | App instalada en Chrome para Android |
+| Vibración | Android (iPhone no permite vibrar desde la web) |
+| Escanear QR | Chrome en Android directo; en iPhone usa la cámara del celular |
+| Inclinar, agitar y soplar | Android e iPhone (en iPhone pide permiso la primera vez) |
+| Accesos directos del ícono | App instalada en Android |
 | Amigos, perfil y nube | Requieren iniciar sesión con Google |
 
 ## ⌨️ Atajos de teclado
