@@ -40,7 +40,7 @@ gl_FragColor=vec4(g,1.);}`;
       [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(k => gl.texParameteri(gl.TEXTURE_2D, k, gl.LINEAR));
       [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(k => gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE));
       const fb = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
-      let rb = null; if (depth) { rb = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, rb); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, w, h); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb); }
+      let rb = null; if (depth) { rb = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, rb); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, w, h); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, rb); /* 24 bits de profundidad: evita que superficies muy juntas se mezclen */ }
       const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE; gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       return { t, fb, rb, w, h, ok };
     };
@@ -72,14 +72,14 @@ gl_FragColor=vec4(g,1.);}`;
       end() {
         gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.disable(gl.CULL_FACE); gl.depthMask(false);
         for (let i = 0; i < 8; i++) gl.disableVertexAttribArray(i);
-        pass(P.br, h1, U => { tex(0, main.t, U.uT); gl.uniform1f(U.uTh, .9); });
+        pass(P.br, h1, U => { tex(0, main.t, U.uT); gl.uniform1f(U.uTh, .95); });
         pass(P.bl, h2, U => { tex(0, h1.t, U.uT); gl.uniform2f(U.uD, 1 / h1.w, 0); });
         pass(P.bl, h1, U => { tex(0, h2.t, U.uT); gl.uniform2f(U.uD, 0, 1 / h1.h); });
         pass(P.bl, q2, U => { tex(0, h1.t, U.uT); gl.uniform2f(U.uD, 1 / q1.w, 0); });
         pass(P.bl, q1, U => { tex(0, q2.t, U.uT); gl.uniform2f(U.uD, 0, 1 / q1.h); });
         pass(P.co, null, U => {
           tex(0, main.t, U.uT); tex(1, h1.t, U.uB1); tex(2, q1.t, U.uB2);
-          gl.uniform2f(U.uPx, 1 / main.w, 1 / main.h); gl.uniform1f(U.uBloom, this.bloom * (Q() === 'ultra' ? .8 : .65));
+          gl.uniform2f(U.uPx, 1 / main.w, 1 / main.h); gl.uniform1f(U.uBloom, this.bloom * (Q() === 'ultra' ? .6 : .5));
           gl.uniform1f(U.uVig, this.vig); gl.uniform1f(U.uFx, 1); gl.uniform1f(U.uTime, (performance.now() % 10000) / 1000 + 1); gl.uniform1f(U.uGrade, this.grade);
         });
         gl.activeTexture(gl.TEXTURE0); gl.enable(gl.DEPTH_TEST); gl.depthMask(true);
@@ -110,7 +110,7 @@ gl_FragColor=vec4(g,1.);}`;
     S3.render = pts => {
       const now = performance.now(), sg = signature();
       if (sg !== sig) { sig = sg; stillSince = now; if (S3.shadow && !S3.shadow.always) S3.shadow.dirty = true; }
-      if (S3.idle !== false && now - stillSince > 1500 && now - lastDraw < 48) return;
+      if (S3.idle !== false && !(window.HPperf && HPperf.forced()) && now - stillSince > 1500 && now - lastDraw < 48) return;
       lastDraw = now; return _render(pts);
     };
     return S3;

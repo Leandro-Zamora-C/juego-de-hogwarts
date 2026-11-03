@@ -397,8 +397,8 @@
   function hallLoop(now) {
     hall.raf = 0;
     if (!hall.R || document.hidden || !hall.vis || currentTab !== 'home') return; // se pausa sola
-    hall.raf = 1; if (window.HPperf) HPperf.slow(t => { hall.raf = 0; hallLoop(t); }, 30); else hall.raf = requestAnimationFrame(hallLoop);
-    if (V.quality() === 'low' && (hall.frames++ & 1)) return;
+    hall.raf = 1; if (window.HPperf) HPperf.slow(t => { hall.raf = 0; hallLoop(t); }, HPperf.deco()); else hall.raf = requestAnimationFrame(hallLoop);
+    if (V.quality() === 'low' && !(window.HPperf && HPperf.forced()) && (hall.frames++ & 1)) return;
     const R = hall.R, t = (now - hall.t0) / 1000, [px, py] = hall.par();
     R.tick(now);
     const k = reduced() ? 0 : (Math.sin(t * .045 - Math.PI / 2) + 1) / 2, z = 24 - k * 34;
@@ -504,7 +504,7 @@
     const cv = document.createElement('canvas'); cv.className = 'v7-fxover'; host.appendChild(cv);
     const x = cv.getContext('2d'), P = [], low = V.quality() === 'low';
     const loop = now => {
-      if (!cv.isConnected) return; if (kind !== 'broom' && window.HPperf) HPperf.slow(loop, 30); else requestAnimationFrame(loop);
+      if (!cv.isConnected) return; if (kind !== 'broom' && window.HPperf) HPperf.slow(loop, HPperf.deco()); else requestAnimationFrame(loop);
       if (document.hidden) return;
       const W = cv.clientWidth, H = cv.clientHeight; if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
       x.clearRect(0, 0, W, H);

@@ -508,8 +508,8 @@
         ${sw(s.wand, 'V9.wandMode', 'Duelo con la varita', 'Elige tu respuesta dibujando su forma.')}
         ${coarse ? sw(s.gyroPlay, 'V9.gyroPlay', 'Mover inclinando el celular', 'En Clase de Vuelo, Laberinto, Defensa, Bosque y Lago.') : ''}
         ${sw(s.taps !== false, 'V9.setTaps', 'Vibración al cambiar de sala', 'Un toque suave al tocar el menú.')}
-        <div class="flex items-center justify-between gap-3 py-2.5"><span><span class="block text-sm text-stone-200 font-semibold">Cuadros por segundo</span><span class="block text-[11px] text-stone-500">60 es lo recomendado. 90 y 120 se ven más fluidos en pantallas rápidas, pero calientan más.</span></span>
-          <select onchange="V9.setFps(this.value)" class="bg-stone-950 border border-amber-800/50 rounded-lg px-2 py-1 text-xs text-amber-100">${[[60, 'Automático (60)'], [30, 'Ahorro (30)'], [90, '90'], [120, '120']].map(([v, l]) => `<option value="${v}" ${(window.HPperf ? HPperf.pref : 60) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="flex items-center justify-between gap-3 py-2.5"><span><span class="block text-sm text-stone-200 font-semibold">Cuadros por segundo</span><span class="block text-[11px] text-stone-500">60 es lo recomendado. «Forzado» hace que todo el juego corra a 90 o 120 (tu pantalla debe estar a esos Hz). Calienta más.</span></span>
+          <select onchange="V9.setFps(this.value)" class="bg-stone-950 border border-amber-800/50 rounded-lg px-2 py-1 text-xs text-amber-100">${[[60, 'Automático (60)'], [30, 'Ahorro (30)'], [90, 'Forzado a 90'], [120, 'Forzado a 120']].map(([v, l]) => `<option value="${v}" ${(window.HPperf ? HPperf.pref : 60) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         ${sw((() => { try { return localStorage.getItem('hp-showfps') === '1'; } catch (e) { return false; } })(), 'V9.showFps', 'Mostrar contador de FPS', 'Un número pequeño arriba a la izquierda.')}</div>`);
     };
   }
@@ -518,13 +518,31 @@
   /* ---------- 21. Rendimiento: modo en juego, FPS, temperatura ---------- */
   V9.inGame = () => { const on = !!(typeof activeGame !== 'undefined' && activeGame) || (typeof currentTab !== 'undefined' && currentTab === 'duel'); document.documentElement.classList.toggle('v9-ingame', on); };
   const HP = window.HPperf;
-  V9.setFps = v => { v = +v || 60; try { localStorage.setItem('hp-fps', v); } catch (e) {} if (HP) HP.pref = v; toast(v === 30 ? 'Modo ahorro: 30 cuadros por segundo.' : v === 60 ? 'Automático: 60 cuadros por segundo (recomendado).' : `${v} cuadros por segundo. Más fluido, pero calienta más el celular.`, '🎞️'); };
+  V9.setFps = v => {
+    v = +v || 60; try { localStorage.setItem('hp-fps', v); } catch (e) {} if (HP) { HP.pref = v; HP.hzWarned = false; }
+    toast(v === 30 ? 'Modo ahorro: 30 cuadros por segundo.' : v === 60 ? 'Automático: 60 cuadros por segundo (recomendado).' : `Forzado a ${v} cuadros: todo el juego corre a ${v}. Calienta más el celular.`, '🎞️');
+    if (v > 60) setTimeout(checkHz, 4000);
+  };
+  // si la pantalla del celular está a menos Hz que lo elegido, se explica cómo subirla
+  function checkHz() {
+    if (!HP || HP.pref <= 60 || HP.hzWarned) return;
+    if (!HP.hz) { checkHz.n = (checkHz.n || 0) + 1; if (checkHz.n < 4) HP.probe(checkHz); return; }
+    const dlg = $('dialog'); if (dlg && !dlg.classList.contains('hidden')) { setTimeout(checkHz, 4000); return; }
+    if (HP.hz >= 30 && HP.hz + 8 < HP.pref) {
+      HP.hzWarned = true;
+      showDialog({ icon: '📱', title: `Tu pantalla está a ${HP.hz} Hz`, body: `<p class="text-sm text-left">El juego ya está pidiendo <b>${HP.pref} cuadros</b>, pero tu celular tiene la pantalla a <b>${HP.hz} Hz</b>, y una página no puede cambiar eso. Para llegar a ${HP.pref}:</p>
+        <ol class="text-sm text-left list-decimal pl-5 space-y-1 mt-2"><li>Abre los <b>Ajustes del celular</b> → <b>Pantalla</b> → <b>Frecuencia de actualización</b> y elige <b>${HP.pref >= 120 ? '120 Hz' : '90 Hz o más'}</b> (no «Automática»).</li>
+        <li>Desactiva el <b>Ahorro de batería</b>: lo baja a 60 Hz.</li><li>Vuelve a abrir Hogwarts (mejor como app instalada).</li></ol>
+        <p class="text-[11px] text-stone-400 mt-2">En Motorola también puedes probar «Frecuencia de actualización alta» por app en Ajustes → Pantalla.</p>`, actions: [{ label: 'Entendido', primary: true }] });
+    }
+  }
+  V9.checkHz = checkHz;
   V9.showFps = on => { try { localStorage.setItem('hp-showfps', on ? '1' : '0'); } catch (e) {} fpsBadge(); };
   function fpsBadge() {
     let on = false; try { on = localStorage.getItem('hp-showfps') === '1'; } catch (e) {}
     let b = $('v9Fps'); if (!on) { if (b) b.remove(); if (HP) HP.onFps = null; return; }
     if (!b) { b = document.createElement('div'); b.id = 'v9Fps'; document.body.appendChild(b); }
-    if (HP) HP.onFps = f => { const t = HP.target(); b.textContent = `${f} FPS · máx ${t}${HP.hot ? ' · 🌡️' : ''}`; b.className = f >= t * .9 ? '' : f >= t * .7 ? 'mid' : 'low'; };
+    if (HP) HP.onFps = f => { const t = HP.target(); b.textContent = `${f} FPS · ${HP.forced() ? 'forzado ' : 'objetivo '}${t}${HP.hz >= 30 ? ' · pantalla ' + HP.hz + ' Hz' : ''}${HP.hot ? ' · 🌡️' : ''}`; b.className = f >= t * .9 ? '' : f >= t * .7 ? 'mid' : 'low'; };
   }
   if (HP) HP.onHot = () => { toast('Tu celular se está calentando: pausé los adornos del fondo. El juego sigue igual.', '🌡️'); if (window.V7 && V7.quality && V7.quality() === 'ultra') { /* se mantiene la calidad del juego */ } };
   // si el celular se enfría (vuelve a ir fluido varios minutos), regresan los adornos
@@ -533,7 +551,7 @@
   /* ---------- arranque ---------- */
   function boot() {
     if (!low()) candles();
-    shortcut(); restoreTab(); fpsBadge(); V9.inGame();
+    shortcut(); restoreTab(); fpsBadge(); V9.inGame(); setTimeout(checkHz, 8000);
     if (typeof currentTab !== 'undefined' && currentTab === 'home') homeStrip();
     setTimeout(() => { if (window.V8 && V8.news) V8.news(); }, 6000);
   }

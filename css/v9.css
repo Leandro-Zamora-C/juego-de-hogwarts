@@ -207,7 +207,7 @@ html.v9-saver .hp-text-logo { animation: none !important; }
 .v8-card.r-l::after { will-change: filter; }
 #skyCanvas { transition: none !important; }
 /* dentro de un juego o del duelo, todo lo decorativo de afuera se pausa */
-html.v9-ingame #v9Candles, html.v9-hot #v9Candles { display: none; }
+html.v9-ingame #v9Candles, html.v9-hot #v9Candles, html.v9-ingame #candleField, html.v9-hot #candleField { display: none; }
 html.v9-ingame header *, html.v9-ingame #mobileNav *, html.v9-ingame #v9Strip *, html.v9-ingame body::after,
 html.v9-ingame .v7-torch, html.v9-ingame .v7-torch * { animation-play-state: paused !important; }
 html.v9-hot .hp-text-logo, html.v9-hot .v9-tile.ready::after, html.v9-hot .v7-torch { animation: none !important; }

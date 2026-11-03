@@ -14,15 +14,22 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-9.1-7c3aed)
+![Versión](https://img.shields.io/badge/versión-9.2-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 9.1 · Menos calor y progreso seguro
+## 🆕 Versión 9.2 · FPS forzados y ajedrez corregido
 
-- **Cuadros por segundo** en Ajustes: Automático (60, recomendado), Ahorro (30), 90 o 120. Los juegos que avanzan por cuadro se quedan en 60 para no ir más rápido de la cuenta. Contador de FPS opcional.
+- **Forzado a 90 o 120 FPS**: todo el juego (menús, cielo, castillo, escenas 3D y juegos) corre a los cuadros elegidos. El contador muestra los Hz reales de la pantalla y, si el celular la tiene más baja, explica cómo subirla en sus ajustes.
+- **Lago Negro, Gobstones y Clase de Vuelo** usan un reloj fijo: van a la misma velocidad a 60, 90 o 120 FPS.
+- **Ajedrez 3D corregido**: vuelven las casillas del tablero (se perdían por la precisión de profundidad del posprocesado), piezas de mármol más naturales y la viñeta cubre todo el tablero.
+- Las velas del fondo se ocultan dentro de los juegos.
+
+## Versión 9.1 · Menos calor y progreso seguro
+
+- **Cuadros por segundo** en Ajustes: Automático (60, recomendado), Ahorro (30), 90 o 120. Contador de FPS opcional.
 - **Menos calor sin perder calidad**: el cielo, las partículas y el clima se pausan dentro de los juegos; las escenas 3D quietas (ajedrez, Ludo) dejan de redibujarse a toda velocidad; el Gran Salón y el exterior corren a 30 cuadros; en celular se quita el vidrio borroso (que se recalculaba sin parar) y la resolución 3D se ajusta a la pantalla.
 - **Protector de temperatura**: si el celular empieza a ir lento por el calor, pausa los adornos del fondo (nunca el juego) y los devuelve cuando se enfría.
 - **Progreso seguro entre dispositivos**: antes de guardar, revisa si otro celular guardó algo; si es así, junta los dos. Los cromos, hechizos, criaturas y logros ya no se pierden al abrir tu cuenta en otro lado.

@@ -211,7 +211,7 @@ html.v7-font-3 { font-size: 125%; }
 #v7Trail { position: fixed; inset: 0; z-index: 180; pointer-events: none; }
 
 /* ---------- capa de efectos de escoba ---------- */
-.v7-fxover { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.v7-fxover { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
 
 @media (prefers-reduced-motion: reduce) { .v7-hat, .v7-torch .flame, .v7-torch .glow, .v7-owlbird { animation: none !important; } }
 

@@ -1,3 +1,10 @@
+NOVEDADES 9.2 · FPS FORZADOS Y AJEDREZ CORREGIDO
+==========================================================
+Para subirla: haz solo el PASO 2 y el PASO 4 de abajo. NO hace falta Supabase.
+- Ajustes → «Cuadros por segundo» → «Forzado a 120»: todo corre a 120.
+  Tu celular debe tener la pantalla en 120 Hz (Ajustes del celular → Pantalla
+  → Frecuencia de actualización → 120 Hz) y sin ahorro de batería.
+
 NOVEDADES 9.1 · MENOS CALOR Y CROMOS GUARDADOS EN TU CUENTA
 ==========================================================
 Para subirla: haz solo el PASO 2 y el PASO 4 de abajo. NO hace falta Supabase.

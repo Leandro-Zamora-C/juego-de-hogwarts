@@ -346,12 +346,16 @@
       every(() => { if (RUN.over) return; t--; set('lgT', t); if (t <= 0) finish(false); }, 1000);
       const loop = now => {
         if (!RUN || RUN.id !== 'lago') return; RUN.raf = requestAnimationFrame(loop);
+        const _st = RUN; _st._acc = Math.min(100, (_st._acc || 0) + (now - (_st._t || now))); _st._t = now;
+        while (_st._acc >= 16.67 && RUN === _st && !RUN.over) { _st._acc -= 16.67;
         const k = RUN.keys; if (k.ArrowLeft) P.tx = P.x - .05; if (k.ArrowRight) P.tx = P.x + .05; if (k.ArrowUp) P.ty = P.y - .05; if (k.ArrowDown) P.ty = P.y + .05;
         P.x += V8.clamp(P.tx - P.x, -.006, .006); P.y += V8.clamp(P.ty - P.y, -.006, .006); P.x = V8.clamp(P.x, .02, .98); P.y = V8.clamp(P.y, .05, .97);
         pearls.forEach(p => { if (!p.got && Math.hypot(p.x - P.x, (p.y - P.y) * .62) < .04) { p.got = true; got++; set('lgP', got); sfx('correct'); } });
         foes.forEach(f => { f.x += f.vx + (P.x - f.x) * .0015; f.y += f.vy + (P.y - f.y) * .0015; if (f.x < .1 || f.x > .95) f.vx *= -1; if (f.y < .15 || f.y > .95) f.vy *= -1; if (Math.hypot(f.x - P.x, (f.y - P.y) * .62) < .045) { hits++; t = Math.max(0, t - 5); set('lgT', t); P.tx = P.x - .15; sfx('wrong'); flash('rgba(37,99,235,.3)'); f.x += .1; } });
         if (Math.hypot(goal.x - P.x, (goal.y - P.y) * .62) < .06) finish(true);
         [['calamar', .5, .25], ['kelpie', .2, .8], ['plimpy', .7, .55]].forEach(([id, bx, by]) => { if (!seen.has(id) && Math.hypot(bx - P.x, by - P.y) < .12) { seen.add(id); V8.discover(id); } });
+        }
+        if (!RUN || RUN.id !== 'lago') return;
         const [x, w, h] = fit(cv), g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#0e4a6e'); g.addColorStop(1, '#020b1a'); x.fillStyle = g; x.fillRect(0, 0, w, h);
         for (let i = 0; i < 8; i++) { x.strokeStyle = 'rgba(56,189,248,.08)'; x.lineWidth = 30; x.beginPath(); x.moveTo((i * .15 + Math.sin(now / 2000 + i) * .02) * w, 0); x.lineTo((i * .15 - .1) * w, h); x.stroke(); }
         x.fillStyle = '#14532d'; for (let i = 0; i < 14; i++) { const bx = i / 13 * w; x.beginPath(); x.moveTo(bx, h); x.quadraticCurveTo(bx + Math.sin(now / 700 + i) * 15, h * .82, bx + 5, h * .7 - (i % 3) * 20); x.lineTo(bx + 10, h); x.fill(); }
@@ -386,9 +390,10 @@
       const score = who => balls.filter(b => b.who === who && Math.hypot(b.x - ring.x, (b.y - ring.y) * 4 / 3) < ring.r).length;
       const aiShot = () => { const tx = ring.x + (Math.random() - .5) * .2, ty = ring.y + (Math.random() - .5) * .12, dx = tx - .5, dy = ty - .9, k = (.92 + Math.random() * .2) / 40; launch(1, dx * k, dy * k); };
       const nextTurn = () => { set('gbM', score(0)); set('gbA', score(1)); if (shots[0] >= 3 && shots[1] >= 3) { RUN.over = true; const a = score(0), b = score(1); return later(() => end('gobstones', { icon: a > b ? '🏆' : a === b ? '🤝' : '🔮', title: a > b ? '¡Ganaste a Gobstones!' : a === b ? 'Empate' : 'Ganó la IA', lines: [`${a} contra ${b} canicas en el círculo`], points: a > b ? 35 : a === b ? 15 : 5 }), 600); } turn = turn ? 0 : 1; if (turn === 1 && shots[1] >= 3) turn = 0; if (turn === 0 && shots[0] >= 3) turn = 1; set('gbN', turn ? 'IA 🤖' : 'Tú'); if (turn === 1) later(aiShot, 900); };
-      const loop = () => {
+      const loop = (now = performance.now()) => {
         if (!RUN || RUN.id !== 'gobstones') return; RUN.raf = requestAnimationFrame(loop);
-        if (moving) {
+        const _st = RUN; _st._acc = Math.min(100, (_st._acc || 0) + (now - (_st._t || now))); _st._t = now; if (!moving) _st._acc = 0;
+        while (moving && _st._acc >= 16.67) { _st._acc -= 16.67;
           let any = false; balls.forEach(b => { b.x += b.vx; b.y += b.vy; b.vx *= .975; b.vy *= .975; if (b.x < .03 || b.x > .97) { b.vx *= -.7; b.x = V8.clamp(b.x, .03, .97); } if (b.y < .03 || b.y > .97) { b.vy *= -.7; b.y = V8.clamp(b.y, .03, .97); } if (Math.hypot(b.vx, b.vy) > .0004) any = true; else { b.vx = b.vy = 0; } });
           for (let i = 0; i < balls.length; i++) for (let j = i + 1; j < balls.length; j++) { const a = balls[i], b = balls[j], dx = b.x - a.x, dy = (b.y - a.y) * 4 / 3, d = Math.hypot(dx, dy); if (d < .056 && d > 0) { const nx = dx / d, ny = dy / d, p = (a.vx * nx + a.vy * ny) - (b.vx * nx + b.vy * ny); if (p > 0) { a.vx -= p * nx; a.vy -= p * ny; b.vx += p * nx; b.vy += p * ny; sfx('tick'); } const o = (.056 - d) / 2; a.x -= nx * o; b.x += nx * o; a.y -= ny * o * .75; b.y += ny * o * .75; } }
           if (!any) { moving = false; nextTurn(); }
@@ -455,12 +460,16 @@
       const clouds = Array.from({ length: 30 }, () => ({ x: (Math.random() - .5) * 8, y: (Math.random() - .5) * 4, z: Math.random() * 480 }));
       body().innerHTML = wrap(hud([['vlR', '⭕ Aros', '0/15']]) + canvasBox('vlCv', '16/10'));
       const cv = $('vlCv'); cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); P.tx = ((e.clientX - r.left) / r.width - .5) * 2.2; P.ty = ((e.clientY - r.top) / r.height - .5) * 1.5; });
-      const loop = () => {
+      const loop = (now = performance.now()) => {
         if (!RUN || RUN.id !== 'vuelo') return; RUN.raf = requestAnimationFrame(loop);
+        const _st = RUN; _st._acc = Math.min(100, (_st._acc || 0) + (now - (_st._t || now))); _st._t = now;
+        while (_st._acc >= 16.67 && !RUN.over) { _st._acc -= 16.67;
         const k = RUN.keys; if (k.ArrowLeft) P.tx -= .04; if (k.ArrowRight) P.tx += .04; if (k.ArrowUp) P.ty -= .04; if (k.ArrowDown) P.ty += .04; P.tx = V8.clamp(P.tx, -1.1, 1.1); P.ty = V8.clamp(P.ty, -.75, .75);
         P.x += (P.tx - P.x) * .08; P.y += (P.ty - P.y) * .08; z += .55 + passed * .02;
         rings.forEach(r => { if (!r.res && z >= r.z) { done++; r.res = Math.hypot(r.x - P.x, r.y - P.y) < .32 ? 1 : -1; if (r.res > 0) { passed++; sfx('correct'); } else sfx('wrong'); set('vlR', `${passed}/15`); } });
         if (done >= 15 && !RUN.over) { RUN.over = true; const medal = passed >= 13 ? ['🥇', 'oro'] : passed >= 9 ? ['🥈', 'plata'] : passed >= 5 ? ['🥉', 'bronce'] : ['🧹', 'participación']; return end('vuelo', { icon: medal[0], title: `Medalla de ${medal[1]}`, lines: [`Pasaste ${passed} de 15 aros`], points: passed * 4, record: passed }); }
+        }
+        if (RUN.over) return;
         const [x, w, h] = fit(cv), g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#60a5fa'); g.addColorStop(.6, '#bfdbfe'); g.addColorStop(.6, '#4d7c0f'); g.addColorStop(1, '#365314'); x.fillStyle = g; x.fillRect(0, 0, w, h);
         const proj = (px, py, pz) => { const d = pz - z; if (d <= .5) return null; const s = 2.2 / d; return [w / 2 + (px - P.x) * s * w * .5, h / 2 + (py - P.y) * s * w * .5, s]; };
         clouds.forEach(c => { let cz = c.z; while (cz < z) cz += 480; c.z = cz; const p = proj(c.x, c.y - 1.5, cz); if (!p) return; x.fillStyle = 'rgba(255,255,255,.7)'; x.beginPath(); x.ellipse(p[0], p[1], p[2] * w * .6, p[2] * w * .25, 0, 0, 7); x.fill(); });

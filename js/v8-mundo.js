@@ -26,7 +26,7 @@
     const cv = document.createElement('canvas'); cv.className = 'v8-weather'; host.appendChild(cv); const x = cv.getContext('2d'), P = [];
     let flash = 0;
     const loop = () => {
-      if (!cv.isConnected) return; window.HPperf ? HPperf.slow(loop, 30) : requestAnimationFrame(loop);
+      if (!cv.isConnected) return; window.HPperf ? HPperf.slow(loop, HPperf.deco()) : requestAnimationFrame(loop);
       if (document.hidden || host.offsetParent === null) return;
       const Wd = cv.clientWidth, H = cv.clientHeight; if (cv.width !== Wd || cv.height !== H) { cv.width = Wd; cv.height = H; }
       x.clearRect(0, 0, Wd, H);
