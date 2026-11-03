@@ -154,7 +154,7 @@
     const stars = Array.from({ length: 180 }, () => { const a = Math.random() * 6.28, e = .1 + Math.random() * 1.2; return [Math.cos(a) * 140 * Math.cos(e), 20 + Math.sin(e) * 110, Math.sin(a) * 140 * Math.cos(e) - 40]; });
     const t0 = performance.now();
     const loop = now => {
-      ext.raf = 0; if (!ext.on || !cv.isConnected || document.hidden || currentTab !== 'home') return; ext.raf = requestAnimationFrame(loop);
+      ext.raf = 0; if (!ext.on || !cv.isConnected || document.hidden || currentTab !== 'home') return; ext.raf = 1; if (window.HPperf) HPperf.slow(t => { ext.raf = 0; loop(t); }, 30); else ext.raf = requestAnimationFrame(loop);
       R.tick(now); const r = cv.getBoundingClientRect(); if (Math.abs(r.width - R.w) > 1) R.resize();
       const t = (now - t0) / 1000, a = Math.sin(t * .05) * .9;
       R.cam.pos = [Math.sin(a) * 30, 6 + Math.sin(t * .2) * .6, Math.cos(a) * 30]; R.cam.target = [0, 5, -3];

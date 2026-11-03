@@ -1,3 +1,10 @@
+NOVEDADES 9.1 · MENOS CALOR Y CROMOS GUARDADOS EN TU CUENTA
+==========================================================
+Para subirla: haz solo el PASO 2 y el PASO 4 de abajo. NO hace falta Supabase.
+- Ajustes → «Cuadros por segundo»: Automático (60) es lo recomendado.
+- Tus cromos y colecciones ahora se juntan entre celulares: abre la página
+  primero en el celular que tiene más cromos, y luego en el otro.
+
 NOVEDADES 9 · GRÁFICOS Y CELULAR
 ==========================================================
 Para subirla: haz solo el PASO 2 y el PASO 4 de abajo. NO hace falta Supabase.

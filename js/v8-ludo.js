@@ -467,7 +467,7 @@
       if (mov) pts.push({ p: [p[0], .25, p[1]], c: [1, .9, .5, .45 + .35 * Math.sin(t * 6)], s: .9 }, { p: [p[0], 1.05 + Math.sin(t * 5) * .08, p[1]], c: [1, .95, .7, .9], s: .22 });
     }));
     L.mats.forEach((m, pi) => { m.em = L.G.turn === pi && L.G.phase !== 'over' ? [.05 + .04 * Math.sin(t * 4), .04, .02] : [0, 0, 0]; });
-    if (R.shadow) R.shadow.dirty = true;
+    if (L.hop && R.shadow) R.shadow.dirty = true;
     if (L.flames) { L.flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 2) * .08 + Math.sin(t * 23 + i) * .05; f.scl = [k, 1.9 * k, k]; }); R.pl[1].color = [.9 * (1 + Math.sin(t * 11) * .08), .55, .25]; R.pl[0].color = [.6 + Math.sin(t * 7) * .04, .45, .25]; }
     // velas flotantes alrededor
     for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + t * .05, rr = 10.5; pts.push({ p: [Math.cos(a) * rr, 3.2 + Math.sin(t + i) * .3, Math.sin(a) * rr], c: [1, .7, .3, .8], s: .35 }, { p: [Math.cos(a) * rr, 3.2 + Math.sin(t + i) * .3, Math.sin(a) * rr], c: [1, .55, .2, .15], s: 1.6 }); }

@@ -62,9 +62,12 @@
       g = e; if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0; if (!g || g.gamma == null || reduced()) return;
-        const x = Math.max(-1, Math.min(1, g.gamma / 30)), y = Math.max(-1, Math.min(1, (g.beta - 45) / 30));
-        const R = document.documentElement.style; R.setProperty('--tx', x.toFixed(3)); R.setProperty('--ty', y.toFixed(3));
         gyroKeys(g);
+        // el efecto de profundidad solo se actualiza fuera de los juegos, 15 veces por segundo y si el cambio se nota
+        const now = performance.now(); if (activeGame || document.documentElement.classList.contains('v9-hot') || now - (gyroListen.t || 0) < 66) return; gyroListen.t = now;
+        const x = Math.max(-1, Math.min(1, g.gamma / 30)), y = Math.max(-1, Math.min(1, (g.beta - 45) / 30));
+        if (Math.abs(x - (gyroListen.x || 0)) < .04 && Math.abs(y - (gyroListen.y || 0)) < .04) return; gyroListen.x = x; gyroListen.y = y;
+        const R = document.documentElement.style; R.setProperty('--tx', x.toFixed(2)); R.setProperty('--ty', y.toFixed(2));
       });
     }, { passive: true });
   }
@@ -140,11 +143,11 @@
     window.openGame = openGame = function (id) {
       const r = _og.apply(this, arguments);
       try { const g = (typeof GAMES !== 'undefined' && GAMES.find(x => x.id === id)); if (g) { st().last = { id, name: g.name, icon: g.icon, at: Date.now() }; save(); } } catch (e) {}
-      setTimeout(V9.gameBar, 60); return r;
+      setTimeout(V9.gameBar, 60); V9.inGame(); return r;
     };
   }
   const _cg = window.closeGame;
-  if (typeof _cg === 'function') window.closeGame = closeGame = function () { const r = _cg.apply(this, arguments); const b = $('v9GameBar'); if (b) b.remove(); return r; };
+  if (typeof _cg === 'function') window.closeGame = closeGame = function () { const r = _cg.apply(this, arguments); const b = $('v9GameBar'); if (b) b.remove(); V9.inGame(); return r; };
   function shortcut() {
     let to = ''; try { to = new URLSearchParams(location.search).get('ir') || ''; } catch (e) {}
     if (!to) return;
@@ -267,7 +270,8 @@
     window.switchTab = switchTab = function (tab) {
       const prev = typeof currentTab !== 'undefined' ? currentTab : '';
       const r = _sw.apply(this, arguments);
-      try { const s = st(); s.tab = currentTab; s.tabAt = Date.now(); save(); } catch (e) {}
+      try { localStorage.setItem('hp-lasttab', JSON.stringify({ tab: currentTab, at: Date.now() })); } catch (e) {}
+      V9.inGame();
       if (tab === 'home') homeStrip();
       if (tab === 'ranking') rivalsBox();
       if (tab === 'profile') setTimeout(profileShareBtn, 50);
@@ -276,7 +280,7 @@
     };
   }
   function restoreTab() {
-    const s = st(); if (location.hash && location.hash.length > 1) return;
+    let s = {}; try { s = JSON.parse(localStorage.getItem('hp-lasttab') || '{}'); s.tabAt = s.at; } catch (e) {} if (location.hash && location.hash.length > 1) return;
     if (s.tab && s.tab !== 'home' && Date.now() - (s.tabAt || 0) < 30 * 60000 && ['games', 'duel', 'quiz', 'castle', 'shop', 'profile', 'ranking', 'library', 'movies'].includes(s.tab)) setTimeout(() => { try { switchTab(s.tab); } catch (e) {} }, 400);
   }
 
@@ -366,7 +370,7 @@
     bar.innerHTML = `<button class="v9-stk-btn" onclick="this.parentNode.classList.toggle('open')" aria-label="Stickers">😀</button><div class="list">${STK.map((s, i) => `<button onclick="V9.sticker(${i})">${s}</button>`).join('')}</div>`;
     document.body.appendChild(bar);
   }
-  setInterval(stickerBar, 1500);
+  setInterval(() => { if (!document.hidden && (typeof gr !== 'undefined' && gr.ch || $('v9Stk'))) stickerBar(); }, 2500);
   let stkAt = 0;
   V9.sticker = i => { if (Date.now() - stkAt < 1500) return; stkAt = Date.now(); grSend({ type: 'v9stk', i }); showSticker(STK[i], true); const b = $('v9Stk'); if (b) b.classList.remove('open'); };
   function showSticker(t, mine) {
@@ -503,15 +507,33 @@
       box.insertAdjacentHTML('beforeend', `<div class="pt-3 mt-2 border-t border-amber-900/40"><p class="text-[10px] uppercase tracking-widest text-amber-500 font-bold">Versión 9</p>
         ${sw(s.wand, 'V9.wandMode', 'Duelo con la varita', 'Elige tu respuesta dibujando su forma.')}
         ${coarse ? sw(s.gyroPlay, 'V9.gyroPlay', 'Mover inclinando el celular', 'En Clase de Vuelo, Laberinto, Defensa, Bosque y Lago.') : ''}
-        ${sw(s.taps !== false, 'V9.setTaps', 'Vibración al cambiar de sala', 'Un toque suave al tocar el menú.')}</div>`);
+        ${sw(s.taps !== false, 'V9.setTaps', 'Vibración al cambiar de sala', 'Un toque suave al tocar el menú.')}
+        <div class="flex items-center justify-between gap-3 py-2.5"><span><span class="block text-sm text-stone-200 font-semibold">Cuadros por segundo</span><span class="block text-[11px] text-stone-500">60 es lo recomendado. 90 y 120 se ven más fluidos en pantallas rápidas, pero calientan más.</span></span>
+          <select onchange="V9.setFps(this.value)" class="bg-stone-950 border border-amber-800/50 rounded-lg px-2 py-1 text-xs text-amber-100">${[[60, 'Automático (60)'], [30, 'Ahorro (30)'], [90, '90'], [120, '120']].map(([v, l]) => `<option value="${v}" ${(window.HPperf ? HPperf.pref : 60) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        ${sw((() => { try { return localStorage.getItem('hp-showfps') === '1'; } catch (e) { return false; } })(), 'V9.showFps', 'Mostrar contador de FPS', 'Un número pequeño arriba a la izquierda.')}</div>`);
     };
   }
   V9.setTaps = on => { st().taps = on; save(); };
 
+  /* ---------- 21. Rendimiento: modo en juego, FPS, temperatura ---------- */
+  V9.inGame = () => { const on = !!(typeof activeGame !== 'undefined' && activeGame) || (typeof currentTab !== 'undefined' && currentTab === 'duel'); document.documentElement.classList.toggle('v9-ingame', on); };
+  const HP = window.HPperf;
+  V9.setFps = v => { v = +v || 60; try { localStorage.setItem('hp-fps', v); } catch (e) {} if (HP) HP.pref = v; toast(v === 30 ? 'Modo ahorro: 30 cuadros por segundo.' : v === 60 ? 'Automático: 60 cuadros por segundo (recomendado).' : `${v} cuadros por segundo. Más fluido, pero calienta más el celular.`, '🎞️'); };
+  V9.showFps = on => { try { localStorage.setItem('hp-showfps', on ? '1' : '0'); } catch (e) {} fpsBadge(); };
+  function fpsBadge() {
+    let on = false; try { on = localStorage.getItem('hp-showfps') === '1'; } catch (e) {}
+    let b = $('v9Fps'); if (!on) { if (b) b.remove(); if (HP) HP.onFps = null; return; }
+    if (!b) { b = document.createElement('div'); b.id = 'v9Fps'; document.body.appendChild(b); }
+    if (HP) HP.onFps = f => { const t = HP.target(); b.textContent = `${f} FPS · máx ${t}${HP.hot ? ' · 🌡️' : ''}`; b.className = f >= t * .9 ? '' : f >= t * .7 ? 'mid' : 'low'; };
+  }
+  if (HP) HP.onHot = () => { toast('Tu celular se está calentando: pausé los adornos del fondo. El juego sigue igual.', '🌡️'); if (window.V7 && V7.quality && V7.quality() === 'ultra') { /* se mantiene la calidad del juego */ } };
+  // si el celular se enfría (vuelve a ir fluido varios minutos), regresan los adornos
+  setInterval(() => { if (HP && HP.hot && !document.hidden && HP.fps >= Math.min(HP.target(), 60) * .95) { HP.coolFor = (HP.coolFor || 0) + 1; if (HP.coolFor >= 18) { HP.hot = false; HP.coolFor = 0; document.documentElement.classList.remove('v9-hot'); } } else if (HP) HP.coolFor = 0; }, 10000);
+
   /* ---------- arranque ---------- */
   function boot() {
     if (!low()) candles();
-    shortcut(); restoreTab();
+    shortcut(); restoreTab(); fpsBadge(); V9.inGame();
     if (typeof currentTab !== 'undefined' && currentTab === 'home') homeStrip();
     setTimeout(() => { if (window.V8 && V8.news) V8.news(); }, 6000);
   }

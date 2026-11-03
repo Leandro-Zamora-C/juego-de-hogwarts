@@ -14,13 +14,20 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-9.0-7c3aed)
+![Versión](https://img.shields.io/badge/versión-9.1-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 9 · Gráficos y celular
+## 🆕 Versión 9.1 · Menos calor y progreso seguro
+
+- **Cuadros por segundo** en Ajustes: Automático (60, recomendado), Ahorro (30), 90 o 120. Los juegos que avanzan por cuadro se quedan en 60 para no ir más rápido de la cuenta. Contador de FPS opcional.
+- **Menos calor sin perder calidad**: el cielo, las partículas y el clima se pausan dentro de los juegos; las escenas 3D quietas (ajedrez, Ludo) dejan de redibujarse a toda velocidad; el Gran Salón y el exterior corren a 30 cuadros; en celular se quita el vidrio borroso (que se recalculaba sin parar) y la resolución 3D se ajusta a la pantalla.
+- **Protector de temperatura**: si el celular empieza a ir lento por el calor, pausa los adornos del fondo (nunca el juego) y los devuelve cuando se enfría.
+- **Progreso seguro entre dispositivos**: antes de guardar, revisa si otro celular guardó algo; si es así, junta los dos. Los cromos, hechizos, criaturas y logros ya no se pierden al abrir tu cuenta en otro lado.
+
+## Versión 9 · Gráficos y celular
 
 - **Ícono nuevo** (castillo bajo la luna con una varita), versión adaptable para Android, accesos directos al mantener presionado el ícono (Duelo, Ludo, Abrir rana) e **imagen nueva al compartir el enlace**.
 - **Gráficos 3D más realistas** en los 9 escenarios 3D: brillo de luces y velas, color de película, viñeta, bordes suaves y reflejos en los metales.
@@ -160,7 +167,7 @@ juego-de-hogwarts/
 │   ├── v8-progreso.js       # Misiones, premio diario, tiendas, retos, club
 │   ├── v8-mundo.js          # Mapa del castillo, fantasmas, retratos, cartas, eventos
 │   ├── v8-sistema.js        # 3D, idioma, accesibilidad, narrador, panel de admin
-│   ├── v9-graficos.js       # Calidad Ultra y posprocesado de los juegos 3D
+│   ├── v9-graficos.js       # Calidad Ultra, posprocesado y 3D en reposo
 │   └── v9-app.js            # Ruleta, cofre, QR, stickers, gestos, tarjeta de mago
 ├── supabase-v8.sql          # Tablas nuevas de la versión 8
 ├── tests/                   # Pruebas automáticas

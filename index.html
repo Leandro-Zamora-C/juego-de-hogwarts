@@ -2,6 +2,50 @@
 <html lang="es" class="dark">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ===== Limitador de cuadros y protector de temperatura (Hogwarts 9.1) =====
+   Toda animación pasa por aquí: el juego dibuja como máximo a los FPS elegidos
+   (60 por defecto) aunque la pantalla del celular sea de 90 o 120 Hz. */
+(function () {
+  var raw = window.requestAnimationFrame.bind(window), q = new Map(), id = 0, pending = false, last = 0;
+  var SAFE = ['chess','ludo','q3d','broom','snitch','mixta','snap','retrato','ritmo','laberinto','dcao','caldero','herbologia','adivinacion','escape2','memory','potions','guess','hangman','school','escape','map','quidditch'];
+  var pref = 60; try { pref = +(localStorage.getItem('hp-fps') || 60) || 60; } catch (e) {}
+  var HP = window.HPperf = { pref: pref, frames: 0, fps: 0, hot: false, slowSince: 0 };
+  HP.target = function () {
+    var f = HP.pref, g = (typeof activeGame !== 'undefined' && activeGame) || null;
+    if (f > 60 && g && SAFE.indexOf(g) < 0) f = 60;   // juegos que avanzan por cuadro: siempre a 60
+    return f;
+  };
+  // fondos (cielo, partículas, clima): 30 cuadros, casi quietos dentro de un juego o si el celular se calienta
+  HP.bgFps = function () { var d = document.documentElement.classList; return (d.contains('v9-ingame') || d.contains('v9-hot')) ? 2 : 30; };
+  HP.slow = function (cb, fps) { setTimeout(function () { raw(cb); }, Math.max(0, 1000 / (fps || HP.bgFps()) - 6)); };
+  var mStart = 0, mCount = 0, lastTick = 0;
+  function tick(t) {
+    pending = false;
+    if (t - lastTick > 250) { mStart = t; mCount = 0; HP.slowSince = 0; }   // hubo una pausa sin animaciones: no cuenta
+    lastTick = t;
+    var iv = 1000 / HP.target();
+    if (HP.target() < 200 && t - last < iv - 2.5) { schedule(); return; }
+    last = Math.max(last + iv, t - iv);
+    // medición de FPS reales
+    mCount++; if (!mStart) mStart = t;
+    if (t - mStart >= 1000) {
+      HP.fps = Math.round(mCount * 1000 / (t - mStart)); mCount = 0; mStart = t;
+      // protector: si durante 20 s no llega ni al 75 % de lo pedido, el celular se está calentando
+      var want = Math.min(HP.target(), 60);
+      if (!document.hidden && HP.fps < want * .75) { if (!HP.slowSince) HP.slowSince = t; else if (t - HP.slowSince > 20000 && !HP.hot) { HP.hot = true; document.documentElement.classList.add('v9-hot'); if (HP.onHot) HP.onHot(); } }
+      else HP.slowSince = 0;
+      if (HP.onFps) HP.onFps(HP.fps);
+    }
+    var cbs = q; q = new Map();
+    cbs.forEach(function (cb) { try { cb(t); } catch (e) { setTimeout(function () { throw e; }); } });
+  }
+  function schedule() { if (!pending) { pending = true; raw(tick); } }
+  window.requestAnimationFrame = function (cb) { id++; q.set(id, cb); schedule(); return id; };
+  window.cancelAnimationFrame = function (i) { q.delete(i); };
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { HP.slowSince = 0; mStart = 0; mCount = 0; } });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#12091c">
 <meta name="description" content="Trivia de las 8 películas, duelos en línea, 7 juegos mágicos, Mapa del Merodeador, Ollivanders y tu carta de Hogwarts. Por Leandro Zamora.">
@@ -1577,6 +1621,7 @@ function sizeFx() { fx.width = window.innerWidth; fx.height = window.innerHeight
 function spark(x, y, n = 2, color = S.sparkColor) {
   if (parts.length > 450 || reduceMotion) return;
   for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 2.4, vy: (Math.random() - .5) * 2.4, r: Math.random() * 2.6 + 1, a: 1, c: color, decay: .02 + Math.random() * .02, g: .02 });
+  fxWake();
 }
 function burst(x = window.innerWidth / 2, y = window.innerHeight / 2, color = S.sparkColor, n = 60) {
   if (reduceMotion) return;
@@ -1584,6 +1629,7 @@ function burst(x = window.innerWidth / 2, y = window.innerHeight / 2, color = S.
     const ang = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 6;
     parts.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, r: Math.random() * 3 + 1.5, a: 1, c: color, decay: .014 + Math.random() * .014, g: .05 });
   }
+  fxWake();
 }
 function fxLoop() {
   fxc.clearRect(0, 0, fx.width, fx.height);
@@ -1595,8 +1641,11 @@ function fxLoop() {
     fxc.beginPath(); fxc.arc(p.x, p.y, p.r, 0, Math.PI * 2); fxc.fill();
   }
   fxc.globalAlpha = 1; fxc.shadowBlur = 0;
+  if (!parts.length) { fxIdle = (fxIdle || 0) + 1; if (fxIdle > 2) { fxSleeping = true; return; } } else fxIdle = 0;
   requestAnimationFrame(fxLoop);
 }
+let fxIdle = 0, fxSleeping = false;
+function fxWake() { if (fxSleeping) { fxSleeping = false; fxIdle = 0; requestAnimationFrame(fxLoop); } }
 let lastSpark = 0;
 window.addEventListener('pointermove', e => {
   const now = performance.now();
@@ -3535,7 +3584,7 @@ function skyFrame(t) {
       x.strokeStyle = gr; x.lineWidth = 2; x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x - s.vx * 14, s.y - s.vy * 14); x.stroke();
     }
   }
-  if (sky.on && !reduceMotion) sky.raf = requestAnimationFrame(skyFrame);
+  if (sky.on && !reduceMotion) HPperf.slow(skyFrame);
 }
 function startSky() {
   if (!sky.c) { sky.c = $('skyCanvas'); sky.x = sky.c.getContext('2d'); sizeSky(); window.addEventListener('resize', () => { if (sky.on) { sizeSky(); if (reduceMotion) skyFrame(0); } }); }
@@ -4947,22 +4996,68 @@ save = function () {
   if (cloud.user && !cloud.booting && !cloud.merging) scheduleCloudPush();
 };
 function scheduleCloudPush() { if (cloud.timer) return; cloud.timer = setTimeout(() => { cloud.timer = null; cloudPush(); }, 2500); setCloudStatus('Guardando…'); }
+/* Mezcla dos copias del progreso sin perder nada de lo coleccionado.
+   La copia más reciente manda en lo demás (galeones, ajustes, partida actual). */
+function mergeProgress(newer, older) {
+  const R = JSON.parse(JSON.stringify(newer || {})), O = older || {};
+  const uni = (a, b) => Array.from(new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])].map(x => typeof x === 'object' ? JSON.stringify(x) : x))).map(x => { try { return typeof x === 'string' && /^[\[{]/.test(x) ? JSON.parse(x) : x; } catch (e) { return x; } });
+  const maxObj = (a, b) => { const o = Object.assign({}, a || {}); Object.entries(b || {}).forEach(([k, v]) => { if (typeof v === 'number') o[k] = Math.max(o[k] || 0, v); else if (o[k] == null) o[k] = v; }); return o; };
+  ['ach', 'done', 'spells', 'owned', 'snacks'].forEach(k => { if (R[k] || O[k]) R[k] = uni(R[k], O[k]); });
+  ['xp', 'points', 'dailyStreak'].forEach(k => { R[k] = Math.max(R[k] || 0, O[k] || 0); });
+  R.best = maxObj(R.best, O.best); R.stats = maxObj(R.stats, O.stats);
+  if (R.games || O.games) { R.games = maxObj(R.games, O.games); R.games.potions = uni((R.games || {}).potions, (O.games || {}).potions); }
+  if (R.v8 || O.v8) {
+    const a = R.v8 = R.v8 || {}, b = O.v8 || {};
+    a.cards = maxObj(a.cards, b.cards);
+    ['owned', 'spells', 'beasts'].forEach(k => { if (a[k] || b[k]) a[k] = uni(a[k], b[k]); });
+    a.medals = maxObj(a.medals, b.medals);
+    if (a.riddle || b.riddle) a.riddle = Object.assign({}, b.riddle, a.riddle, { read: uni((a.riddle || {}).read, (b.riddle || {}).read) });
+    a.records = maxObj(a.records, b.records);
+  }
+  if (R.v9 || O.v9) { const a = R.v9 = R.v9 || {}, b = O.v9 || {}; a.rivals = Object.assign({}, b.rivals, a.rivals); }
+  return R;
+}
+cloud.syncedAt = 0;
 async function cloudPush() {
   if (!cloud.user || !sb) return;
   clearTimeout(cloud.timer); cloud.timer = null;
+  if (cloud.pushing) { scheduleCloudPush(); return; }
+  cloud.pushing = true;
   S._owner = cloud.user.id;
   try {
-    const { error } = await sb.from('progreso').upsert({ user_id: cloud.user.id, datos: S, xp: S.xp || 0, casa: S.house || null, updated_at: new Date().toISOString() });
+    // ¿Otro dispositivo guardó algo después de nuestra última sincronización? Entonces se mezcla antes de subir.
+    const head = await sb.from('progreso').select('updated_at').eq('user_id', cloud.user.id).maybeSingle();
+    const rt = head.data ? Date.parse(head.data.updated_at) || 0 : 0;
+    if (rt && rt > (S._syncedAt || 0) + 1000) {
+      const full = await sb.from('progreso').select('datos, updated_at').eq('user_id', cloud.user.id).maybeSingle();
+      if (full.data && full.data.datos) {
+        const remote = full.data.datos, localNewer = (S._savedAt || 0) > rt;
+        const merged = localNewer ? mergeProgress(S, remote) : mergeProgress(remote, S);
+        cloud.merging = true; S = Object.assign(DEFAULT_STATE(), merged); ensureExtraState(); S._owner = cloud.user.id; _origSaveLocal(); cloud.merging = false;
+        try { renderAll(); updateWallet(); } catch (e) {}
+      }
+    }
+    const now = new Date().toISOString(); S._syncedAt = Date.parse(now); _origSaveLocal();
+    const { error } = await sb.from('progreso').upsert({ user_id: cloud.user.id, datos: S, xp: S.xp || 0, casa: S.house || null, updated_at: now });
     if (error) throw error;
+    cloud.pushing = false;
     cloud.lastSync = Date.now(); setCloudStatus('Guardado en la nube ✓');
-  } catch (e) { setCloudStatus('No se pudo guardar en la nube. Se reintentará.'); cloud.timer = setTimeout(() => { cloud.timer = null; cloudPush(); }, 15000); }
+  } catch (e) { cloud.pushing = false; cloud.merging = false; setCloudStatus('No se pudo guardar en la nube. Se reintentará.'); cloud.timer = setTimeout(() => { cloud.timer = null; cloudPush(); }, 15000); }
 }
+/* Al volver a la app (desde otra app u otro dispositivo) se traen los cambios de la cuenta;
+   al salir se guarda lo pendiente de inmediato */
+document.addEventListener('visibilitychange', () => {
+  if (!cloud.user || cloud.booting) return;
+  if (document.hidden) { if (cloud.timer) cloudPush(); }
+  else if (Date.now() - (cloud.lastCheck || 0) > 20000) { cloud.lastCheck = Date.now(); cloudPush(); }
+});
 function setCloudStatus(t) { cloud.status = t; const el = $('cloudStatus'); if (el) el.textContent = t; }
 
 /* Usar los datos de la cuenta en este dispositivo */
-function adoptRemote(remote) {
+function adoptRemote(remote, remoteTime) {
   cloud.merging = true;
   S = Object.assign(DEFAULT_STATE(), remote);
+  if (remoteTime) S._syncedAt = remoteTime;
   S.stats = Object.assign(DEFAULT_STATE().stats, remote.stats || {});
   ensureExtraState();
   S._owner = cloud.user.id;
@@ -4991,8 +5086,13 @@ async function onSignedIn(user) {
       toast('¡Listo! Tu progreso se guardará en tu cuenta.', '☁️');
     } else if (!hasProgress(S) || S._owner === user.id) {
       // Este dispositivo no tiene progreso, o ya era de esta cuenta: gana el más reciente
-      const remoteTime = Date.parse(data.updated_at) || 0;
-      if (!hasProgress(S) || remoteTime >= (S._savedAt || 0)) { adoptRemote(remote); toast(`¡Bienvenido/a de vuelta${remote.student ? ', ' + esc(remote.student) : ''}!`, '☁️'); }
+      const remoteTime = Date.parse(data.updated_at) || 0, synced = S._syncedAt || 0, localDirty = (S._savedAt || 0) > synced;
+      if (!hasProgress(S) || (remoteTime > synced && !localDirty)) { adoptRemote(remote, remoteTime); toast(`¡Bienvenido/a de vuelta${remote.student ? ', ' + esc(remote.student) : ''}!`, '☁️'); }
+      else if (remoteTime > synced) {
+        // los dos dispositivos cambiaron: se juntan (nada coleccionado se pierde)
+        const merged = remoteTime >= (S._savedAt || 0) ? mergeProgress(remote, S) : mergeProgress(S, remote);
+        adoptRemote(merged, remoteTime); await cloudPush(); toast('Juntamos tu progreso de este celular con el de tu cuenta.', '☁️');
+      }
       else await cloudPush();
       cloud.lastSync = Date.now(); setCloudStatus('Sincronizado ✓');
     } else {
@@ -5004,7 +5104,7 @@ async function onSignedIn(user) {
           <div class="bg-stone-950 rounded-xl p-3 border border-amber-700/50"><p class="font-bold text-amber-300 mb-1">📱 Este dispositivo</p>${esc(S.house || 'Sin casa')}<br>${S.xp || 0} XP · ${S.points || 0} pts</div></div>
           <p class="text-[11px] text-stone-400 mt-2">El que no elijas se reemplazará.</p>`,
         actions: [
-          { label: `Usar el de mi cuenta (${remote.xp || 0} XP)`, primary: true, onClick: () => { adoptRemote(remote); setCloudStatus('Sincronizado ✓'); } },
+          { label: `Usar el de mi cuenta (${remote.xp || 0} XP)`, primary: true, onClick: () => { adoptRemote(remote, Date.parse(data.updated_at) || 0); setCloudStatus('Sincronizado ✓'); } },
           { label: `Usar el de este dispositivo (${S.xp || 0} XP)`, onClick: () => { S._owner = user.id; _origSaveLocal(); cloudPush(); } }
         ]
       });

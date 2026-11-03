@@ -91,12 +91,28 @@ gl_FragColor=vec4(g,1.);}`;
   const _create = M3.create;
   M3.create = function (canvas, o) {
     o = Object.assign({}, o || {}); const q = Q();
-    if (q === 'ultra') o.maxDpr = 3; else if (q === 'high') o.maxDpr = Math.max(o.maxDpr || 2, 2);
+    const coarse = matchMedia('(pointer: coarse)').matches;
+    // en celular, 2.25x ya es tan nítido como la pantalla y gasta ~40 % menos que 3x
+    if (q === 'ultra') o.maxDpr = coarse ? 2.25 : 3; else if (q === 'high') o.maxDpr = Math.max(o.maxDpr || 2, 2);
     const S3 = _create.call(this, canvas, o); if (!S3) return S3;
     if (q !== 'low') attach(S3);
     const _mat = S3.mat; S3.mat = o => { const m = _mat(o); if (m.env == null && !m.unlit && m.spec >= 1) m.env = q === 'low' ? 0 : .38; return m; };
     const _ss = S3.setShadow;
     S3.setShadow = (sz, c, e) => { if (sz) { const max = S3.gl.getParameter(S3.gl.MAX_TEXTURE_SIZE) || 2048; sz = Math.min(max, q === 'ultra' ? sz * 2 : q === 'high' ? Math.max(sz, 2048) : sz); } return _ss(sz, c, e); };
+    // escena quieta = no se redibuja a toda velocidad (solo titilan las velas, a ~20 cuadros)
+    const _render = S3.render; let sig = '', stillSince = performance.now(), lastDraw = 0;
+    const r3 = v => Math.round(v * 500);
+    const signature = () => {
+      const c = S3.cam, out = [S3.w, S3.h, r3(c.pos[0]), r3(c.pos[1]), r3(c.pos[2]), r3(c.target[0]), r3(c.target[1]), r3(c.target[2])];
+      const walk = list => list.forEach(n => { if (n.mesh && n.cast !== false) out.push(n.visible ? 1 : 0, r3(n.pos[0]), r3(n.pos[1]), r3(n.pos[2]), r3(n.rot[0]), r3(n.rot[1]), r3(n.rot[2])); if (n.children.length) walk(n.children); });
+      walk(S3.nodes); return out.join(',');
+    };
+    S3.render = pts => {
+      const now = performance.now(), sg = signature();
+      if (sg !== sig) { sig = sg; stillSince = now; if (S3.shadow && !S3.shadow.always) S3.shadow.dirty = true; }
+      if (S3.idle !== false && now - stillSince > 1500 && now - lastDraw < 48) return;
+      lastDraw = now; return _render(pts);
+    };
     return S3;
   };
   window.V9G = { attach };
