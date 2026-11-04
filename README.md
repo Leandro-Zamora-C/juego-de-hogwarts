@@ -14,13 +14,33 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-9.2-7c3aed)
+![Versión](https://img.shields.io/badge/versión-9.4-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 9.2 · FPS forzados y ajedrez corregido
+## 🆕 Versión 9.4 · Toda la página más fluida
+
+- Mientras desplazas, la decoración (cielo, clima, Gran Salón, exterior) espera un instante y el celular dedica todo al desplazamiento.
+- El cielo dibuja una sola vez las estrellas quietas y solo anima las que titilan.
+- Sin velas duplicadas ni capa de tinte a pantalla completa; la textura de las tarjetas es una imagen liviana (antes un filtro SVG muy costoso al pintar).
+- Las pestañas aparecen al instante (la tarjeta de mago se dibuja justo después), los toques responden sin espera y las ventanas no arrastran la página de atrás.
+- En celular, el Gran Salón y el exterior de la portada no usan posprocesado; los juegos 3D sí.
+
+## Versión 9.3 · Patronus, Ministerio y más realismo
+
+- **Patronus**: 45 patronus (comunes 1.000, raros 2.500, épicos 5.000 y legendarios 10.000 galeones; míticos que solo se ganan con logros y de evento por fecha). Test gratis para el primero, ceremonia «Expecto Patronum», patronus 3D de partículas que se gira con el dedo, niveles por uso, álbum con siluetas, escudo de patronus en el duelo y tu patronus acompañándote en la portada.
+- **Duelo de Patronus** (juego nuevo) e **invasión de dementores** los fines de semana.
+- **Ministerio de Magia**: cambio de nombre (cada cambio cuesta el doble), ofertas del día y ruleta premium.
+- **Madame Malkin**: marcos animados, ropero de túnicas y mascota en tu avatar. **Firma mágica** en la tarjeta y **vitrina de trofeos**.
+- **Modo historia**: tus 7 años en Hogwarts con tareas y premios. Misiones con más premios, cofre semanal legendario y Gringotts con plazos de 14 y 30 días.
+- **Juegos**: Snap Explosivo corregido (margen justo y 4 niveles de IA), IA del ajedrez en segundo plano con nivel «Dumbledore», Ludo con nivel «Gran Mago», botón 🚩 para reportar problemas y registro automático de errores en el panel de administrador.
+- **Fluidez**: sin Tailwind en línea, todo a 60 FPS (o al forzado), listas que solo dibujan lo que se ve y archivos con versión para que la actualización llegue completa.
+- **Realismo**: relieve en madera y piedra, sombras más suaves, sombra de contacto bajo cada pieza, tableros lacados.
+- **Nube**: los ajustes del dispositivo se guardan en tu cuenta, las compras se suben al instante y la base de datos frena trampas de galeones o experiencia (`supabase-v9.sql`).
+
+## Versión 9.2 · FPS forzados y ajedrez corregido
 
 - **Forzado a 90 o 120 FPS**: todo el juego (menús, cielo, castillo, escenas 3D y juegos) corre a los cuadros elegidos. El contador muestra los Hz reales de la pantalla y, si el celular la tiene más baja, explica cómo subirla en sus ajustes.
 - **Lago Negro, Gobstones y Clase de Vuelo** usan un reloj fijo: van a la misma velocidad a 60, 90 o 120 FPS.
@@ -175,8 +195,12 @@ juego-de-hogwarts/
 │   ├── v8-mundo.js          # Mapa del castillo, fantasmas, retratos, cartas, eventos
 │   ├── v8-sistema.js        # 3D, idioma, accesibilidad, narrador, panel de admin
 │   ├── v9-graficos.js       # Calidad Ultra, posprocesado y 3D en reposo
-│   └── v9-app.js            # Ruleta, cofre, QR, stickers, gestos, tarjeta de mago
+│   ├── v9-app.js            # Ruleta, cofre, QR, stickers, gestos, tarjeta de mago
+│   ├── v9-juego.js          # IA del ajedrez en segundo plano, reportes y errores
+│   ├── v9-patronus.js       # Patronus, Duelo de Patronus y dementores
+│   └── v9-extras.js         # Ministerio, ropero, marcos, historia, perfil y nube
 ├── supabase-v8.sql          # Tablas nuevas de la versión 8
+├── supabase-v9.sql          # Errores, reportes, anti-trampas y perfil extendido
 ├── tests/                   # Pruebas automáticas
 ├── .github/workflows/       # Hace que GitHub ejecute las pruebas
 │

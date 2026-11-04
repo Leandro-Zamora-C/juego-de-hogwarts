@@ -110,10 +110,19 @@ gl_FragColor=vec4(g,1.);}`;
     S3.render = pts => {
       const now = performance.now(), sg = signature();
       if (sg !== sig) { sig = sg; stillSince = now; if (S3.shadow && !S3.shadow.always) S3.shadow.dirty = true; }
-      if (S3.idle !== false && !(window.HPperf && HPperf.forced()) && now - stillSince > 1500 && now - lastDraw < 48) return;
+      if (S3.idle === true && now - stillSince > 1500 && now - lastDraw < 48) return;
       lastDraw = now; return _render(pts);
     };
     return S3;
+  };
+  // sombra de contacto: un halo oscuro y suave justo debajo de cada pieza (por escena, se crea una sola vez)
+  window.M3ao = R => {
+    if (R._ao) return R._ao;
+    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), g = x.createRadialGradient(32, 32, 2, 32, 32, 32);
+    g.addColorStop(0, 'rgba(0,0,0,.75)'); g.addColorStop(.45, 'rgba(0,0,0,.4)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+    const plane = M3.G.plane(1, 1, 1, 1);
+    R._ao = { mesh: R.mesh(plane), mat: R.mat({ tex: R.texture(c), color: [0, 0, 0], unlit: true, op: .999, fog: false, shadow: false, dw: false }) };
+    return R._ao;
   };
   window.V9G = { attach };
 })();

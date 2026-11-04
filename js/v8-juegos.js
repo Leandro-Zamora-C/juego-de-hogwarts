@@ -188,32 +188,34 @@
   const SNAP_SYM = ['⚡', '🦉', '🧹', '🐍', '🦁', '🦅', '🦡', '🔮', '🪄', '🏰'];
   def('snap', {
     howto: ['Las cartas caen de a una en la pila.', 'Cuando salen dos iguales seguidas, toca ¡SNAP! antes que tu rival.', 'Si tocas cuando no son iguales, pierdes un punto. Gana quien llegue a 7.'],
-    intro() { body().innerHTML = wrap(`<div class="glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-6xl">💥</div><p class="text-sm text-stone-300">Toca ¡SNAP! cuando salgan dos cartas iguales seguidas. ¡Cuidado, las cartas explotan!</p><div class="flex gap-2 justify-center flex-wrap"><button class="btn-gold" onclick="V8G.snap('ia')">🤖 Contra la IA</button><button class="btn-ghost" onclick="V8G.snap('2p')">👥 Dos en este celular</button><button class="btn-ghost" onclick="V8G.online('snap')">🌐 Contra un amigo en línea</button></div></div>`); ON.active = false; },
+    intro() { body().innerHTML = wrap(`<div class="glass-card rounded-3xl p-6 text-center space-y-3"><div class="text-6xl">💥</div><p class="text-sm text-stone-300">Toca ¡SNAP! cuando salgan dos cartas iguales seguidas. ¡Cuidado, las cartas explotan!</p><div class="flex gap-2 justify-center flex-wrap"><div class="flex gap-1 justify-center w-full flex-wrap text-[11px]">${[[1, 'Fácil'], [2, 'Normal'], [3, 'Difícil'], [4, 'Gran Mago']].map(([v, l]) => `<button class="v8-chip ${(V8.st().snapLvl || 2) === v ? 'on' : ''}" onclick="V8.st().snapLvl=${v};save();GAMES_IMPL.snap.intro()">${l}</button>`).join('')}</div><button class="btn-gold" onclick="V8G.snap('ia')">🤖 Contra la IA</button><button class="btn-ghost" onclick="V8G.snap('2p')">👥 Dos en este celular</button><button class="btn-ghost" onclick="V8G.online('snap')">🌐 Contra un amigo en línea</button></div></div>`); ON.active = false; },
     play() { GAMES_IMPL.snap.start(GAMES_IMPL.snap.mode || 'ia'); },
     start(mode) {
       begin('snap'); GAMES_IMPL.snap.mode = mode;
       const sc = [0, 0], names = mode === 'ia' ? ['Tú', 'IA 🤖'] : ['Jugador 1', 'Jugador 2'];
-      let prev = null, cur = null, open = false, speed = 1300, aiT = 0; const rr = V8.rng(Math.floor(Math.random() * 2 ** 31));
+      let prev = null, cur = null, open = false, speed = 1300, aiT = 0, closedAt = 0; const rr = V8.rng(Math.floor(Math.random() * 2 ** 31));
+      const lvl = V8.st().snapLvl || 2, AI = { 1: [900, 900], 2: [520, 700], 3: [360, 420], 4: [240, 260] }[lvl]; // reacción de la IA: base + azar (ms)
       body().innerHTML = wrap(`<div class="v8-snap">${mode === '2p' ? `<button class="snapbtn p2" id="snB">💥 SNAP<br><small>${names[1]}</small></button>` : ''}
         <div class="score"><span>${names[0]} <b id="sn0">0</b></span><span>${names[1]} <b id="sn1">0</b></span></div>
         <div class="pile"><div class="card prev" id="snP"></div><div class="card cur" id="snC">🂠</div></div><p id="snMsg" class="text-center text-sm text-stone-300 h-5"></p>
         <button class="snapbtn" id="snA">💥 ¡SNAP!${mode === '2p' ? `<br><small>${names[0]}</small>` : ''}</button></div>`);
       const msg = t => set('snMsg', t);
-      const point = (who, good) => { if (!RUN) return; sc[who] = Math.max(0, sc[who] + (good ? 1 : -1)); set('sn0', sc[0]); set('sn1', sc[1]); if (good) { open = false; clearTimeout(aiT); const c = $('snC'); c.classList.add('boom'); sfx('zap'); burst(innerWidth / 2, innerHeight / 2, '#f97316', 40); msg(`¡${names[who]} gana la jugada!`); prev = null; }
-        else { sfx('wrong'); msg(`${names[who]} se equivocó: −1`); }
-        if (sc[who] >= 7) { const youWin = mode === '2p' || who === 0; later(() => end('snap', { icon: youWin ? '🏆' : '💥', title: mode === '2p' ? `¡Ganó ${names[who]}!` : youWin ? '¡Ganaste al Snap!' : 'La IA ganó', lines: [`${sc[0]} a ${sc[1]}`], points: youWin && mode === 'ia' ? 40 : mode === '2p' ? 15 : 5 }), 700); RUN.over = true; }
+      const point = (who, good) => { if (!RUN) return; sc[who] = Math.max(0, sc[who] + (good ? 1 : -1)); set('sn0', sc[0]); set('sn1', sc[1]); if (good) { open = false; clearTimeout(aiT); const c = $('snC'); c.classList.add('boom'); sfx('zap'); burst(innerWidth / 2, innerHeight / 2, '#f97316', 40); msg(who === 0 && mode === 'ia' ? '¡Ganaste la jugada!' : `¡${names[who]} gana la jugada!`); prev = null; }
+        else { sfx('wrong'); msg(who === 0 && mode === 'ia' ? 'Te equivocaste: −1' : `${names[who]} se equivocó: −1`); }
+        if (sc[who] >= 7) { const youWin = mode === '2p' || who === 0; later(() => end('snap', { icon: youWin ? '🏆' : '💥', title: mode === '2p' ? `¡Ganó ${names[who]}!` : youWin ? '¡Ganaste al Snap!' : 'La IA ganó', lines: [`${sc[0]} a ${sc[1]}`], points: youWin && mode === 'ia' ? [0, 20, 40, 70, 120][lvl] : mode === '2p' ? 15 : 5, record: youWin && mode === 'ia' ? lvl : null }), 700); RUN.over = true; }
       };
-      const snap = who => { if (!RUN || RUN.over) return; if (open) point(who, true); else point(who, false); };
+      // margen justo: si tocas hasta 0,35 s después de que el par se fue, igual cuenta
+      const snap = who => { if (!RUN || RUN.over) return; if (open) point(who, true); else if (closedAt && performance.now() - closedAt < 350 && closedAt !== -1) { closedAt = -1; point(who, true); } else point(who, false); };
       $('snA').onclick = () => snap(0); if ($('snB')) $('snB').onclick = () => snap(1);
       const kd = e => { if (e.key === ' ' || e.key === 'a' || e.key === 'A') snap(0); if (mode === '2p' && (e.key === 'l' || e.key === 'L')) snap(1); }; addEventListener('keydown', kd); RUN.off = () => removeEventListener('keydown', kd);
       const deal = () => {
         if (!RUN || RUN.over) return;
-        open = false; clearTimeout(aiT);
+        closedAt = open ? performance.now() : 0; open = false; clearTimeout(aiT);
         const c = $('snC'); if (!c) return; c.classList.remove('boom');
         prev = cur; cur = rr() < .3 && prev ? prev : V8.pick(SNAP_SYM, rr);
         $('snP').textContent = prev || ''; c.textContent = cur; c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip'); sfx('tick');
-        if (prev && prev === cur) { open = true; if (mode === 'ia') aiT = later(() => snap(1), 420 + Math.random() * 700 + Math.max(0, 7 - sc[1]) * 40); }
-        speed = Math.max(700, 1300 - (sc[0] + sc[1]) * 40);
+        if (prev && prev === cur) { open = true; if (mode === 'ia') aiT = later(() => { if (open) snap(1); }, AI[0] + Math.random() * AI[1]); }
+        speed = Math.max(lvl >= 3 ? 650 : 800, 1300 - (sc[0] + sc[1]) * 35);
         later(deal, speed);
       };
       later(deal, 900);

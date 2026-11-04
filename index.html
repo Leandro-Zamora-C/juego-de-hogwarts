@@ -19,9 +19,13 @@
   // fondos (cielo, partículas, clima): 30 cuadros, casi quietos dentro de un juego o si el celular se calienta
   // 90 o 120 = modo forzado: todo (menús, cielo, castillo, 3D quieto y juegos) corre a esos cuadros
   HP.forced = function () { return HP.pref >= 90; };
-  HP.bgFps = function () { var d = document.documentElement.classList; if (d.contains('v9-hot')) return 2; if (HP.forced()) return HP.pref; return d.contains('v9-ingame') ? 2 : 30; };
-  HP.deco = function () { return HP.forced() ? HP.pref : (HP.pref <= 30 ? 20 : 30); };
-  HP.slow = function (cb, fps) { fps = fps || HP.bgFps(); if (fps >= 60) { window.requestAnimationFrame(cb); return; } setTimeout(function () { raw(cb); }, Math.max(0, 1000 / fps - 6)); };
+  HP.bgFps = function () { var d = document.documentElement.classList; if (d.contains('v9-hot')) return 10; return d.contains('v9-ingame') ? 30 : HP.pref; };
+  HP.deco = function () { return document.documentElement.classList.contains('v9-hot') ? 30 : HP.pref; };
+  HP.scrollUntil = 0;
+  HP.scrolling = function () { return performance.now() < HP.scrollUntil; };
+  var mark = function () { HP.scrollUntil = performance.now() + 220; };
+  addEventListener('scroll', mark, { passive: true, capture: true }); addEventListener('touchmove', mark, { passive: true }); addEventListener('wheel', mark, { passive: true });
+  HP.slow = function (cb, fps) { if (HP.scrolling()) { setTimeout(function () { HP.slow(cb, fps); }, 90); return; } fps = fps || HP.bgFps(); if (fps >= 60) { window.requestAnimationFrame(cb); return; } setTimeout(function () { raw(cb); }, Math.max(0, 1000 / fps - 6)); };
   // frecuencia real de la pantalla (Hz): el navegador no puede subirla, la decide el celular
   HP.hz = 0; var hzD = [], prevRaw = 0;
   HP.probe = function (done) { var ts = []; function f(t) { ts.push(t); if (ts.length < 40) raw(f); else { var d = []; for (var i = 1; i < ts.length; i++) d.push(ts[i] - ts[i - 1]); d.sort(function (a, b) { return a - b; }); HP.hz = Math.round(1000 / d[Math.floor(d.length * .1)]); if (done) done(); } } raw(f); };
@@ -82,17 +86,14 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://juego-de-hogwarts.vercel.app/img/app/compartir.jpg">
 <!-- Estilos ya preparados (carga rápida). Tailwind se completa después de abrir la página. -->
-<link rel="stylesheet" href="css/tailwind.css">
+<link rel="stylesheet" href="css/tailwind.css?v=9.4">
 <script>
+window.HP_BUILD = '9.4';
 window.HP_TW = { darkMode: 'class', theme: { extend: {
   fontFamily: { serif: ['Cinzel','Georgia','serif'], hand: ['Caveat','cursive'], sans: ['Montserrat','sans-serif'] },
   colors: { amber: { 50: 'rgb(var(--amber-50) / <alpha-value>)', 100: 'rgb(var(--amber-100) / <alpha-value>)', 200: 'rgb(var(--amber-200) / <alpha-value>)', 300: 'rgb(var(--amber-300) / <alpha-value>)', 400: 'rgb(var(--amber-400) / <alpha-value>)', 500: 'rgb(var(--amber-500) / <alpha-value>)', 600: 'rgb(var(--amber-600) / <alpha-value>)', 700: 'rgb(var(--amber-700) / <alpha-value>)', 800: 'rgb(var(--amber-800) / <alpha-value>)', 900: 'rgb(var(--amber-900) / <alpha-value>)', 950: 'rgb(var(--amber-950) / <alpha-value>)' } }
 } } };
-addEventListener('load', () => setTimeout(() => {
-  const s = document.createElement('script'); s.src = 'https://cdn.tailwindcss.com';
-  s.onload = () => { try { tailwind.config = window.HP_TW; } catch (e) {} };
-  document.head.appendChild(s);
-}, 1200));
+/* Los estilos ya vienen preparados en css/tailwind.css: no se carga Tailwind en línea (daba tirones). */
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -503,18 +504,21 @@ addEventListener('load', () => setTimeout(() => {
   .ch-caps svg { width: 16px; height: 16px; filter: none; }
   .online-badge { position: absolute; top: .5rem; left: .5rem; font-size: 9px; font-weight: 700; background: rgba(14,116,144,.9); color: #e0f2fe; padding: .1rem .5rem; border-radius: 999px; }
 </style>
-<link rel="stylesheet" href="css/v7.css">
-<script defer src="js/v7-duelo.js"></script>
-<script defer src="js/v7-magia.js"></script>
-<link rel="stylesheet" href="css/v8.css">
-<link rel="stylesheet" href="css/v9.css">
-<script defer src="js/v8-nucleo.js"></script>
-<script defer src="js/v8-coleccion.js"></script>
-<script defer src="js/v8-progreso.js"></script>
-<script defer src="js/v8-mundo.js"></script>
-<script defer src="js/v8-sistema.js"></script>
-<script defer src="js/v9-graficos.js"></script>
-<script defer src="js/v9-app.js"></script>
+<link rel="stylesheet" href="css/v7.css?v=9.4">
+<script defer src="js/v7-duelo.js?v=9.4"></script>
+<script defer src="js/v7-magia.js?v=9.4"></script>
+<link rel="stylesheet" href="css/v8.css?v=9.4">
+<link rel="stylesheet" href="css/v9.css?v=9.4">
+<script defer src="js/v8-nucleo.js?v=9.4"></script>
+<script defer src="js/v8-coleccion.js?v=9.4"></script>
+<script defer src="js/v8-progreso.js?v=9.4"></script>
+<script defer src="js/v8-mundo.js?v=9.4"></script>
+<script defer src="js/v8-sistema.js?v=9.4"></script>
+<script defer src="js/v9-graficos.js?v=9.4"></script>
+<script defer src="js/v9-app.js?v=9.4"></script>
+<script defer src="js/v9-juego.js?v=9.4"></script>
+<script defer src="js/v9-patronus.js?v=9.4"></script>
+<script defer src="js/v9-extras.js?v=9.4"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -3557,7 +3561,7 @@ function sizeSky() {
   c.width = sky.w * dpr; c.height = sky.h * dpr;
   sky.x.setTransform(dpr, 0, 0, dpr, 0, 0);
   const n = Math.min(220, Math.round(sky.w * sky.h / 6500));
-  sky.stars = Array.from({ length: n }, () => ({ x: Math.random() * sky.w, y: Math.random() * sky.h, r: Math.random() * 1.3 + .3, p: Math.random() * Math.PI * 2, s: .6 + Math.random() * 1.8 }));
+  sky.base = null; sky.stars = Array.from({ length: n }, () => ({ x: Math.random() * sky.w, y: Math.random() * sky.h, r: Math.random() * 1.3 + .3, p: Math.random() * Math.PI * 2, s: .6 + Math.random() * 1.8 }));
 }
 function drawMoon(x, t) {
   const mx = sky.w * .86, my = Math.max(110, sky.h * .2), r = Math.max(26, Math.min(56, Math.min(sky.w, sky.h) * .05));
@@ -3570,11 +3574,22 @@ function drawMoon(x, t) {
   x.fillStyle = 'rgba(150,140,110,.35)';
   [[-.3, -.15, .18], [.25, .2, .22], [.1, -.4, .1], [-.2, .35, .12]].forEach(([dx, dy, rr]) => { x.beginPath(); x.arc(mx + dx * r, my + dy * r, rr * r, 0, Math.PI * 2); x.fill(); });
 }
+function skyBase() {
+  // capa de estrellas quietas, dibujada una sola vez (antes se redibujaban todas en cada cuadro)
+  const c = sky.base || (sky.base = document.createElement('canvas')), d = sky.c.width / sky.w;
+  c.width = sky.c.width; c.height = sky.c.height; const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); x.fillStyle = '#fff6dc';
+  sky.stars.forEach((s, i) => { s.tw = i % 4 === 0; if (s.tw) return; x.globalAlpha = .45 + .4 * Math.abs(Math.sin(s.p)); x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill(); });
+  sky.baseW = sky.w; sky.baseH = sky.h;
+}
 function skyFrame(t) {
   const x = sky.x; x.clearRect(0, 0, sky.w, sky.h);
+  if (!sky.base || sky.baseW !== sky.w || sky.baseH !== sky.h) skyBase();
+  x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(sky.base, 0, 0); x.restore();
+  x.fillStyle = '#fff6dc';
   for (const s of sky.stars) {
+    if (!s.tw) continue;
     const a = reduceMotion ? .7 : .45 + .55 * Math.abs(Math.sin(s.p + t / 1000 * s.s));
-    x.globalAlpha = a; x.fillStyle = '#fff6dc'; x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill();
+    x.globalAlpha = a; x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill();
   }
   x.globalAlpha = 1;
   drawMoon(x, t);
@@ -3790,7 +3805,7 @@ function equipItem(cat, id) {
    TARJETA DE MAGO (imagen PNG)
 =================================================================== */
 const PATRONI = [['Ciervo', '🦌'], ['Nutria', '🦦'], ['Liebre', '🐇'], ['Lobo', '🐺'], ['Gato', '🐈'], ['Fénix', '🔥'], ['Caballo', '🐎'], ['Zorro', '🦊'], ['Cisne', '🦢'], ['Búho', '🦉'], ['Delfín', '🐬'], ['Halcón', '🦅'], ['Oso', '🐻'], ['Jaguar', '🐆'], ['Colibrí', '🐦'], ['Cóndor', '🪶']];
-const patronusFor = name => PATRONI[hash('patronus-' + (name || 'mago').toLowerCase()) % PATRONI.length];
+let patronusFor = name => PATRONI[hash('patronus-' + (name || 'mago').toLowerCase()) % PATRONI.length];
 function wrapText(x, text, maxW) {
   const words = String(text).split(' '); const lines = []; let line = '';
   words.forEach(w => { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
@@ -5532,7 +5547,8 @@ const profileLink = code => `${siteUrl().replace(/\/?$/, '/')}?perfil=${code}`;
 async function fetchProfiles(codes) {
   if (!codes.length || !supaReady()) return [];
   const c = await loadSupabase();
-  const { data, error } = await c.from('perfiles').select('codigo,nombre,casa,xp,puntos,rango,titulo,avatar,logros,varita,patronus,updated_at').in('codigo', codes);
+  let { data, error } = await c.from('perfiles').select('codigo,nombre,casa,xp,puntos,rango,titulo,avatar,logros,varita,patronus,updated_at,extra').in('codigo', codes);
+  if (error) ({ data, error } = await c.from('perfiles').select('codigo,nombre,casa,xp,puntos,rango,titulo,avatar,logros,varita,patronus,updated_at').in('codigo', codes));
   if (error) throw error; return data || [];
 }
 function profileCardHtml(p) {
@@ -6302,7 +6318,7 @@ function chessInit() {
   Object.assign(CH, { turn: 'w', sel: null, moves: [], castle: { K: true, Q: true, k: true, q: true }, ep: null, over: false, last: null, thinking: false });
   $('gameBody').innerHTML = `<div class="max-w-xl mx-auto space-y-3">
     <div class="flex flex-wrap justify-between items-center gap-2"><p id="chStatus" class="text-sm font-bold text-amber-200">Tu turno (blancas)</p>
-      <label class="text-xs text-stone-300">IA: <select onchange="CH.level=+this.value" class="bg-stone-900 border border-amber-800/50 rounded-lg p-1 text-amber-200 text-xs"><option value="1" ${CH.level === 1 ? 'selected' : ''}>Primer año</option><option value="2" ${CH.level === 2 ? 'selected' : ''}>Prefecto</option><option value="3" ${CH.level === 3 ? 'selected' : ''}>Gran Mago</option></select></label>
+      <label class="text-xs text-stone-300">IA: <select onchange="CH.level=+this.value" class="bg-stone-900 border border-amber-800/50 rounded-lg p-1 text-amber-200 text-xs"><option value="1" ${CH.level === 1 ? 'selected' : ''}>Primer año</option><option value="2" ${CH.level === 2 ? 'selected' : ''}>Prefecto</option><option value="3" ${CH.level === 3 ? 'selected' : ''}>Gran Mago</option><option value=\"4\" ${CH.level === 4 ? 'selected' : ''}>Dumbledore</option></select></label>
       <button onclick="chessInit()" class="btn-ghost !py-1.5 !text-[11px]"><i class="fa-solid fa-rotate"></i> Nueva partida</button></div>
     <div id="chBoard" class="chess-board"></div></div>`;
   chessRender();
@@ -6831,7 +6847,7 @@ function chessReset() {
   Object.assign(CH, { turn: 'w', sel: null, moves: [], castle: { K: true, Q: true, k: true, q: true }, ep: null, over: false, last: null, thinking: false, hist: [], anim: null });
 }
 function chessShell(online) {
-  const lvl = !online ? `<label class="text-xs text-stone-300">IA: <select onchange="CH.level=+this.value" class="bg-stone-900 border border-amber-800/50 rounded-lg p-1 text-amber-200 text-xs"><option value="1" ${CH.level === 1 ? 'selected' : ''}>Primer año</option><option value="2" ${CH.level === 2 ? 'selected' : ''}>Prefecto</option><option value="3" ${CH.level === 3 ? 'selected' : ''}>Gran Mago</option></select></label>
+  const lvl = !online ? `<label class="text-xs text-stone-300">IA: <select onchange="CH.level=+this.value" class="bg-stone-900 border border-amber-800/50 rounded-lg p-1 text-amber-200 text-xs"><option value="1" ${CH.level === 1 ? 'selected' : ''}>Primer año</option><option value="2" ${CH.level === 2 ? 'selected' : ''}>Prefecto</option><option value="3" ${CH.level === 3 ? 'selected' : ''}>Gran Mago</option><option value=\"4\" ${CH.level === 4 ? 'selected' : ''}>Dumbledore</option></select></label>
       <button onclick="chessInit()" class="btn-ghost !py-1.5 !text-[11px]"><i class="fa-solid fa-rotate"></i> Nueva partida</button>` : `<button onclick="chessResign()" id="chResign" class="btn-ghost !py-1.5 !text-[11px]"><i class="fa-solid fa-flag"></i> Rendirse</button>`;
   return `<div class="max-w-xl mx-auto space-y-2">
     <div id="chOppBar" class="ch-bar"></div>
@@ -6858,7 +6874,7 @@ function chessCaptured(side) {
 }
 function chessBars() {
   const me = CH.my, opp = me === 'w' ? 'b' : 'w';
-  const names = CH.mode === 'online' ? [gr.me, gr.opp || 'Rival'] : [S.student || myName() || 'Tú', ['', 'IA · Primer año', 'IA · Prefecto', 'IA · Gran Mago'][CH.level]];
+  const names = CH.mode === 'online' ? [gr.me, gr.opp || 'Rival'] : [S.student || myName() || 'Tú', ['', 'IA · Primer año', 'IA · Prefecto', 'IA · Gran Mago', 'IA · Dumbledore'][CH.level]];
   const mat = s => chessCaptured(s === 'w' ? 'b' : 'w').reduce((a, p) => a + PIECE_VAL[p.toLowerCase()], 0);
   const diff = Math.round((mat(me) - mat(opp)) / 100);
   const bar = (name, side, isMe) => {
@@ -6969,6 +6985,7 @@ GR.chess = {
     toast(`Juegas con las ${CH.my === 'w' ? 'blancas: empiezas tú' : 'negras: empieza tu rival'}`, CH.my === 'w' ? '♔' : '♚');
   },
   msg(m) {
+    if (m.type === 'mv' && document.hidden && window.V8 && V8.notify) V8.notify('♟️ ¡Te toca en el ajedrez!', `${gr.opp || 'Tu rival'} ya movió.`);
     if (m.type === 'mv' && CH.mode === 'online' && !CH.over && CH.turn !== CH.my) {
       const mv = legalMoves(CH, CH.turn).find(x => x.fr === m.mv.fr && x.fc === m.mv.fc && x.tr === m.mv.tr && x.tc === m.mv.tc);
       if (mv) chessDo(mv, true);
@@ -7595,13 +7612,13 @@ uniform mat4 uM,uVP,uLVP;uniform mat3 uNM;varying vec3 vW,vN,vC,vO;varying vec2 
 void main(){vec4 w=uM*vec4(aP,1.);vW=w.xyz;vO=aP;vN=uNM*aN;vC=aC;vU=aU;vL=uLVP*w;gl_Position=uVP*w;}`;
   const FS = `precision highp float;
 uniform vec3 uCol,uEm,uSky,uGnd,uLDir,uLCol,uCam,uFogC,uRimC,uPL0,uPC0,uPL1,uPC1;
-uniform float uSpec,uShin,uOp,uFog,uRim,uUnlit,uPat,uPatS,uShadow,uTexOn,uSMs,uPR0,uPR1,uTime,uEnv;
+uniform float uSpec,uShin,uOp,uFog,uRim,uUnlit,uPat,uPatS,uShadow,uTexOn,uSMs,uPR0,uPR1,uTime,uEnv,uBump;
 uniform sampler2D uTex,uSM;varying vec3 vW,vN,vC,vO;varying vec2 vU;varying vec4 vL;
 float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float ns(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hs(i),hs(i+vec2(1.,0.)),f.x),mix(hs(i+vec2(0.,1.)),hs(i+vec2(1.,1.)),f.x),f.y);}
 float fb(vec2 p){return ns(p)*.5+ns(p*2.1)*.25+ns(p*4.3)*.125;}
 float up(vec4 c){return dot(c,vec4(1.,1./255.,1./65025.,1./16581375.));}
-float shd(float nl){vec3 s=vL.xyz/vL.w*.5+.5;if(s.x<0.||s.x>1.||s.y<0.||s.y>1.||s.z>1.)return 1.;float bi=.0025+.008*(1.-nl);float r=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=up(texture2D(uSM,s.xy+vec2(float(x),float(y))/uSMs));r+=s.z-bi>d?0.:1.;}return r/9.;}
+float shd(float nl){vec3 s=vL.xyz/vL.w*.5+.5;if(s.x<0.||s.x>1.||s.y<0.||s.y>1.||s.z>1.)return 1.;float bi=.0025+.008*(1.-nl);float r=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=up(texture2D(uSM,s.xy+vec2(float(x),float(y))*1.6/uSMs));r+=s.z-bi>d?0.:1.;}return r/9.;}
 void main(){vec3 b=uCol*vC;
 if(uTexOn>.5)b*=texture2D(uTex,vU).rgb;
 if(uPat>.5&&uPat<1.5){float g=sin((vO.y+vO.z)*uPatS*40.+fb(vO.xz*uPatS*vec2(3.,30.))*7.);b*=.84+.16*g;}
@@ -7612,7 +7629,8 @@ else if(uPat>4.5&&uPat<5.5){b*=.6+.6*fb(vO.xy*5.+vO.zz*3.);}
 else if(uPat>5.5&&uPat<6.5){b*=.75+.35*hs(vec2(floor(atan(vO.z,vO.y)*14.),1.));}
 else if(uPat>6.5&&uPat<7.5){vec3 q=vO*uPatS*4.;float v=abs(sin(q.x*1.7+q.y*3.1+fb(q.xy*1.3+q.zz)*6.));float vein=1.-smoothstep(0.,.06,v);b*=.98+.04*fb(q.xz*6.);b=mix(b,b*vec3(.7,.71,.75),vein*.4);}
 else if(uPat>7.5&&uPat<8.5){vec3 q=vO*uPatS*4.;float v=abs(sin(q.y*2.3+q.x*1.1+fb(q.xz*1.7+q.yy)*5.));b+=vec3(.05,.04,.09)*(1.-smoothstep(0.,.12,v));}
-vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(uCam-vW);vec3 c;
+vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;
+if(uBump>0.){vec2 q=(uPat<1.5?vO.xz*uPatS*vec2(3.,30.):vW.xz*uPatS*6.);float h0=fb(q),hx=fb(q+vec2(.06,0.)),hz=fb(q+vec2(0.,.06));N=normalize(N+vec3(h0-hx,0.,h0-hz)*uBump*3.);}vec3 V=normalize(uCam-vW);vec3 c;
 if(uUnlit>.5)c=b+uEm;else{
 vec3 L=-uLDir;float nl=max(dot(N,L),0.);float sh=uShadow>.5&&nl>0.?shd(nl):1.;vec3 am=mix(uGnd,uSky,N.y*.5+.5);float d=nl*sh;
 float sp=pow(max(dot(N,normalize(L+V)),0.),uShin)*uSpec*sh;
@@ -7623,7 +7641,7 @@ float ps=(pow(max(dot(N,normalize(n0+V)),0.),uShin)*a0+pow(max(dot(N,normalize(n
 c=b*(am+d*uLCol+pl)+sp*uLCol+ps*(uPC0+uPC1)*.5+uEm+uRimC*pow(1.-max(dot(N,V),0.),3.)*uRim;
 if(uEnv>0.){vec3 R=reflect(-V,N);float fr=.04+.96*pow(1.-max(dot(N,V),0.),5.);vec3 env=mix(uGnd*.6,uSky*1.25,smoothstep(-.3,.6,R.y))+uLCol*pow(max(dot(R,L),0.),24.)*.6+(uPC0+uPC1)*.15;c+=env*uEnv*(.25+fr)*mix(vec3(1.),b,.35);}}
 float ds=length(uCam-vW);float f=1.-exp(-ds*ds*uFog*uFog);c=mix(c,uFogC,clamp(f,0.,1.));
-gl_FragColor=vec4(c,uOp);}`;
+gl_FragColor=vec4(c,uOp*(uTexOn>.5?texture2D(uTex,vU).a:1.));}`;
   const DVS = 'attribute vec3 aP;uniform mat4 uM,uLVP;void main(){gl_Position=uLVP*uM*vec4(aP,1.);}';
   const DFS = 'precision highp float;void main(){vec4 e=fract(vec4(1.,255.,65025.,16581375.)*gl_FragCoord.z);e-=e.yzww*vec4(1./255.,1./255.,1./255.,0.);gl_FragColor=e;}';
   const PVS = 'attribute vec3 aP;attribute vec4 aC;attribute float aS;uniform mat4 uVP;uniform float uPx;varying vec4 vC;void main(){vec4 p=uVP*vec4(aP,1.);gl_Position=p;gl_PointSize=clamp(aS*uPx/p.w,1.,120.);vC=aC;}';
@@ -7726,7 +7744,7 @@ gl_FragColor=vec4(c,uOp);}`;
         gl.uniformMatrix4fv(U.uM, false, n.world); gl.uniformMatrix3fv(U.uNM, false, M.normalMat(n.world));
         gl.uniform3fv(U.uCol, m.color); gl.uniform3fv(U.uEm, m.em); gl.uniform1f(U.uSpec, m.spec); gl.uniform1f(U.uShin, m.shin); gl.uniform1f(U.uOp, m.op);
         gl.uniform1f(U.uFog, m.fog ? S3.fog.density : 0); gl.uniform1f(U.uRim, m.rim); gl.uniform3fv(U.uRimC, m.rimC); gl.uniform1f(U.uUnlit, m.unlit ? 1 : 0);
-        gl.uniform1f(U.uPat, m.pat); gl.uniform1f(U.uPatS, m.patS); if (U.uEnv) gl.uniform1f(U.uEnv, m.env || 0); gl.uniform1f(U.uShadow, S3.shadow && m.shadow ? 1 : 0);
+        gl.uniform1f(U.uPat, m.pat); gl.uniform1f(U.uPatS, m.patS); if (U.uEnv) gl.uniform1f(U.uEnv, m.env || 0); if (U.uBump) gl.uniform1f(U.uBump, m.bump != null ? m.bump : (m.pat === 1 || m.pat === 3 || m.pat === 4 || m.pat === 5 ? .45 : 0)); gl.uniform1f(U.uShadow, S3.shadow && m.shadow ? 1 : 0);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, m.tex || tex1); gl.uniform1f(U.uTexOn, m.tex ? 1 : 0);
         if (m.ds) gl.disable(gl.CULL_FACE); else { gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); }
         gl.drawElements(gl.TRIANGLES, n.mesh.count, n.mesh.type, 0);
@@ -7853,7 +7871,7 @@ function c3Mount() {
   R.add(R.node(R.mesh(c3SkyGeo([.02, .02, .07], [.16, .1, .26], [.02, .01, .03])), mat({ unlit: true, bg: true, fog: false, ds: true }), { cast: false }));
   R.add(R.node(R.mesh(G.cyl(8.5, 8.2, .6, 64)), mat({ color: [.17, .17, .22], pat: 4, spec: .9, shin: 90 }), { pos: [0, -.9, 0], cast: false }));
   R.add(R.node(R.mesh(G.box(9.4, .34, 9.4)), mat({ color: [.42, .22, .1], pat: 1, patS: .5, spec: .5, shin: 50 }), { pos: [0, -.17, 0] }));
-  R.add(R.node(R.mesh(G.plane(9.2, 9.2, 1, 1)), mat({ tex: R.texture(c3BoardTexture()), spec: .35, shin: 60 }), { pos: [0, .006, 0], cast: false }));
+  R.add(R.node(R.mesh(G.plane(9.2, 9.2, 1, 1)), mat({ tex: R.texture(c3BoardTexture()), spec: .7, shin: 120, env: .18, bump: .12, pat: 3, patS: .2 }), { pos: [0, .006, 0], cast: false }));
   C3.candles = [];
   const candleG = R.mesh(G.cyl(.085, .1, .8, 16)), flameG = R.mesh(G.sphere(.07, 12, 8));
   const wax = mat({ color: [.95, .9, .78], spec: .2, em: [.12, .08, .03] }), flame = mat({ color: [1, .7, .25], unlit: true, add: true, op: .95, fog: false });
@@ -7886,7 +7904,9 @@ function c3Rebuild() {
 }
 function c3PieceNode(p, r, c) {
   const R = C3.R, t = p.toLowerCase(), w = isW(p), [x, z] = c3XZ(r, c);
-  return R.add(R.node(C3.meshes[t], w ? C3.mats.w : C3.mats.b, { pos: [x, 0, z], rot: [0, t === 'n' ? (w ? Math.PI : 0) : (w ? 0 : Math.PI), 0] }));
+  const n = R.add(R.node(C3.meshes[t], w ? C3.mats.w : C3.mats.b, { pos: [x, 0, z], rot: [0, t === 'n' ? (w ? Math.PI : 0) : (w ? 0 : Math.PI), 0] }));
+  if (window.M3ao) { const ao = M3ao(R); R.add(R.node(ao.mesh, ao.mat, { pos: [0, .012, 0], scl: [.95, 1, .95], cast: false }), n); }
+  return n;
 }
 function c3Sync() {
   if (!C3.R) return;
@@ -7947,7 +7967,7 @@ function c3Loop(now) {
   if (!document.body.contains(R.canvas)) { c3Destroy(); return; }
   C3.raf = requestAnimationFrame(c3Loop);
   const busy = C3.anims.length || C3.frame < 4 || C3.frags.length || C3.sparks.length || C3.drag;
-  C3.frame++; if (!busy && C3.frame % 2 && !(window.HPperf && HPperf.forced())) return;
+  C3.frame++;
   R.tick(now); const t = now / 1000;
   const asp = R.w / R.h, dist = C3.dist * Math.max(1, 1.12 / asp), az = C3.az + (CH.my === 'b' ? Math.PI : 0);
   R.cam.fov = 36; R.cam.target = [.35 * Math.sin(az), -.3, .35 * Math.cos(az)]; R.cam.pos = [Math.sin(az) * Math.cos(C3.el) * dist, Math.sin(C3.el) * dist, Math.cos(az) * Math.cos(C3.el) * dist];

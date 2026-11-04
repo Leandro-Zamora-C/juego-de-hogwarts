@@ -6,7 +6,8 @@
 ===================================================================== */
 (() => {
   const V = window.V7 = window.V7 || {};
-  const st = () => { S.v7 = Object.assign({ duelT: 25, duelDiff: 'all', duelTopic: 'all', cpuBet: 0, usedQ: [], history: [], chatSent: 0, betsWon: 0, jokers: 0 }, S.v7 || {}); return S.v7; };
+  const D7 = { duelT: 25, duelDiff: 'all', duelTopic: 'all', cpuBet: 0, usedQ: [], history: [], chatSent: 0, betsWon: 0, jokers: 0 };
+  const st = () => { const o = S.v7 || (S.v7 = {}); for (const k in D7) if (o[k] === undefined) o[k] = JSON.parse(JSON.stringify(D7[k])); return o; };
   V.st = st;
 
   /* ---------- logros nuevos ---------- */

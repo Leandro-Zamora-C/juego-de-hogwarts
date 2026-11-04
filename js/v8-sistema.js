@@ -135,6 +135,7 @@
   function extBuild(host) {
     const cv = document.createElement('canvas'); cv.id = 'v8Ext'; host.appendChild(cv);
     const R = M3.create(cv, { maxDpr: 1.75 }); if (!R) { cv.remove(); return null; }
+    if (R && R.post && matchMedia('(pointer: coarse)').matches) R.post.on = false; // decoración de la portada: en celular sin posprocesado (el 3D y las luces se mantienen)
     const G = M3.G, mat = R.mat;
     R.clear = [.02, .02, .07]; R.sky = [.3, .32, .55]; R.ground = [.05, .05, .08]; R.light.dir = M3.norm([.4, -.6, -.7]); R.light.color = [.55, .6, .95];
     R.fog = { color: [.06, .06, .16], density: .013 }; R.cam.fov = 42; R.cam.far = 260;
@@ -154,8 +155,8 @@
     const stars = Array.from({ length: 180 }, () => { const a = Math.random() * 6.28, e = .1 + Math.random() * 1.2; return [Math.cos(a) * 140 * Math.cos(e), 20 + Math.sin(e) * 110, Math.sin(a) * 140 * Math.cos(e) - 40]; });
     const t0 = performance.now();
     const loop = now => {
-      ext.raf = 0; if (!ext.on || !cv.isConnected || document.hidden || currentTab !== 'home') return; ext.raf = 1; if (window.HPperf) HPperf.slow(t => { ext.raf = 0; loop(t); }, HPperf.deco()); else ext.raf = requestAnimationFrame(loop);
-      R.tick(now); const r = cv.getBoundingClientRect(); if (Math.abs(r.width - R.w) > 1) R.resize();
+      ext.raf = 0; if (!ext.on || !cv.isConnected || document.hidden || currentTab !== 'home') return; if (window.HPperf && HPperf.scrolling()) { ext.raf = 1; setTimeout(() => { ext.raf = 0; loop(performance.now()); }, 90); return; } ext.raf = 1; if (window.HPperf) HPperf.slow(t => { ext.raf = 0; loop(t); }, HPperf.deco()); else ext.raf = requestAnimationFrame(loop);
+      R.tick(now); if (Math.abs(cv.clientWidth - R.w) > 1) R.resize();
       const t = (now - t0) / 1000, a = Math.sin(t * .05) * .9;
       R.cam.pos = [Math.sin(a) * 30, 6 + Math.sin(t * .2) * .6, Math.cos(a) * 30]; R.cam.target = [0, 5, -3];
       const pts = stars.map((p, i) => ({ p, c: [.9, .92, 1, .4 + .4 * Math.sin(t * 2 + i)], s: 1.2 }));

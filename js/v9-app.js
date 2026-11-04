@@ -7,7 +7,8 @@
 (() => {
   const V9 = window.V9 = window.V9 || {};
   V9.version = '9.0';
-  const st = () => { S.v9 = Object.assign({ wheel: '', chest: 0, last: null, tabAt: 0, tab: '', rivals: {}, dismiss: {}, gyroPlay: false, wand: false, taps: true }, S.v9 || {}); return S.v9; };
+  const DEF9 = { wheel: '', chest: 0, last: null, tabAt: 0, tab: '', rivals: {}, dismiss: {}, gyroPlay: false, wand: false, taps: true };
+  const st = () => { const o = S.v9 || (S.v9 = {}); for (const k in DEF9) if (o[k] === undefined) o[k] = JSON.parse(JSON.stringify(DEF9[k])); return o; };
   const today = () => new Date().toISOString().slice(0, 10);
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reduced = () => (window.V8 && V8.reduced && V8.reduced()) || matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -16,6 +17,11 @@
   V9.buzz = p => { try { if (window.V7 && V7.vib ? V7.vib() : navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
   const loadJS = src => new Promise((ok, ko) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
 
+  (function noise() {
+    try { const c = document.createElement('canvas'); c.width = c.height = 96; const x = c.getContext('2d'), d = x.createImageData(96, 96);
+      for (let i = 0; i < d.data.length; i += 4) { const v = 150 + Math.random() * 105; d.data[i] = v; d.data[i + 1] = v * .85; d.data[i + 2] = v * .6; d.data[i + 3] = Math.random() * 14; }
+      x.putImageData(d, 0, 0); document.documentElement.style.setProperty('--v9noise', `url(${c.toDataURL('image/png')})`); } catch (e) {}
+  })();
   /* ---------- 1. Vibración en momentos clave ---------- */
   if (window.V8 && V8.on) {
     V8.on('answer', ({ ok }) => V9.buzz(ok ? 25 : [40, 60, 40]));
@@ -189,8 +195,8 @@
       ${isWeekend() ? `<button class="v9-tile ready" onclick="switchTab('games');setTimeout(()=>openGame('${V9.featured()}'),250)"><span class="ic">🎉</span><span><b>Fin de semana</b><small>Galeones dobles en ${gameName(V9.featured())}</small></span></button>` : ''}
       </div>${installCard()}`;
   }
-  V9.homeStrip = homeStrip;
-  setInterval(() => { if (typeof currentTab !== 'undefined' && currentTab === 'home' && !document.hidden) homeStrip(); }, 60000);
+  V9.homeStrip = homeStrip; // las demás partes llaman a V9.homeStrip para poder extenderla
+  setInterval(() => { if (typeof currentTab !== 'undefined' && currentTab === 'home' && !document.hidden) V9.homeStrip(); }, 60000);
 
   // cofre cada 4 horas
   V9.chest = () => {
@@ -201,13 +207,13 @@
     V8.sheet('🎁 Cofre mágico', `<div class="v9-chestbox"><div class="lid"></div><div class="base"></div><div class="glow"></div></div><p class="text-center font-wizard text-2xl text-amber-300 mt-3" id="v9ChestTxt">&nbsp;</p><p class="text-center text-xs text-stone-400">Vuelve en 4 horas para el siguiente.</p>`);
     sfx('spell');
     setTimeout(() => { const b = document.querySelector('.v9-chestbox'); if (b) b.classList.add('open'); sfx('achieve'); V9.buzz([30, 30, 90]); fireConfetti({ particleCount: 70, spread: 70, origin: { y: .55 } });
-      if (frog) { V8.addFrogs(1); $('v9ChestTxt').textContent = '¡Una rana de chocolate! 🐸'; } else { V8.gold(g); $('v9ChestTxt').textContent = `+${g} galeones 🪙`; } homeStrip(); }, 900);
+      if (frog) { V8.addFrogs(1); $('v9ChestTxt').textContent = '¡Una rana de chocolate! 🐸'; } else { V8.gold(g); $('v9ChestTxt').textContent = `+${g} galeones 🪙`; } V9.homeStrip(); }, 900);
     notifyLater();
   };
   function notifyLater() {
-    clearTimeout(V9._nt); V9._nt = setTimeout(() => { if (document.hidden && V8.notify) V8.notify('🎁 ¡Tu cofre está listo!', 'Entra a Hogwarts para abrirlo.'); homeStrip(); }, CHEST_MS);
+    clearTimeout(V9._nt); V9._nt = setTimeout(() => { if (document.hidden && V8.notify) V8.notify('🎁 ¡Tu cofre está listo!', 'Entra a Hogwarts para abrirlo.'); V9.homeStrip(); }, CHEST_MS);
   }
-  if (st().chest) { const left = st().chest + CHEST_MS - Date.now(); if (left > 0) V9._nt = setTimeout(() => { if (document.hidden && V8.notify) V8.notify('🎁 ¡Tu cofre está listo!', 'Entra a Hogwarts para abrirlo.'); homeStrip(); }, left); }
+  if (st().chest) { const left = st().chest + CHEST_MS - Date.now(); if (left > 0) V9._nt = setTimeout(() => { if (document.hidden && V8.notify) V8.notify('🎁 ¡Tu cofre está listo!', 'Entra a Hogwarts para abrirlo.'); V9.homeStrip(); }, left); }
 
   // ruleta diaria que se gira con el dedo
   const PRIZES = [['20 🪙', () => V8.gold(20)], ['🐸 x1', () => V8.addFrogs(1)], ['40 🪙', () => V8.gold(40)], ['15 🪙', () => V8.gold(15)], ['🐸 x2', () => V8.addFrogs(2)], ['60 🪙', () => V8.gold(60)], ['25 🪙', () => V8.gold(25)], ['100 🪙', () => V8.gold(100)]];
@@ -235,7 +241,7 @@
       const a = ((-Math.PI / 2 - ang) % (Math.PI * 2) + Math.PI * 4) % (Math.PI * 2), i = Math.floor(a / (Math.PI * 2) * N) % N;
       PRIZES[i][1](); sfx('levelup'); V9.buzz([40, 40, 120]); fireConfetti({ particleCount: 110, spread: 90 });
       const t = $('v9WheelTxt'); if (t) { t.className = 'text-center font-wizard text-xl text-amber-300 mt-2'; t.textContent = `¡Ganaste ${PRIZES[i][0]}!`; }
-      homeStrip();
+      V9.homeStrip();
     };
     const spin = v => {
       if (done || spinning) return; spinning = true;
@@ -262,7 +268,7 @@
     return `<div class="v9-install"><img src="img/app/icon-192.png" alt="" width="52" height="52"><div class="flex-grow"><b>Instala Hogwarts en tu celular</b><small>${ios ? 'Toca <i class="fa-solid fa-arrow-up-from-bracket"></i> Compartir y luego «Agregar a inicio».' : 'Ábrelo como app, con su propio ícono y sin barra del navegador.'}</small></div>
       ${ios ? '' : '<button class="btn-gold !py-1.5 !px-3 !text-xs" onclick="installApp()">Instalar</button>'}<button class="v9-x" aria-label="Ocultar" onclick="V9.hideInstall()">✕</button></div>`;
   }
-  V9.hideInstall = () => { st().dismiss.install = Date.now() + 7 * 86400000; save(); homeStrip(); };
+  V9.hideInstall = () => { st().dismiss.install = Date.now() + 7 * 86400000; save(); V9.homeStrip(); };
 
   /* ---------- 10. Recordar la pestaña al volver a abrir ---------- */
   if (typeof switchTab === 'function') {
@@ -272,7 +278,7 @@
       const r = _sw.apply(this, arguments);
       try { localStorage.setItem('hp-lasttab', JSON.stringify({ tab: currentTab, at: Date.now() })); } catch (e) {}
       V9.inGame();
-      if (tab === 'home') homeStrip();
+      if (tab === 'home') V9.homeStrip();
       if (tab === 'ranking') rivalsBox();
       if (tab === 'profile') setTimeout(profileShareBtn, 50);
       if (prev !== tab && st().taps !== false) V9.buzz(8);
@@ -358,7 +364,7 @@
     root.querySelectorAll('#grCode, #lnCode').forEach(inp => { if (inp.dataset.v9) return; inp.dataset.v9 = 1; const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-ghost !py-1.5 !px-2.5 !text-xs shrink-0'; b.innerHTML = '<i class="fa-solid fa-camera"></i>'; b.title = 'Escanear QR'; b.setAttribute('aria-label', 'Escanear código QR'); b.onclick = V9.qrScan; inp.insertAdjacentElement('afterend', b); });
     root.querySelectorAll('[onclick="V8.ludoShare()"]').forEach(b => { if (b.dataset.v9) return; b.dataset.v9 = 1; const q = document.createElement('button'); q.className = 'btn-ghost !py-1.5 !text-xs'; q.innerHTML = '<i class="fa-solid fa-qrcode"></i> QR'; q.onclick = () => { V9.qrShow(V8.ludoUrl()); }; b.insertAdjacentElement('afterend', q); });
   };
-  new MutationObserver(() => { const gb = $('gameBody'); if (gb) addScan(gb); }).observe(document.body, { childList: true, subtree: true });
+  new MutationObserver(() => { if (typeof activeGame === 'undefined' || !activeGame) return; const gb = $('gameBody'); if (gb) addScan(gb); }).observe(document.body, { childList: true, subtree: true });
 
   /* ---------- 15. Stickers en partidas en línea ---------- */
   const STK = ['⚡ ¡Expelliarmus!', '😂', '😱', '🔥 ¡Buena!', '🧙 ¡Te gané!', '🔁 ¡Revancha!', '👏', '🐸'];
@@ -476,23 +482,22 @@
 
   /* ---------- 19. Novedades con lechuza ---------- */
   if (window.V8) {
-    V8.version = '9.0';
+    V8.version = '9.3';
     V8.news = force => {
-      const s = V8.st(); if (!force && (s.seenNews === '9.0' || !S.house)) return;
+      const s = V8.st(); if (!force && (s.seenNews === '9.3' || !S.house)) return;
       const dlg = $('dialog');
       if (!force && ($('v7Tut') || $('v8Sheet') || currentTab !== 'home' || activeGame || (dlg && !dlg.classList.contains('hidden')))) { V9._nt2 = (V9._nt2 || 0) + 1; if (V9._nt2 < 20) setTimeout(() => V8.news(), 4000); return; }
-      s.seenNews = '9.0'; save();
+      s.seenNews = '9.3'; save();
       const owl = document.createElement('div'); owl.className = 'v9-owl'; owl.innerHTML = '<span>🦉</span><i>✉️</i>'; document.body.appendChild(owl); sfx('spell');
       setTimeout(() => {
         owl.remove();
-        showDialog({ icon: '🦉', title: '¡Llegó una lechuza: Hogwarts 9!', body: `<ul class="text-left text-sm space-y-1.5">
-          <li>🏰 <b>Nuevo ícono</b> y gráficos 3D más realistas (ajedrez de mármol, Ludo con figuras de las casas).</li>
-          <li>🎡 <b>Ruleta diaria</b>, 🎁 <b>cofre cada 4 horas</b> y 🔥 racha en la portada.</li>
-          <li>📱 Desliza entre pestañas, baja para cerrar y <b>escanea un QR</b> para unirte a una sala.</li>
-          <li>🪄 <b>Duelo con la varita</b>: dibuja la forma de tu respuesta.</li>
-          <li>😀 <b>Stickers</b> en partidas en línea y ranking <b>entre amigos</b>.</li>
-          <li>🪪 <b>Tu tarjeta de mago</b> e historias para tus estados.</li>
-          <li>⚙️ Calidad gráfica <b>Ultra</b> en Ajustes.</li></ul>`, actions: [{ label: '¡A explorar!', primary: true }] });
+        showDialog({ icon: '🦉', title: '¡Llegó una lechuza: Hogwarts 9.3!', body: `<ul class="text-left text-sm space-y-1.5">
+          <li>🦌 <b>Patronus</b>: más de 40 para conseguir, con ceremonia, patronus 3D, niveles y míticos por logros. Descubre el tuyo gratis.</li>
+          <li>🏛️ <b>Ministerio de Magia</b>: cambia tu nombre, ofertas del día y ruleta premium.</li>
+          <li>📖 <b>Modo historia</b>: tus 7 años en Hogwarts con premios.</li>
+          <li>🖼️ Marcos animados, ropero, mascota en tu avatar, firma mágica y vitrina de trofeos.</li>
+          <li>🎮 <b>Duelo de Patronus</b>, invasión de dementores los fines de semana e IA «Dumbledore» en ajedrez.</li>
+          <li>⚡ Todo más fluido y con gráficos más realistas. 🚩 Reporta problemas desde cada juego.</li></ul>`, actions: [{ label: '¡A explorar!', primary: true }] });
       }, reduced() ? 50 : 1700);
     };
   }
@@ -550,9 +555,9 @@
 
   /* ---------- arranque ---------- */
   function boot() {
-    if (!low()) candles();
+    /* las velas flotantes ya existen desde la v4 (#candleField): no se duplican */
     shortcut(); restoreTab(); fpsBadge(); V9.inGame(); setTimeout(checkHz, 8000);
-    if (typeof currentTab !== 'undefined' && currentTab === 'home') homeStrip();
+    if (typeof currentTab !== 'undefined' && currentTab === 'home') V9.homeStrip();
     setTimeout(() => { if (window.V8 && V8.news) V8.news(); }, 6000);
   }
   if (document.readyState === 'complete') setTimeout(boot, 200); else addEventListener('load', () => setTimeout(boot, 200));

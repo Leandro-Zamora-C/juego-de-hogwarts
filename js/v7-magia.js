@@ -7,7 +7,7 @@
 ===================================================================== */
 (() => {
   const V = window.V7 = window.V7 || {};
-  const st = V.st || (() => { S.v7 = Object.assign({}, S.v7 || {}); return S.v7; });
+  const st = V.st || (() => S.v7 || (S.v7 = {}));
   const opt = () => { const s = st(); s.opt = Object.assign({ theme: 'dark', font: 1, quality: 'auto', ambient: true, vib: true, trail: true, trans: true }, s.opt || {}); return s.opt; };
   const reduced = () => typeof reduceMotion !== 'undefined' && reduceMotion;
 
@@ -337,6 +337,7 @@
     hallLine();
     if (!M3.supported()) { $('v7Hall').querySelector('canvas').remove(); $('v7Hall').style.background = 'radial-gradient(ellipse at 50% 30%, rgba(255,190,90,.35), transparent 60%), linear-gradient(#120b22, #2a1a0c)'; return; }
     const cv = $('v7Hall').querySelector('canvas'), R = M3.create(cv, { maxDpr: 1.75 });
+    if (R && R.post && matchMedia('(pointer: coarse)').matches) R.post.on = false; // decoración de la portada: en celular sin posprocesado (el 3D y las luces se mantienen)
     if (!R) return; hall.R = R; unlock('v7hall');
     cv.addEventListener('webglcontextlost', e => { e.preventDefault(); hall.lost = true; });
     const G = M3.G, mat = R.mat;
@@ -397,8 +398,9 @@
   function hallLoop(now) {
     hall.raf = 0;
     if (!hall.R || document.hidden || !hall.vis || currentTab !== 'home') return; // se pausa sola
+    if (window.HPperf && HPperf.scrolling()) { hall.raf = 1; setTimeout(() => { hall.raf = 0; hallLoop(performance.now()); }, 90); return; }
     hall.raf = 1; if (window.HPperf) HPperf.slow(t => { hall.raf = 0; hallLoop(t); }, HPperf.deco()); else hall.raf = requestAnimationFrame(hallLoop);
-    if (V.quality() === 'low' && !(window.HPperf && HPperf.forced()) && (hall.frames++ & 1)) return;
+    
     const R = hall.R, t = (now - hall.t0) / 1000, [px, py] = hall.par();
     R.tick(now);
     const k = reduced() ? 0 : (Math.sin(t * .045 - Math.PI / 2) + 1) / 2, z = 24 - k * 34;

@@ -128,7 +128,7 @@
       YARD(s).forEach(c => parts.push([G.cyl(.38, .42, .06, 20), G.at(c[0] - 7, .16, c[1] - 7), hex(SEATS[s].light)]));
       void o;
     });
-    R.add(R.node(R.mesh(G.merge(parts)), mat({ color: [1, 1, 1], spec: .25, shin: 20, pat: 5, patS: .35 })));
+    R.add(R.node(R.mesh(G.merge(parts)), mat({ color: [1, 1, 1], spec: .55, shin: 70, pat: 5, patS: .35, env: .12, bump: .08 })));
     // centro: cuatro triángulos
     const tri = [[[-1.5, -1.5], [-1.5, 1.5], [0, 0]], [[-1.5, -1.5], [1.5, -1.5], [0, 0]], [[1.5, -1.5], [1.5, 1.5], [0, 0]], [[1.5, 1.5], [-1.5, 1.5], [0, 0]]];
     tri.forEach((t, s) => { const g = G.extrude(t.map(([x, y]) => [x, y]), .14); R.add(R.node(R.mesh(g), mat({ color: hex(SEATS[s].color), spec: .6, shin: 50 }), { pos: [0, .07, 0], rot: [Math.PI / 2, 0, 0] })); });
@@ -159,7 +159,7 @@
       const sm = SEATS[pl.seat], m = mat({ color: hex(sm.color).map(v => Math.min(1, v * 1.1)), spec: .9, shin: 60, rim: .35, rimC: hex(sm.light) });
       L.mats[pi] = m;
       m.env = .45; m.spec = 1.1; m.shin = 90;
-      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); return R.add(R.node(figM[sm.house] || figM.Gryffindor, m, { pos: [w[0], .12, w[1]], scl: [1.15, 1.15, 1.15] })); });
+      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); const n = R.add(R.node(figM[sm.house] || figM.Gryffindor, m, { pos: [w[0], .12, w[1]], scl: [1.15, 1.15, 1.15] })); if (window.M3ao) { const ao = M3ao(R); R.add(R.node(ao.mesh, ao.mat, { pos: [0, .01, 0], scl: [.8, 1, .8], cast: false }), n); } return n; });
     });
     return R;
   }
@@ -230,7 +230,7 @@
       <p class="text-xs text-stone-400">${local ? 'Se pasan el celular por turnos. Cada uno juega con una casa.' : 'Tú juegas con tu casa y la IA con las demás.'}</p>
       <div><p class="text-[11px] font-bold text-amber-300 mb-1">¿Cuántos jugadores?</p><div class="flex gap-2">${[2, 3, 4].map(k => `<button onclick="V8L._n=${k};V8L.mode('${local ? 'local' : 'ia'}')" class="${n === k ? 'btn-gold' : 'btn-ghost'} flex-1 !py-2">${k}</button>`).join('')}</div></div>
       ${local ? `<div class="space-y-2">${Array.from({ length: n }, (_, i) => `<label class="flex items-center gap-2"><span class="text-xl">${SEATS[seatsFor(n)[i]].emoji}</span><input id="lnm${i}" maxlength="14" class="${input}" value="${esc(names[i] || 'Mago ' + (i + 1))}"></label>`).join('')}</div>`
-        : `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Nivel de la IA</p><select id="laiLvl" class="${input}"><option value="1">Fácil</option><option value="2" selected>Normal</option><option value="3">Difícil</option></select></div>`}
+        : `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Nivel de la IA</p><select id="laiLvl" class="${input}"><option value="1">Fácil</option><option value="2" selected>Normal</option><option value="3">Difícil</option><option value="4">Gran Mago</option></select></div>`}
       <button onclick="V8L.startLocal(${local})" class="btn-gold w-full"><i class="fa-solid fa-dice"></i> ¡Empezar!</button></div>`);
   }
   // asientos según cantidad: 2 = casas enfrentadas
@@ -391,7 +391,17 @@
     // en línea: si alguien no juega en 25 s, se juega solo
     if (L.mode === 'online' && p.id !== NET.myId) L.tmr = setTimeout(() => { if (!L || L.G.phase === 'over') return; if (L.G.phase === 'roll') apply('roll'); else apply('move', aiPick(L.G)); }, 25000);
   }
-  function aiChoose(G, lvl) { const opts = movable(G, G.turn, G.dice); if (lvl === 1 && Math.random() < .5) return V8.pick(opts); if (lvl === 2 && Math.random() < .15) return V8.pick(opts); return aiPick(G); }
+  function aiChoose(G, lvl) { const opts = movable(G, G.turn, G.dice); if (lvl === 1 && Math.random() < .5) return V8.pick(opts); if (lvl === 2 && Math.random() < .15) return V8.pick(opts); if (lvl >= 4) return aiPick4(G); return aiPick(G); }
+  // Gran Mago: prueba cada jugada y mira cuántas de sus fichas quedarían a tiro de un rival
+  function aiPick4(G) {
+    const pi = G.turn, seat = G.players[pi].seat, d = G.dice, opts = movable(G, pi, d), base = aiPick(G);
+    const threat = pieces => { let t = 0; pieces.forEach(p => { if (p < 0 || p > 50) return; const a = absCell(seat, p); if (SAFE.has(a)) return; G.players.forEach((pl, oi) => { if (oi === pi) return; G.pieces[oi].forEach(q => { if (q < 0 || q > 50) return; const b = absCell(pl.seat, q), dist = (a - b + 52) % 52; if (dist >= 1 && dist <= 6) t += 1; }); }); }); return t; };
+    let best = base, bs = -1e9;
+    opts.forEach(k => { const from = G.pieces[pi][k], to = from < 0 ? 0 : from + d, after = G.pieces[pi].slice(); after[k] = to; const abs = absCell(seat, to);
+      let sc = (k === base ? 40 : 0) - threat(after) * 35 + to * .5 + (to === 56 ? 120 : 0) + (abs >= 0 && !SAFE.has(abs) && occupants(G, abs).some(([oi]) => oi !== pi) ? 150 : 0);
+      if (sc > bs) { bs = sc; best = k; } });
+    return best;
+  }
 
   function finish() {
     const G = L.G, w = G.players[G.winner];
@@ -457,7 +467,7 @@
     if (document.hidden || !L.canvas.isConnected) return;
     if (L.hop && performance.now() - L.hop.t0 > L.hop.dur + 40) L.hop = null;
     if (!L.R) { if (L.hop) { const h = L.hop, t = V8.clamp((performance.now() - h.t0) / h.dur, 0, 1); L.anim[h.key] = [h.s0[0] + (h.end[0] - h.s0[0]) * t, h.s0[1] + (h.end[1] - h.s0[1]) * t]; } draw2D(L); return; }
-    const R = L.R; R.tick(now); { const r = L.canvas.getBoundingClientRect(); if (Math.abs(r.width - R.w) > 1 || Math.abs(r.height - R.h) > 1) R.resize(); }
+    const R = L.R; R.tick(now); { const cw = L.canvas.clientWidth, ch = L.canvas.clientHeight; if (Math.abs(cw - R.w) > 1 || Math.abs(ch - R.h) > 1) R.resize(); }
     const d = L.dist, el = L.el, az = L.az;
     R.cam.pos = [Math.sin(az) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(az) * Math.cos(el) * d]; R.cam.target = [0, 0, 0];
     const pts = [], t = now / 1000;
@@ -538,6 +548,7 @@
   function pickSeat(house) { const used = NET.lobby.map(p => p.seat), pref = HOUSE_SEAT[house]; if (pref != null && !used.includes(pref)) return pref; return [0, 2, 1, 3].find(s => !used.includes(s)); }
   function netMsg(m) {
     if (!m || !m.t) return;
+    if (m.t === 'state' && document.hidden) setTimeout(() => { try { const G = L && L.G, p = G && G.players[G.turn]; if (p && p.id === NET.myId && G.phase !== 'over' && Date.now() - (NET._nt || 0) > 30000) { NET._nt = Date.now(); V8.notify && V8.notify('🎲 ¡Te toca en el Ludo!', 'Tus amigos esperan tu jugada.'); } } catch (e) {} }, 80);
     if (m.t === 'hi' && NET.host) {
       if (NET.started || NET.lobby.length >= 4) { netSend({ t: 'full', to: m.id }); return; }
       if (!NET.lobby.find(p => p.id === m.id)) NET.lobby.push({ id: m.id, name: String(m.name || 'Mago').slice(0, 14), seat: pickSeat(m.house) });

@@ -54,13 +54,13 @@
   V8.claim = (weekly, i) => {
     const M = missions(), m = (weekly ? M.wlist : M.list)[i]; if (!m || !m.done || m.got) return;
     m.got = true; save();
-    if (weekly) { V8.gold(150, 'Misión semanal'); V8.addFrogs(2); } else { V8.gold(40, 'Misión diaria'); if (i === 2) V8.addFrogs(1); }
+    if (weekly) { V8.gold(600, 'Misión semanal'); V8.addFrogs(3); } else { V8.gold(90, 'Misión diaria'); if (i === 2) V8.addFrogs(1); }
     if (Math.random() < .5) { const sp = V8.pick(V8.SPELLS.filter(x => !st().spells.includes(x.id))); if (sp) V8.learnSpell(sp.id); }
     fireConfetti({ particleCount: 60, spread: 70 }); sfx('levelup');
     if (M.list.every(x => x.got)) { unlock('v8missions'); toast('¡Completaste las 3 misiones de hoy! La Sala de los Menesteres apareció en el mapa del castillo.', '🚪'); }
     renderMissionCard(); if ($('v8Sheet')) V8.openMissions();
   };
-  const row = (m, i, weekly) => `<div class="v8-mission ${m.got ? 'got' : m.done ? 'done' : ''}"><div class="flex-grow min-w-0"><b>${label(m)}</b><div class="bar"><i style="width:${m.p / m.n * 100}%"></i></div><small>${m.p}/${m.n} · Premio: ${weekly ? '150 🪙 + 2 🐸' : i === 2 ? '40 🪙 + 1 🐸' : '40 🪙'}</small></div>${m.got ? '<span class="ok">✔</span>' : m.done ? `<button class="btn-gold !py-1 !px-3 !text-xs" onclick="V8.claim(${weekly},${i})">Reclamar</button>` : ''}</div>`;
+  const row = (m, i, weekly) => `<div class="v8-mission ${m.got ? 'got' : m.done ? 'done' : ''}"><div class="flex-grow min-w-0"><b>${label(m)}</b><div class="bar"><i style="width:${m.p / m.n * 100}%"></i></div><small>${m.p}/${m.n} · Premio: ${weekly ? '600 🪙 + 3 🐸' : i === 2 ? '90 🪙 + 1 🐸' : '90 🪙'}</small></div>${m.got ? '<span class="ok">✔</span>' : m.done ? `<button class="btn-gold !py-1 !px-3 !text-xs" onclick="V8.claim(${weekly},${i})">Reclamar</button>` : ''}</div>`;
   V8.openMissions = () => { const M = missions(); V8.sheet('📜 Misiones', `<p class="text-xs text-stone-400 mb-2">Se renuevan cada día y cada semana.</p><h4 class="v8-h4">Hoy</h4>${M.list.map((m, i) => row(m, i, false)).join('')}<h4 class="v8-h4 mt-4">Esta semana</h4>${M.wlist.map((m, i) => row(m, i, true)).join('')}`); };
   function renderMissionCard() {
     const box = $('v8HomeCard'); if (!box) return; const M = missions(), s = st();
@@ -132,7 +132,7 @@
   if (typeof beam === 'function') { const _b = beam; beam = function (fromLeft, color) { const c = fromLeft && FXCOL[st().effect] ? FXCOL[st().effect] : color; return _b(fromLeft, c); }; }
 
   /* ---------- Gringotts: depósitos a plazo fijo ---------- */
-  const PLAZOS = [[1, .04, '1 día'], [3, .12, '3 días'], [7, .3, '7 días']];
+  const PLAZOS = [[1, .05, '1 día'], [3, .15, '3 días'], [7, .4, '7 días'], [14, .9, '14 días'], [30, 2.2, '30 días']];
   function depositsHTML() {
     const s = st(), now = Date.now();
     return `<div class="glass-card rounded-2xl p-4 space-y-3"><h3 class="font-wizard font-bold text-amber-300">📈 Plazo fijo</h3><p class="text-[11px] text-stone-400">Deja tus galeones guardados un tiempo y recíbelos con intereses. No puedes sacarlos antes.</p>

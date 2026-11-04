@@ -11,7 +11,8 @@
 
   /* ---------- estado ---------- */
   V8.st = () => {
-    S.v8 = Object.assign({ frogs: 1, cards: {}, missions: null, daily: { last: '', streak: 0 }, avatar: null, room: {}, owned: [], effect: '', spells: [], beasts: [], riddle: { read: [] }, medals: {}, deposits: [], plant: null, stats: { movie: {}, hours: Array(24).fill(0), days: {} }, castle: {}, tut: {}, seenNews: '', titles: [], best: {} }, S.v8 || {});
+    const D = { frogs: 1, cards: {}, missions: null, daily: { last: '', streak: 0 }, avatar: null, room: {}, owned: [], effect: '', spells: [], beasts: [], riddle: { read: [] }, medals: {}, deposits: [], plant: null, stats: { movie: {}, hours: Array(24).fill(0), days: {} }, castle: {}, tut: {}, seenNews: '', titles: [], best: {} };
+    const o = S.v8 || (S.v8 = {}); for (const k in D) if (o[k] === undefined) o[k] = D[k];
     return S.v8;
   };
   V8.st();
@@ -88,7 +89,7 @@
   };
   V8.impl = (id, impl) => { V8.games[id] = Object.assign(V8.games[id] || {}, impl); };
   const loaded = {};
-  V8.load = file => loaded[file] || (loaded[file] = loadScript(file + '?v=' + V8.version).catch(e => { delete loaded[file]; throw e; }));
+  V8.load = file => loaded[file] || (loaded[file] = loadScript(file + '?v=' + (window.HP_BUILD || V8.version)).catch(e => { delete loaded[file]; throw e; }));
 
   const MAIN = ['chess', 'ludo', 'memory'];
   const ORDER = ['chess', 'ludo', 'memory', 'broom', 'snitch', 'quidditch', 'school', 'escape', 'potions', 'guess', 'hangman', 'map', 'q3d', 'mixta', 'snap', 'laberinto', 'dcao', 'bosque', 'lago', 'gobstones', 'ritmo', 'vuelo', 'caldero', 'herbologia', 'retrato', 'escape2', 'adivinacion', 'school', 'quidditch', 'map', 'potions', 'guess', 'hangman', 'escape'];
