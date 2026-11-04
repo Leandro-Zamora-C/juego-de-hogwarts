@@ -105,18 +105,18 @@
   function build3D(L, canvas) {
     const R = M3.create(canvas, { maxDpr: 2 }); if (!R) return null;
     const G = M3.G, mat = R.mat;
-    R.clear = [.03, .02, .05]; R.sky = [.55, .5, .62]; R.ground = [.12, .08, .06];
-    R.light.dir = M3.norm([-.45, -1, -.35]); R.light.color = [1.05, .95, .82];
-    R.fog = { color: [.03, .02, .05], density: .012 }; R.cam.fov = 40; R.cam.far = 200;
-    R.pl[0] = { pos: [0, 6, 0], color: [.6, .45, .25], range: 14 };
-    R.setShadow(V8.low() ? 0 : 1024, [0, 0, 0], 10);
+    R.clear = [.03, .02, .06]; R.sky = [.3, .27, .4]; R.ground = [.1, .075, .06];
+    R.light.dir = M3.norm([-.5, -1, -.6]); R.light.color = [1.0, .9, .76];
+    R.fog = { color: [.04, .03, .08], density: .016 }; R.cam.fov = 40; R.cam.far = 200;
+    R.pl[0] = { pos: [0, 7, 0], color: [.32, .22, .12], range: 11 };
+    R.setShadow(V8.low() ? 0 : (window.innerWidth < 700 ? 1024 : 2048), [0, 0, 0], 9);
     if (typeof c3SkyGeo === 'function') R.add(R.node(R.mesh(c3SkyGeo([.02, .02, .07], [.22, .12, .3], [.04, .03, .06])), mat({ unlit: true, bg: true, fog: false, ds: true }), { cast: false, scl: [2, 2, 2] }));
     // mesa y base de madera
-    R.add(R.node(R.mesh(G.plane(80, 80, 1, 1)), mat({ color: [.16, .1, .06], pat: 1, patS: .25, spec: .2 }), { pos: [0, -.62, 0], cast: false }));
-    R.add(R.node(R.mesh(G.box(16.4, .5, 16.4)), mat({ color: [.42, .24, .11], pat: 1, patS: .8, spec: .5, shin: 40 }), { pos: [0, -.3, 0] }));
+    R.add(R.node(R.mesh(G.plane(80, 80, 1, 1)), mat({ color: [.13, .08, .05], pat: 1, patS: .25, spec: .3, shin: 30 }), { pos: [0, -.62, 0], cast: false }));
+    R.add(R.node(R.mesh(G.box(16.4, .5, 16.4)), mat({ color: [.38, .2, .09], pat: 1, patS: .8, spec: .9, shin: 90, env: .15 }), { pos: [0, -.3, 0] }));
     R.add(R.node(R.mesh(G.merge([[G.box(16.6, .16, .3), G.at(0, .02, 8.15)], [G.box(16.6, .16, .3), G.at(0, .02, -8.15)], [G.box(.3, .16, 16.6), G.at(8.15, .02, 0)], [G.box(.3, .16, 16.6), G.at(-8.15, .02, 0)]])), mat({ color: [.95, .74, .3], spec: 1.3, shin: 90 })));
     // casillas
-    const parts = [], parch = hex('#efe2c2'), tile = G.box(.92, .1, .92);
+    const parts = [], parch = hex('#e9dcbc'), tile = G.box(.92, .1, .92);
     const put = (c, col, h = .1, s = .92) => parts.push([s === .92 && h === .1 ? tile : G.box(s, h, s), G.at(c[0] - 7, h / 2, c[1] - 7), col]);
     PATH.forEach((c, i) => { const startSeat = [0, 13, 26, 39].indexOf(i); put(c, startSeat >= 0 ? hex(SEATS[startSeat].color) : parch); });
     [0, 1, 2, 3].forEach(s => {
@@ -128,7 +128,7 @@
       YARD(s).forEach(c => parts.push([G.cyl(.38, .42, .06, 20), G.at(c[0] - 7, .16, c[1] - 7), hex(SEATS[s].light)]));
       void o;
     });
-    R.add(R.node(R.mesh(G.merge(parts)), mat({ color: [1, 1, 1], spec: .55, shin: 70, pat: 5, patS: .35, env: .12, bump: .08 })));
+    R.add(R.node(R.mesh(G.merge(parts)), mat({ color: [.92, .9, .88], spec: .75, shin: 110, env: .14, bump: 0 })));
     // centro: cuatro triángulos
     const tri = [[[-1.5, -1.5], [-1.5, 1.5], [0, 0]], [[-1.5, -1.5], [1.5, -1.5], [0, 0]], [[1.5, -1.5], [1.5, 1.5], [0, 0]], [[1.5, 1.5], [-1.5, 1.5], [0, 0]]];
     tri.forEach((t, s) => { const g = G.extrude(t.map(([x, y]) => [x, y]), .14); R.add(R.node(R.mesh(g), mat({ color: hex(SEATS[s].color), spec: .6, shin: 50 }), { pos: [0, .07, 0], rot: [Math.PI / 2, 0, 0] })); });
@@ -140,15 +140,17 @@
     R.add(R.node(R.mesh(G.merge(starParts)), mat({ color: [.98, .78, .25], spec: 1.2, shin: 80 }), { cast: false }));
     // fichas: peones como los del ajedrez
     // figuras talladas: pedestal + animal de cada casa (mira hacia +z)
-    const ped = G.lathe([[0, 0], [.32, 0], [.33, .05], [.3, .09], [.22, .13], [.17, .22], [.15, .3], [.21, .34], [.22, .37], [0, .37]], 28);
+    const SEG = V8.low() ? 24 : 48;
+    const ped = G.lathe([[0, 0], [.32, 0], [.335, .02], [.33, .05], [.3, .09], [.24, .12], [.2, .16], [.17, .22], [.155, .3], [.2, .33], [.215, .35], [.2, .37], [0, .37]], SEG);
     const lt = [1.35, 1.3, 1.25], dk = [.55, .55, .55];
     const FIG = {
-      Gryffindor: G.merge([[ped], [G.sphere(.2, 20, 14), G.at(0, .62, 0, 0, 0, 0, 1, 1, .8)], [G.torus(.2, .085, 22, 10), G.at(0, .62, -.02, Math.PI / 2, 0, 0)], [G.sphere(.15, 18, 12), G.at(0, .62, .07), lt], [G.sphere(.075, 12, 10), G.at(0, .58, .2), lt], [G.sphere(.035, 8, 6), G.at(0, .6, .27), dk], [G.sphere(.06, 10, 8), G.at(-.13, .78, .02)], [G.sphere(.06, 10, 8), G.at(.13, .78, .02)], [G.sphere(.024, 8, 6), G.at(-.06, .68, .2), dk], [G.sphere(.024, 8, 6), G.at(.06, .68, .2), dk]]),
-      Slytherin: G.merge([[ped], [G.torus(.17, .07, 22, 10), G.at(0, .45, 0)], [G.torus(.13, .062, 20, 10), G.at(0, .55, 0)], [G.torus(.09, .055, 18, 10), G.at(0, .64, 0)], [G.cyl(.05, .06, .2, 12), G.at(0, .66, .02)], [G.sphere(.1, 16, 12), G.at(0, .86, .06, 0, 0, 0, 1, .75, 1.35)], [G.sphere(.022, 8, 6), G.at(-.06, .9, .14), [2, 1.8, .4]], [G.sphere(.022, 8, 6), G.at(.06, .9, .14), [2, 1.8, .4]], [G.box(.015, .01, .1), G.at(0, .85, .24), [1.6, .3, .3]]]),
-      Hufflepuff: G.merge([[ped], [G.sphere(.19, 18, 12), G.at(0, .55, 0, 0, 0, 0, 1, .85, 1.05)], [G.sphere(.15, 18, 12), G.at(0, .72, .1, 0, 0, 0, 1, .9, 1.3)], [G.box(.07, .05, .34), G.at(0, .82, .1), lt], [G.sphere(.05, 10, 8), G.at(0, .7, .3), dk], [G.sphere(.045, 10, 8), G.at(-.11, .82, .0)], [G.sphere(.045, 10, 8), G.at(.11, .82, .0)], [G.sphere(.022, 8, 6), G.at(-.07, .76, .22), dk], [G.sphere(.022, 8, 6), G.at(.07, .76, .22), dk]]),
-      Ravenclaw: G.merge([[ped], [G.sphere(.15, 18, 12), G.at(0, .55, 0, 0, 0, 0, .9, 1.25, .9)], [G.box(.34, .05, .16), G.at(-.2, .66, -.03, 0, 0, .55)], [G.box(.34, .05, .16), G.at(.2, .66, -.03, 0, 0, -.55)], [G.box(.22, .04, .12), G.at(-.33, .78, -.04, 0, 0, .9)], [G.box(.22, .04, .12), G.at(.33, .78, -.04, 0, 0, -.9)], [G.sphere(.1, 16, 12), G.at(0, .78, .03), lt], [G.cyl(0, .045, .1, 10), G.at(0, .76, .12, Math.PI / 2, 0, 0), [1.6, 1.3, .4]], [G.sphere(.02, 8, 6), G.at(-.05, .81, .1), dk], [G.sphere(.02, 8, 6), G.at(.05, .81, .1), dk]])
+      Gryffindor: G.merge([[ped], [G.sphere(.2, 32, 22), G.at(0, .62, 0, 0, 0, 0, 1, 1, .8)], [G.torus(.2, .085, 36, 14), G.at(0, .62, -.02, Math.PI / 2, 0, 0)], [G.sphere(.15, 28, 18), G.at(0, .62, .07), lt], [G.sphere(.075, 12, 10), G.at(0, .58, .2), lt], [G.sphere(.035, 8, 6), G.at(0, .6, .27), dk], [G.sphere(.06, 10, 8), G.at(-.13, .78, .02)], [G.sphere(.06, 10, 8), G.at(.13, .78, .02)], [G.sphere(.024, 8, 6), G.at(-.06, .68, .2), dk], [G.sphere(.024, 8, 6), G.at(.06, .68, .2), dk]]),
+      Slytherin: G.merge([[ped], [G.torus(.17, .07, 36, 14), G.at(0, .45, 0)], [G.torus(.13, .062, 32, 12), G.at(0, .55, 0)], [G.torus(.09, .055, 28, 12), G.at(0, .64, 0)], [G.cyl(.05, .06, .2, 12), G.at(0, .66, .02)], [G.sphere(.1, 16, 12), G.at(0, .86, .06, 0, 0, 0, 1, .75, 1.35)], [G.sphere(.022, 8, 6), G.at(-.06, .9, .14), [2, 1.8, .4]], [G.sphere(.022, 8, 6), G.at(.06, .9, .14), [2, 1.8, .4]], [G.box(.015, .01, .1), G.at(0, .85, .24), [1.6, .3, .3]]]),
+      Hufflepuff: G.merge([[ped], [G.sphere(.19, 30, 20), G.at(0, .55, 0, 0, 0, 0, 1, .85, 1.05)], [G.sphere(.15, 28, 18), G.at(0, .72, .1, 0, 0, 0, 1, .9, 1.3)], [G.box(.07, .05, .34), G.at(0, .82, .1), lt], [G.sphere(.05, 10, 8), G.at(0, .7, .3), dk], [G.sphere(.045, 10, 8), G.at(-.11, .82, .0)], [G.sphere(.045, 10, 8), G.at(.11, .82, .0)], [G.sphere(.022, 8, 6), G.at(-.07, .76, .22), dk], [G.sphere(.022, 8, 6), G.at(.07, .76, .22), dk]]),
+      Ravenclaw: G.merge([[ped], [G.sphere(.15, 28, 20), G.at(0, .55, 0, 0, 0, 0, .9, 1.25, .9)], [G.box(.34, .05, .16), G.at(-.2, .66, -.03, 0, 0, .55)], [G.box(.34, .05, .16), G.at(.2, .66, -.03, 0, 0, -.55)], [G.box(.22, .04, .12), G.at(-.33, .78, -.04, 0, 0, .9)], [G.box(.22, .04, .12), G.at(.33, .78, -.04, 0, 0, -.9)], [G.sphere(.1, 24, 16), G.at(0, .78, .03), lt], [G.cyl(0, .045, .1, 10), G.at(0, .76, .12, Math.PI / 2, 0, 0), [1.6, 1.3, .4]], [G.sphere(.02, 8, 6), G.at(-.05, .81, .1), dk], [G.sphere(.02, 8, 6), G.at(.05, .81, .1), dk]])
     };
     const figM = {}; Object.keys(FIG).forEach(k => figM[k] = R.mesh(FIG[k]));
+    const ringM = R.mesh(G.torus(.215, .022, SEG, 10)), goldM = mat({ color: [1, .78, .32], spec: 1.6, shin: 140, env: .7 });
     // velas reales en las esquinas de la mesa
     const candleG = R.mesh(G.cyl(.14, .17, 1.2, 16)), flameG = R.mesh(G.sphere(.11, 12, 8));
     const wax = mat({ color: [.95, .9, .78], spec: .2, em: [.14, .09, .03] }), fl = mat({ color: [1, .7, .25], unlit: true, add: true, op: .95, fog: false });
@@ -158,8 +160,8 @@
     L.G.players.forEach((pl, pi) => {
       const sm = SEATS[pl.seat], m = mat({ color: hex(sm.color).map(v => Math.min(1, v * 1.1)), spec: .9, shin: 60, rim: .35, rimC: hex(sm.light) });
       L.mats[pi] = m;
-      m.env = .45; m.spec = 1.1; m.shin = 90;
-      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); const n = R.add(R.node(figM[sm.house] || figM.Gryffindor, m, { pos: [w[0], .12, w[1]], scl: [1.15, 1.15, 1.15] })); if (window.M3ao) { const ao = M3ao(R); R.add(R.node(ao.mesh, ao.mat, { pos: [0, .01, 0], scl: [.8, 1, .8], cast: false }), n); } return n; });
+      m.env = .35; m.spec = 1.3; m.shin = 130; m.rim = .22;
+      L.p3[pi] = [0, 1, 2, 3].map(k => { const w = world(pl.seat, L.G.pieces[pi][k], k); const n = R.add(R.node(figM[sm.house] || figM.Gryffindor, m, { pos: [w[0], .12, w[1]], scl: [1.15, 1.15, 1.15] })); R.add(R.node(ringM, goldM, { pos: [0, .355, 0], cast: false }), n); if (window.M3ao) { const ao = M3ao(R); R.add(R.node(ao.mesh, ao.mat, { pos: [0, .01, 0], scl: [.8, 1, .8], cast: false }), n); } return n; });
     });
     return R;
   }

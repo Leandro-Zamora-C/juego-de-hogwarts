@@ -86,9 +86,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://juego-de-hogwarts.vercel.app/img/app/compartir.jpg">
 <!-- Estilos ya preparados (carga rápida). Tailwind se completa después de abrir la página. -->
-<link rel="stylesheet" href="css/tailwind.css?v=9.4">
+<link rel="stylesheet" href="css/tailwind.css?v=9.5">
 <script>
-window.HP_BUILD = '9.4';
+window.HP_BUILD = '9.5';
 window.HP_TW = { darkMode: 'class', theme: { extend: {
   fontFamily: { serif: ['Cinzel','Georgia','serif'], hand: ['Caveat','cursive'], sans: ['Montserrat','sans-serif'] },
   colors: { amber: { 50: 'rgb(var(--amber-50) / <alpha-value>)', 100: 'rgb(var(--amber-100) / <alpha-value>)', 200: 'rgb(var(--amber-200) / <alpha-value>)', 300: 'rgb(var(--amber-300) / <alpha-value>)', 400: 'rgb(var(--amber-400) / <alpha-value>)', 500: 'rgb(var(--amber-500) / <alpha-value>)', 600: 'rgb(var(--amber-600) / <alpha-value>)', 700: 'rgb(var(--amber-700) / <alpha-value>)', 800: 'rgb(var(--amber-800) / <alpha-value>)', 900: 'rgb(var(--amber-900) / <alpha-value>)', 950: 'rgb(var(--amber-950) / <alpha-value>)' } }
@@ -504,21 +504,21 @@ window.HP_TW = { darkMode: 'class', theme: { extend: {
   .ch-caps svg { width: 16px; height: 16px; filter: none; }
   .online-badge { position: absolute; top: .5rem; left: .5rem; font-size: 9px; font-weight: 700; background: rgba(14,116,144,.9); color: #e0f2fe; padding: .1rem .5rem; border-radius: 999px; }
 </style>
-<link rel="stylesheet" href="css/v7.css?v=9.4">
-<script defer src="js/v7-duelo.js?v=9.4"></script>
-<script defer src="js/v7-magia.js?v=9.4"></script>
-<link rel="stylesheet" href="css/v8.css?v=9.4">
-<link rel="stylesheet" href="css/v9.css?v=9.4">
-<script defer src="js/v8-nucleo.js?v=9.4"></script>
-<script defer src="js/v8-coleccion.js?v=9.4"></script>
-<script defer src="js/v8-progreso.js?v=9.4"></script>
-<script defer src="js/v8-mundo.js?v=9.4"></script>
-<script defer src="js/v8-sistema.js?v=9.4"></script>
-<script defer src="js/v9-graficos.js?v=9.4"></script>
-<script defer src="js/v9-app.js?v=9.4"></script>
-<script defer src="js/v9-juego.js?v=9.4"></script>
-<script defer src="js/v9-patronus.js?v=9.4"></script>
-<script defer src="js/v9-extras.js?v=9.4"></script>
+<link rel="stylesheet" href="css/v7.css?v=9.5">
+<script defer src="js/v7-duelo.js?v=9.5"></script>
+<script defer src="js/v7-magia.js?v=9.5"></script>
+<link rel="stylesheet" href="css/v8.css?v=9.5">
+<link rel="stylesheet" href="css/v9.css?v=9.5">
+<script defer src="js/v8-nucleo.js?v=9.5"></script>
+<script defer src="js/v8-coleccion.js?v=9.5"></script>
+<script defer src="js/v8-progreso.js?v=9.5"></script>
+<script defer src="js/v8-mundo.js?v=9.5"></script>
+<script defer src="js/v8-sistema.js?v=9.5"></script>
+<script defer src="js/v9-graficos.js?v=9.5"></script>
+<script defer src="js/v9-app.js?v=9.5"></script>
+<script defer src="js/v9-juego.js?v=9.5"></script>
+<script defer src="js/v9-patronus.js?v=9.5"></script>
+<script defer src="js/v9-extras.js?v=9.5"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -7796,7 +7796,7 @@ const C3 = { R: null, raf: 0, state: null, anims: [], frags: [], sparks: [], mes
 function c3Arc(cy, r, a0, a1, n) { const o = []; for (let k = 0; k <= n; k++) { const a = (a0 + (a1 - a0) * k / n) * Math.PI / 180; o.push([Math.cos(a) * r, cy + Math.sin(a) * r]); } return o; }
 function c3Base(rb) { return [[0, 0], [rb, 0], [rb, 0], [rb, .05], [rb * .93, .08], [rb * .95, .11], [rb * .97, .13], [rb * .78, .16], [rb * .7, .19]]; }
 function c3Meshes(R) {
-  const G = M3.G, at = G.at, L = (p, s = 40) => G.lathe(p, s);
+  const G = M3.G, at = G.at, L = (p, s = (window.V8 && V8.low && V8.low() ? 32 : 64)) => G.lathe(p, s);
   const pawn = L([...c3Base(.34), [.17, .3], [.12, .42], [.2, .45], [.21, .47], [.2, .49], [.11, .5], ...c3Arc(.61, .13, -60, 90, 10)]);
   const rookBody = L([...c3Base(.37), [.26, .26], [.23, .6], [.3, .64], [.31, .67], [.3, .72], [.28, .74], [.28, .78], [.2, .78], [.2, .74], [0, .74]]);
   const merlons = []; for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; merlons.push([G.box(.13, .12, .1), at(Math.cos(a) * .24, .84, Math.sin(a) * .24, 0, -a)]); }

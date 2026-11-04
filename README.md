@@ -27,6 +27,7 @@
 - Sin velas duplicadas ni capa de tinte a pantalla completa; la textura de las tarjetas es una imagen liviana (antes un filtro SVG muy costoso al pintar).
 - Las pestañas aparecen al instante (la tarjeta de mago se dibuja justo después), los toques responden sin espera y las ventanas no arrastran la página de atrás.
 - En celular, el Gran Salón y el exterior de la portada no usan posprocesado; los juegos 3D sí.
+- Ludo con la misma iluminación cálida del ajedrez, casillas lacadas, sombras finas y figuras más detalladas con anillo de oro; piezas de ajedrez más suaves.
 
 ## Versión 9.3 · Patronus, Ministerio y más realismo
 
