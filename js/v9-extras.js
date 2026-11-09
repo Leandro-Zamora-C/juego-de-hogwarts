@@ -61,7 +61,7 @@
     if (!pay(price, 'Cambio de nombre')) return;
     st().names.push({ from: cur, to: v, t: Date.now() }); S.student = v; S.rankName = v.slice(0, 20);
     try { if (typeof gr !== 'undefined') gr.me = v; } catch (e) {}
-    V9E.saveNow(); try { publishProfile(); } catch (e) {} try { renderAll(); } catch (e) {}
+    V9E.saveNow(); try { publishProfile(); } catch (e) {} try { if (typeof submitRanking === 'function') submitRanking(false); } catch (e) {} try { renderAll(); } catch (e) {}
     V8.closeSheet(); sfx('levelup'); fireConfetti({ particleCount: 70, spread: 80 }); toast(`Ahora eres <b>${esc(v)}</b>`, '📜');
   };
 
@@ -74,6 +74,19 @@
       return _gl.apply(this, arguments);
     };
   }
+
+  // el apodo del ranking es siempre tu nombre de la cuenta (así no se cambia gratis por ahí)
+  if (typeof submitRanking === 'function') {
+    const _sr = submitRanking;
+    window.submitRanking = submitRanking = function (manual) {
+      if (S.student) { const i = $('rankingName'); if (i) i.value = S.student.slice(0, 20); S.rankName = S.student.slice(0, 20); }
+      return _sr.apply(this, arguments);
+    };
+  }
+  const lockRankName = () => { const i = $('rankingName'); if (i && S.student) { i.value = S.student.slice(0, 20); i.readOnly = true; i.title = 'Tu nombre se cambia en el Registro del Ministerio'; } };
+  setInterval(lockRankName, 3000); lockRankName();
+  // cambios de perfil (marco, túnica, mascota, patronus) se suben al momento
+  ['buyFrame', 'buyRobe', 'buyPet'].forEach(k => { const f = V9E[k]; if (f) V9E[k] = function () { const r = f.apply(this, arguments); clearTimeout(V9E._pt); V9E._pt = setTimeout(() => { V9E.saveNow(); }, 400); return r; }; });
 
   /* ---------- 23. ofertas del día ---------- */
   const seed = s => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };

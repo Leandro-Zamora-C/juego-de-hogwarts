@@ -185,7 +185,7 @@
     open() { V8.sheet('🦌 Patronus', `<div id="v9PatBox">${V9P.html()}</div>`, { wide: true }); V9P.mount(); },
     refresh() { const b = $('v9PatBox'); if (b) { b.innerHTML = V9P.html(); V9P.mount(); } const panel = $('v9PatShop'); if (panel) { panel.innerHTML = V9P.html(); V9P.mount(); } },
     mount() { const c = $('v9PatView'), s = st(); if (c && s.cur) viewer(c, byId(s.cur)); },
-    equip(id) { const s = st(); if (!s.owned.includes(id)) return; s.cur = id; save(); sfx('spell'); toast(`Tu patronus ahora es: ${byId(id).name}`, byId(id).e); V9P.refresh(); },
+    equip(id) { const s = st(); if (!s.owned.includes(id)) return; s.cur = id; if (window.V9E && V9E.saveNow) V9E.saveNow(); else save(); sfx('spell'); toast(`Tu patronus ahora es: ${byId(id).name}`, byId(id).e); V9P.refresh(); },
     buy(id) {
       const p = byId(id), s = st(); if (!p || s.owned.includes(id) || p.r === 'm') return;
       if (p.r === 'ev' && !evOpen(p)) return toast('Este patronus solo aparece en su fecha.', '📅');

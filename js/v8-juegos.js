@@ -563,24 +563,44 @@
   /* =====================================================================
      13. ADIVINA EL RETRATO
   ===================================================================== */
+  const RETRATOS_EXTRA = [
+    ['petunia', 'Petunia Dursley', '', '🏠', 'Tía de Harry. Odia todo lo que tenga que ver con la magia.'], ['vernon', 'Vernon Dursley', '', '🔩', 'Tío de Harry y director de la fábrica de taladros Grunnings.'],
+    ['dudley', 'Dudley Dursley', '', '🐷', 'Primo de Harry. Una vez le salió una cola de cerdo.'], ['fudge', 'Cornelius Fudge', '', '🎩', 'Ministro de Magia que se negó a creer que Voldemort había vuelto.'],
+    ['scrimgeour', 'Rufus Scrimgeour', '', '🦁', 'Ministro de Magia y antiguo jefe de los aurores.'], ['aberforth', 'Aberforth Dumbledore', 'Gryffindor', '🐐', 'Dueño de Cabeza de Puerco y hermano de Albus.'],
+    ['narcissa', 'Narcissa Malfoy', 'Slytherin', '🌼', 'Madre de Draco. Le mintió a Voldemort en el Bosque Prohibido.'], ['seamus', 'Seamus Finnigan', 'Gryffindor', '💥', 'Todo lo que toca termina explotando.'],
+    ['dean', 'Dean Thomas', 'Gryffindor', '⚽', 'Fanático del fútbol y compañero de cuarto de Harry.'], ['lavender', 'Lavender Brown', 'Gryffindor', '💗', 'Llamaba «Ro-Ro» a su novio.'],
+    ['quirrell', 'Quirinus Quirrell', 'Ravenclaw', '🧣', 'Profesor de Defensa que escondía algo bajo el turbante.'], ['crouch', 'Barty Crouch Jr.', '', '🧪', 'Se hizo pasar por Ojoloco Moody con poción multijugos.'],
+    ['maxime', 'Madame Maxime', '', '🦋', 'Directora de la Academia Beauxbatons.'], ['karkaroff', 'Igor Karkaroff', '', '❄️', 'Director de Durmstrang y antiguo mortífago.'],
+    ['griphook', 'Griphook', '', '🗡️', 'Duende de Gringotts que ayudó a entrar a la cámara de los Lestrange.'], ['kreacher', 'Kreacher', '', '🧦', 'Elfo doméstico de la familia Black.'],
+    ['percy', 'Percy Weasley', 'Gryffindor', '📏', 'Prefecto perfecto que terminó trabajando en el Ministerio.'], ['bill', 'Bill Weasley', 'Gryffindor', '🏦', 'Rompedor de maldiciones de Gringotts.'],
+    ['wood', 'Oliver Wood', 'Gryffindor', '🧹', 'Capitán y guardián del equipo de Quidditch de Gryffindor.'], ['lily', 'Lily Potter', 'Gryffindor', '🦌', 'Su amor protegió a Harry de la maldición asesina.'],
+    ['james', 'James Potter', 'Gryffindor', '🦌', 'Cornamenta, uno de los Merodeadores.'], ['xenophilius', 'Xenophilius Lovegood', 'Ravenclaw', '📰', 'Editor de la revista El Quisquilloso.'],
+    ['riddle', 'Tom Riddle', 'Slytherin', '📓', 'El joven que abrió la Cámara de los Secretos.']
+  ].map(([id, name, house, sym, info]) => ({ id, name, house, sym, info }));
+  // todos los retratos: los cromos (menos los fantasmas sin foto) + los personajes extra
+  const RETRATOS_POOL = () => [...V8.CARDS.filter(c => !['nearly', 'fraile', 'dama', 'baron'].includes(c.id)), ...RETRATOS_EXTRA];
+
   def('retrato', {
     howto: ['El retrato (o la tarjeta con pistas) está tapado por 16 cuadros que se van destapando.', 'Elige quién es antes de que se vea todo: más rápido, más puntos.', 'Puedes poner tus propias imágenes en la carpeta img/personajes (lee la guía).'],
     best: b => b ? `Récord: ${b}` : '',
-    intro: () => intro('retrato', '🖼️', 'Ocho retratos tapados. Se destapan de a poco: adivina quién es cuanto antes para ganar más puntos.'),
+    intro: () => intro('retrato', '🖼️', 'Diez retratos tapados de entre casi 80 personajes. Se destapan de a poco: adivina quién es cuanto antes para ganar más puntos.'),
     play() {
       begin('retrato');
-      const rounds = V8.shuffle(V8.CARDS.filter(c => !['nearly', 'fraile', 'dama', 'baron'].includes(c.id))).slice(0, 8); const plans = rounds.map(() => V8.rng(Math.floor(Math.random() * 2 ** 31))); let r = 0, score = 0;
+      const POOL = RETRATOS_POOL(), N = 10;
+      const rounds = V8.shuffle(POOL).slice(0, N); const plans = rounds.map(() => V8.rng(Math.floor(Math.random() * 2 ** 31))); let r = 0, score = 0, streak = 0, hits = [];
       const next = () => {
         if (!RUN || RUN.id !== 'retrato') return;
-        if (r >= rounds.length) return end('retrato', { icon: '🖼️', title: `${score} puntos`, lines: ['¡Buen ojo para los retratos!'], points: Math.round(score / 20), record: score });
-        const rr = plans[r], c = rounds[r++], opts = V8.shuffle([c, ...V8.shuffle(V8.CARDS.filter(x => x.id !== c.id), rr).slice(0, 3)], rr);
+        if (r >= rounds.length) return end('retrato', { icon: '🖼️', title: `${score} puntos`, lines: [`Acertaste ${hits.length} de ${N} retratos.`, hits.length ? `<span class="v9-rt-gal">${hits.map(id => `<img src="img/personajes/${id}.jpg" alt="">`).join('')}</span>` : '¡Sigue practicando!'], points: Math.round(score / 20), record: score });
+        // las opciones falsas se parecen: primero de la misma casa, así es más difícil adivinar
+        const rr = plans[r], c = rounds[r++], same = V8.shuffle(POOL.filter(x => x.id !== c.id && x.house === c.house), rr), rest = V8.shuffle(POOL.filter(x => x.id !== c.id && x.house !== c.house), rr);
+        const opts = V8.shuffle([c, ...same.slice(0, 2), ...rest].slice(0, 4), rr);
         const order = V8.shuffle([...Array(16).keys()], rr); let shown = 0, answered = false;
-        body().innerHTML = wrap(`${hud([['rtR', 'Retrato', `${r}/8`], ['rtS', 'Puntos', score]])}<div class="v8-portrait-game"><div class="pic" id="rtPic"><div class="clue"><span>${c.sym}</span><b>${c.house || 'Sin casa'}</b><p>${esc(c.info)}</p></div><img alt="" id="rtImg" style="display:none"><div class="tiles">${order.map(i => `<i data-i="${i}"></i>`).join('')}</div></div>
+        body().innerHTML = wrap(`${hud([['rtR', 'Retrato', `${r}/${N}`], ['rtS', 'Puntos', score], ['rtK', 'Racha', streak ? '🔥' + streak : '—']])}<div class="v8-portrait-game"><div class="pic" id="rtPic"><div class="clue"><span>${c.sym}</span><b>${c.house || 'Sin casa'}</b><p>${esc(c.info)}</p></div><img alt="" id="rtImg" style="display:none"><div class="tiles">${order.map(i => `<i data-i="${i}"></i>`).join('')}</div></div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">${opts.map(o => `<button class="opt-btn" data-id="${o.id}">${esc(o.name)}</button>`).join('')}</div></div>`);
         const img = $('rtImg'); img.onload = () => { img.style.display = 'block'; const cl = $('rtPic').querySelector('.clue'); if (cl) cl.style.display = 'none'; }; img.src = `img/personajes/${c.id}.jpg`;
         const tiles = [...document.querySelectorAll('.v8-portrait-game .tiles i')];
         const reveal = every(() => { if (answered) return; if (shown < 16) { const t = tiles.find(x => +x.dataset.i === order[shown]); t && t.classList.add('off'); shown++; } }, 900);
-        document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(b => b.onclick = () => { if (answered) return; answered = true; clearInterval(reveal); const good = b.dataset.id === c.id; tiles.forEach(t => t.classList.add('off')); document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(x => { x.disabled = true; if (x.dataset.id === c.id) x.classList.add('correct'); }); if (!good) b.classList.add('wrong'); if (good) { score += Math.max(10, 100 - shown * 6); set('rtS', score); } sfx(good ? 'correct' : 'wrong'); later(next, 1300); });
+        document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(b => b.onclick = () => { if (answered) return; answered = true; clearInterval(reveal); const good = b.dataset.id === c.id; tiles.forEach(t => t.classList.add('off')); document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(x => { x.disabled = true; if (x.dataset.id === c.id) x.classList.add('correct'); }); if (!good) b.classList.add('wrong'); if (good) { streak++; hits.push(c.id); score += Math.max(10, 100 - shown * 6) + (streak >= 3 ? 20 : 0); set('rtS', score); set('rtK', '🔥' + streak); } else { streak = 0; set('rtK', '—'); } sfx(good ? 'correct' : 'wrong'); later(next, 1300); });
       };
       next();
     }

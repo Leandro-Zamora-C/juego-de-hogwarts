@@ -91,8 +91,8 @@
   const loaded = {};
   V8.load = file => loaded[file] || (loaded[file] = loadScript(file + '?v=' + (window.HP_BUILD || V8.version)).catch(e => { delete loaded[file]; throw e; }));
 
-  const MAIN = ['chess', 'ludo', 'memory'];
-  const ORDER = ['chess', 'ludo', 'memory', 'broom', 'snitch', 'quidditch', 'school', 'escape', 'potions', 'guess', 'hangman', 'map', 'q3d', 'mixta', 'snap', 'laberinto', 'dcao', 'bosque', 'lago', 'gobstones', 'ritmo', 'vuelo', 'caldero', 'herbologia', 'retrato', 'escape2', 'adivinacion', 'school', 'quidditch', 'map', 'potions', 'guess', 'hangman', 'escape'];
+  const MAIN = ['chess', 'ludo', 'memory', 'retrato'];
+  const ORDER = ['chess', 'ludo', 'memory', 'retrato', 'broom', 'snitch', 'quidditch', 'school', 'escape', 'potions', 'guess', 'hangman', 'map', 'q3d', 'mixta', 'snap', 'laberinto', 'dcao', 'bosque', 'lago', 'gobstones', 'ritmo', 'vuelo', 'caldero', 'herbologia', 'retrato', 'escape2', 'adivinacion', 'school', 'quidditch', 'map', 'potions', 'guess', 'hangman', 'escape'];
   const sortGames = () => GAMES.sort((a, b) => { const ia = ORDER.indexOf(a.id), ib = ORDER.indexOf(b.id); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
 
   const _open = openGame; // ya protegido por la cuenta (v7)

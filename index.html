@@ -86,9 +86,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://juego-de-hogwarts.vercel.app/img/app/compartir.jpg">
 <!-- Estilos ya preparados (carga rápida). Tailwind se completa después de abrir la página. -->
-<link rel="stylesheet" href="css/tailwind.css?v=9.5">
+<link rel="stylesheet" href="css/tailwind.css?v=9.6">
 <script>
-window.HP_BUILD = '9.5';
+window.HP_BUILD = '9.6';
 window.HP_TW = { darkMode: 'class', theme: { extend: {
   fontFamily: { serif: ['Cinzel','Georgia','serif'], hand: ['Caveat','cursive'], sans: ['Montserrat','sans-serif'] },
   colors: { amber: { 50: 'rgb(var(--amber-50) / <alpha-value>)', 100: 'rgb(var(--amber-100) / <alpha-value>)', 200: 'rgb(var(--amber-200) / <alpha-value>)', 300: 'rgb(var(--amber-300) / <alpha-value>)', 400: 'rgb(var(--amber-400) / <alpha-value>)', 500: 'rgb(var(--amber-500) / <alpha-value>)', 600: 'rgb(var(--amber-600) / <alpha-value>)', 700: 'rgb(var(--amber-700) / <alpha-value>)', 800: 'rgb(var(--amber-800) / <alpha-value>)', 900: 'rgb(var(--amber-900) / <alpha-value>)', 950: 'rgb(var(--amber-950) / <alpha-value>)' } }
@@ -504,21 +504,21 @@ window.HP_TW = { darkMode: 'class', theme: { extend: {
   .ch-caps svg { width: 16px; height: 16px; filter: none; }
   .online-badge { position: absolute; top: .5rem; left: .5rem; font-size: 9px; font-weight: 700; background: rgba(14,116,144,.9); color: #e0f2fe; padding: .1rem .5rem; border-radius: 999px; }
 </style>
-<link rel="stylesheet" href="css/v7.css?v=9.5">
-<script defer src="js/v7-duelo.js?v=9.5"></script>
-<script defer src="js/v7-magia.js?v=9.5"></script>
-<link rel="stylesheet" href="css/v8.css?v=9.5">
-<link rel="stylesheet" href="css/v9.css?v=9.5">
-<script defer src="js/v8-nucleo.js?v=9.5"></script>
-<script defer src="js/v8-coleccion.js?v=9.5"></script>
-<script defer src="js/v8-progreso.js?v=9.5"></script>
-<script defer src="js/v8-mundo.js?v=9.5"></script>
-<script defer src="js/v8-sistema.js?v=9.5"></script>
-<script defer src="js/v9-graficos.js?v=9.5"></script>
-<script defer src="js/v9-app.js?v=9.5"></script>
-<script defer src="js/v9-juego.js?v=9.5"></script>
-<script defer src="js/v9-patronus.js?v=9.5"></script>
-<script defer src="js/v9-extras.js?v=9.5"></script>
+<link rel="stylesheet" href="css/v7.css?v=9.6">
+<script defer src="js/v7-duelo.js?v=9.6"></script>
+<script defer src="js/v7-magia.js?v=9.6"></script>
+<link rel="stylesheet" href="css/v8.css?v=9.6">
+<link rel="stylesheet" href="css/v9.css?v=9.6">
+<script defer src="js/v8-nucleo.js?v=9.6"></script>
+<script defer src="js/v8-coleccion.js?v=9.6"></script>
+<script defer src="js/v8-progreso.js?v=9.6"></script>
+<script defer src="js/v8-mundo.js?v=9.6"></script>
+<script defer src="js/v8-sistema.js?v=9.6"></script>
+<script defer src="js/v9-graficos.js?v=9.6"></script>
+<script defer src="js/v9-app.js?v=9.6"></script>
+<script defer src="js/v9-juego.js?v=9.6"></script>
+<script defer src="js/v9-patronus.js?v=9.6"></script>
+<script defer src="js/v9-extras.js?v=9.6"></script>
 </head>
 <body class="min-h-screen flex flex-col relative pb-20 md:pb-0">
 
@@ -5037,7 +5037,19 @@ function mergeProgress(newer, older) {
     if (a.riddle || b.riddle) a.riddle = Object.assign({}, b.riddle, a.riddle, { read: uni((a.riddle || {}).read, (b.riddle || {}).read) });
     a.records = maxObj(a.records, b.records);
   }
-  if (R.v9 || O.v9) { const a = R.v9 = R.v9 || {}, b = O.v9 || {}; a.rivals = Object.assign({}, b.rivals, a.rivals); }
+  if (R.v9 || O.v9) { const a = R.v9 = R.v9 || {}, b = O.v9 || {}; a.rivals = Object.assign({}, b.rivals, a.rivals); ['wheel'].forEach(k => { if ((b[k] || '') > (a[k] || '')) a[k] = b[k]; }); a.chest = Math.max(a.chest || 0, b.chest || 0); }
+  // patronus: se juntan los que tengas en cualquier dispositivo, con su mejor nivel
+  if (R.v9p || O.v9p) { const a = R.v9p = R.v9p || {}, b = O.v9p || {}; a.owned = uni(a.owned, b.owned); a.myth = uni(a.myth, b.myth); a.casts = maxObj(a.casts, b.casts); a.test = !!(a.test || b.test); if (!a.cur && b.cur) a.cur = b.cur; a.inv = Object.assign({}, b.inv, a.inv); }
+  // ropero, marcos, mascotas, nombres e historia
+  if (R.v9x || O.v9x) { const a = R.v9x = R.v9x || {}, b = O.v9x || {};
+    ['frames', 'robes', 'pets'].forEach(k => a[k] = uni(a[k], b[k]));
+    a.names = (a.names || []).length >= (b.names || []).length ? a.names || [] : b.names;
+    if (!a.firma && b.firma) a.firma = b.firma; if ((b.wchest || '') > (a.wchest || '')) a.wchest = b.wchest;
+    const sa = a.story || { y: 0, p: {} }, sb2 = b.story || { y: 0, p: {} }; a.story = { y: Math.max(sa.y || 0, sb2.y || 0), p: maxObj(sa.p, sb2.p) }; }
+  // Ludo: dados comprados y estadísticas
+  if (R.v9l || O.v9l) { const a = R.v9l = R.v9l || {}, b = O.v9l || {}; a.skins = uni(a.skins, b.skins); a.stats = maxObj(a.stats, b.stats); }
+  if (R.v9shop || O.v9shop) R.v9shop = uni(R.v9shop, O.v9shop).sort((x, y) => (x.t || 0) - (y.t || 0)).slice(-150);
+  if (R.v8 || O.v8) { const a = R.v8, b = O.v8 || {}; if (a && b.seenNews && (b.seenNews > (a.seenNews || ''))) a.seenNews = b.seenNews; if (a && b.daily && b.daily.last && (!a.daily || (b.daily.last > (a.daily.last || '')))) a.daily = b.daily; }
   return R;
 }
 cloud.syncedAt = 0;

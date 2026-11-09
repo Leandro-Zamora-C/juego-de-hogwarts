@@ -14,13 +14,19 @@
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
-![Versión](https://img.shields.io/badge/versión-9.4-7c3aed)
+![Versión](https://img.shields.io/badge/versión-9.6-7c3aed)
 
 </div>
 
 ---
 
-## 🆕 Versión 9.4 · Toda la página más fluida
+## 🆕 Versión 9.6 · Ludo Club, Retratos reales y progreso por cuenta
+
+- **Ludo estilo Ludo Club**: modos Clásico, Rápido (fichas afuera, ganan 2 a la meta), Maestro (hay que atrapar una ficha antes de entrar a casa) y Equipos 2 vs 2; pozo de galeones (0, 50, 200 o 1000 por jugador); tiempo de 15 s por turno; avisos de ¡SEIS!, ¡ATRAPADA! y ¡A CASA!; emojis en la partida; dados mágicos comprables; estadísticas (partidas, ganadas, atrapadas, seises, racha). Todo funciona también en línea.
+- **Adivina el Retrato** pasa a ser juego principal: 79 retratos reales, 10 rondas, racha con premio y galería de aciertos al final.
+- **Progreso por cuenta**: patronus, marcos, túnicas, mascotas, nombre, historia, dados y estadísticas del Ludo se juntan bien entre celulares. El nombre del ranking es siempre tu nombre de mago y cambiarlo se sube al instante.
+
+## Versión 9.4 · Toda la página más fluida
 
 - Mientras desplazas, la decoración (cielo, clima, Gran Salón, exterior) espera un instante y el celular dedica todo al desplazamiento.
 - El cielo dibuja una sola vez las estrellas quietas y solo anima las que titilan.
@@ -78,7 +84,7 @@
 
 - **🎲 Ludo Mágico** con las cuatro casas: tablero 3D (o clásico 2D), contra la IA, varios en el mismo celular o **en línea con amigos de 2, 3 o 4 jugadores**. Reglas: sale con 6, el 6 repite, comer o llegar a la meta da otro tiro, estrellas seguras.
 - **19 juegos en línea con amigos**: Ajedrez, Ludo, Memoria, Escoba, Snitch, Duelo y 13 juegos nuevos (los dos juegan la misma partida y gana el mejor puntaje).
-- **Sala de Juegos ordenada**: Ajedrez, Ludo y Memoria primero, y **15 juegos nuevos**: Quidditch 3D, Trivia Mixta (imagen, verdadero o falso, ordenar sucesos, ¿quién lo dijo?), Snap Explosivo, Laberinto del Torneo, Defensa Contra las Artes Oscuras, Bosque Prohibido, Lago Negro, Gobstones, Encantamientos al Ritmo, Clase de Vuelo, Pociones Avanzadas, Herbología (tu planta crece con los días), Adivina el Retrato, Escape del Mes y Adivinación.
+- **Sala de Juegos ordenada**: Ajedrez, Ludo, Memoria y Adivina el Retrato primero, y **15 juegos nuevos**: Quidditch 3D, Trivia Mixta (imagen, verdadero o falso, ordenar sucesos, ¿quién lo dijo?), Snap Explosivo, Laberinto del Torneo, Defensa Contra las Artes Oscuras, Bosque Prohibido, Lago Negro, Gobstones, Encantamientos al Ritmo, Clase de Vuelo, Pociones Avanzadas, Herbología (tu planta crece con los días), Adivina el Retrato, Escape del Mes y Adivinación.
 - **Colección**: 60 cromos de ranas de chocolate (con intercambio entre amigos), libro de 36 hechizos, bestiario de 30 criaturas, medallas por película, diario de Tom Riddle (un capítulo por semana), sala común decorable y avatar de mago.
 - **Progreso diario**: misiones diarias y semanales, premio por entrar cada día con cofre al día 7, títulos que se ganan con logros, efectos de varita, Gringotts a plazo fijo y diploma de 7.º año.
 - **Mapa del castillo**: escaleras que cambian (premio escondido cada día), Sala de los Menesteres, retratos que hablan, fantasmas, clima mágico y lechucería para enviar cartas a tus amigos.

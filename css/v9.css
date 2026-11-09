@@ -319,3 +319,35 @@ button, a, [onclick], label, select, input, .v9-tile, .v8-chip { touch-action: m
 .v8-sheet-body, #dialog > div, .v9-strip, .v9-shelf { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 #skyCanvas, #candleField, #fxCanvas { contain: strict; }
 main { contain: layout style; }
+.v9-rt-gal { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 6px; } .v9-rt-gal img { width: 38px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #fbbf24; }
+
+/* =====================================================================
+   9.5 · LUDO AL ESTILO LUDO CLUB
+   ===================================================================== */
+.v9-lban { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) scale(.4); opacity: 0; pointer-events: none; text-align: center; z-index: 6; }
+.v9-lban.show { animation: v9Ban 1.3s cubic-bezier(.2,1.4,.4,1) forwards; }
+.v9-lban b { display: block; font-family: Cinzel, Georgia, serif; font-size: clamp(28px, 7vw, 54px); font-weight: 900; letter-spacing: 2px; -webkit-text-stroke: 1.5px rgba(0,0,0,.7); text-shadow: 0 4px 0 rgba(0,0,0,.6), 0 0 26px currentColor; white-space: nowrap; }
+.v9-lban small { display: inline-block; margin-top: 4px; padding: 3px 12px; border-radius: 99px; background: rgba(0,0,0,.65); color: #fff; font-weight: 700; font-size: 12px; }
+@keyframes v9Ban { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); } 30% { transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -70%) scale(1); } }
+.v9-ltimer { height: 6px; border-radius: 9px; background: rgba(255,255,255,.08); overflow: hidden; }
+.v9-ltimer i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, #34d399, #fbbf24); }
+.v9-ltimer.run i { animation: v9Tm 15s linear forwards; }
+.v9-ltimer.warn i { background: linear-gradient(90deg, #ef4444, #f97316); }
+@keyframes v9Tm { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.v8-dice-wrap { cursor: pointer; }
+/* dados mágicos */
+.v9-dskin { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid rgba(252,211,77,.25); }
+.v9-dskin.on { border-color: #fbbf24; box-shadow: 0 0 14px -4px #fbbf24; }
+.v9-dskin small { font-size: 10px; color: #e7e5e4; line-height: 1.1; text-align: center; } .v9-dskin b { font-size: 10px; color: #fcd34d; }
+.v8-dice-mini { width: 30px; height: 30px; border-radius: 7px; background: #fafaf9; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 3px 6px #0008; position: relative; }
+.v8-dice-mini::after { content: ''; position: absolute; inset: 0; margin: auto; width: 7px; height: 7px; border-radius: 50%; background: #7f1d1d; }
+.sk-oro.v8-dice-mini, .v8-dice.sk-oro .f { background: linear-gradient(145deg, #fff3b0, #e5b33a 45%, #a16207) !important; }
+.sk-cristal.v8-dice-mini, .v8-dice.sk-cristal .f { background: linear-gradient(145deg, rgba(224,242,254,.95), rgba(125,211,252,.55)) !important; box-shadow: inset 0 0 12px rgba(255,255,255,.8) !important; }
+.sk-fuego.v8-dice-mini, .v8-dice.sk-fuego .f { background: radial-gradient(circle at 30% 30%, #fde047, #f97316 45%, #7f1d1d) !important; }
+.sk-plata.v8-dice-mini, .v8-dice.sk-plata .f { background: linear-gradient(145deg, #f8fafc, #cbd5e1 50%, #64748b) !important; box-shadow: 0 0 14px rgba(186,230,253,.7) !important; }
+.sk-obsidiana.v8-dice-mini, .v8-dice.sk-obsidiana .f { background: linear-gradient(145deg, #3f3f46, #09090b) !important; }
+.v8-dice.sk-oro .f i.on, .sk-oro.v8-dice-mini::after { background: #422006 !important; }
+.v8-dice.sk-cristal .f i.on, .sk-cristal.v8-dice-mini::after { background: #1e3a8a !important; }
+.v8-dice.sk-fuego .f i.on, .sk-fuego.v8-dice-mini::after { background: #fff7ed !important; box-shadow: 0 0 6px #fff; }
+.v8-dice.sk-plata .f i.on, .sk-plata.v8-dice-mini::after { background: #0c4a6e !important; }
+.v8-dice.sk-obsidiana .f i.on, .sk-obsidiana.v8-dice-mini::after { background: #a855f7 !important; box-shadow: 0 0 6px #a855f7; }

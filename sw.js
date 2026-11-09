@@ -1,8 +1,8 @@
 /* Service worker de Hogwarts Magic Experience
    Permite instalar la página como app y usarla sin internet.
    Si cambias index.html y no ves los cambios, sube el número de VERSION. */
-const VERSION = 'hogwarts-v20';
-const B = '?v=9.5';
+const VERSION = 'hogwarts-v21';
+const B = '?v=9.6';
 const CORE = ['./', './index.html', './manifest.json', './css/tailwind.css' + B, './css/v7.css' + B, './css/v8.css' + B, './css/v9.css' + B, './js/v7-duelo.js' + B, './js/v7-magia.js' + B, './js/v8-nucleo.js' + B, './js/v8-coleccion.js' + B, './js/v8-progreso.js' + B, './js/v8-mundo.js' + B, './js/v8-sistema.js' + B, './js/v9-graficos.js' + B, './js/v9-app.js' + B, './js/v9-juego.js' + B, './js/v9-patronus.js' + B, './js/v9-extras.js' + B, './js/preguntas-duelo-1.js' + B, './js/preguntas-duelo-2.js' + B, './img/app/icon-192.png', './img/app/icon-512.png', './img/app/maskable-512.png', './img/app/favicon-32.png'];
 const OPTIONAL = ['./js/v8-ludo.js' + B, './js/v8-juegos.js' + B, './privacidad.html','./audio/musica1.mp3', './audio/musica2.mp3', './audio/musica3.mp3', './audio/musica.mp3', './audio/sombrero.mp3',
   './audio/gryffindor.mp3', './audio/slytherin.mp3', './audio/ravenclaw.mp3', './audio/hufflepuff.mp3',

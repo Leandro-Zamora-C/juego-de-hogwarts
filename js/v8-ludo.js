@@ -44,9 +44,15 @@
   /* =====================================================================
      MOTOR DEL JUEGO (igual para IA, mismo celular y en línea)
   ===================================================================== */
-  const newGame = players => ({ players, pieces: players.map(() => [-1, -1, -1, -1]), turn: 0, dice: 0, phase: 'roll', sixes: 0, winner: -1, log: '¡Que empiece el juego!', mv: 0, last: null });
+  // modos: clasico · rapido (fichas ya afuera, gana quien lleve 2) · maestro (hay que atrapar para entrar a la meta) · equipos (2 contra 2)
+  const newGame = (players, opt) => { opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, opt || {}); if (opt.mode === 'equipos' && players.length !== 4) opt.mode = 'clasico';
+    return { players, opt, pieces: players.map(() => opt.mode === 'rapido' ? [0, 0, 0, 0] : [-1, -1, -1, -1]), kills: players.map(() => 0), done: [], turn: 0, dice: 0, phase: 'roll', sixes: 0, winner: -1, log: '¡Que empiece el juego!', mv: 0, last: null }; };
+  const GOAL = G => (G.opt && G.opt.mode === 'rapido') ? 2 : 4;
+  const homeN = (G, pi) => G.pieces[pi].filter(p => p === 56).length;
+  const mate = (G, a, b) => G.opt && G.opt.mode === 'equipos' && a !== b && G.players[a].seat % 2 === G.players[b].seat % 2;
+  const enemy = (G, pi, oi) => oi !== pi && !mate(G, pi, oi);
   const curP = G => G.players[G.turn];
-  const movable = (G, pi, d) => G.pieces[pi].map((p, k) => (p < 0 ? d === 6 : p + d <= 56) ? k : -1).filter(k => k >= 0);
+  const movable = (G, pi, d) => { const lock = G.opt && G.opt.mode === 'maestro' && !(G.kills || [])[pi]; return G.pieces[pi].map((p, k) => (p < 0 ? d === 6 : p >= 56 ? false : lock && p <= 50 ? p + d <= 50 : p + d <= 56) ? k : -1).filter(k => k >= 0); };
   const occupants = (G, abs) => { const out = []; G.players.forEach((pl, pi) => G.pieces[pi].forEach((p, k) => { if (absCell(pl.seat, p) === abs) out.push([pi, k]); })); return out; };
   function doRoll(G, forced) {
     if (G.phase !== 'roll') return false;
@@ -67,17 +73,25 @@
     G.pieces[pi][k] = to; G.mv++;
     let extra = d === 6, captured = [];
     const abs = absCell(pl.seat, to);
-    if (abs >= 0 && !SAFE.has(abs)) occupants(G, abs).forEach(([oi, ok]) => { if (oi !== pi) { G.pieces[oi][ok] = -1; captured.push([oi, ok]); } });
-    if (captured.length) extra = true;
+    if (abs >= 0 && !SAFE.has(abs)) occupants(G, abs).forEach(([oi, ok]) => { if (enemy(G, pi, oi)) { G.pieces[oi][ok] = -1; captured.push([oi, ok]); } });
+    if (captured.length) { extra = true; if (G.kills) G.kills[pi] += captured.length; }
     if (to === 56) extra = true;
     G.last = { kind: 'move', pi, k, from, to, captured };
     G.log = captured.length ? `¡${pl.name} atrapó una ficha de ${G.players[captured[0][0]].name}! Tira otra vez.` : to === 56 ? `¡Una ficha de ${pl.name} llegó a la meta!` : from < 0 ? `${pl.name} saca una ficha del patio.` : `${pl.name} avanza ${d}.`;
-    if (G.pieces[pi].every(p => p === 56)) { G.winner = pi; G.phase = 'over'; G.log = `🏆 ¡${pl.name} gana la partida!`; return true; }
+    if (homeN(G, pi) >= GOAL(G) && !(G.done || []).includes(pi)) {
+      (G.done = G.done || []).push(pi);
+      if (G.opt && G.opt.mode === 'equipos') {
+        const m = G.players.findIndex((q, i) => mate(G, pi, i));
+        if (G.done.includes(m)) { G.winner = pi; G.phase = 'over'; G.log = `🏆 ¡El equipo de ${pl.name} y ${G.players[m].name} gana!`; return true; }
+        G.log = `🎉 ${pl.name} terminó. ¡Ahora le toca a su compañero!`; nextTurn(G); return true;
+      }
+      G.winner = pi; G.phase = 'over'; G.log = `🏆 ¡${pl.name} gana la partida!`; return true;
+    }
     if (extra) { G.phase = 'roll'; if (!captured.length && to !== 56) G.log += ' ¡Sacó 6, tira otra vez!'; }
     else nextTurn(G);
     return true;
   }
-  function nextTurn(G, keepSixes) { G.turn = (G.turn + 1) % G.players.length; G.phase = 'roll'; if (!keepSixes) G.sixes = 0; else G.sixes = 0; }
+  function nextTurn(G) { for (let i = 0; i < G.players.length; i++) { G.turn = (G.turn + 1) % G.players.length; if (!(G.done || []).includes(G.turn)) break; } G.phase = 'roll'; G.sixes = 0; }
 
   // IA: elige la mejor ficha
   function aiPick(G) {
@@ -89,7 +103,7 @@
       let s = to * .6;
       if (from < 0) s += 55;
       if (to === 56) s += 90; else if (to > 50) s += 45;
-      if (abs >= 0 && !SAFE.has(abs) && occupants(G, abs).some(([oi]) => oi !== pi)) s += 110;
+      if (abs >= 0 && !SAFE.has(abs) && occupants(G, abs).some(([oi]) => enemy(G, pi, oi))) s += 110;
       if (abs >= 0 && SAFE.has(abs)) s += 20;
       s -= danger(abs) * 28; s += danger(absCell(seat, from)) * 18;
       s += Math.random() * 4;
@@ -224,6 +238,18 @@
       <div class="flex justify-center gap-2 flex-wrap">${[['ia', '🤖 Contra la IA'], ['local', '👥 En este celular'], ['online', '🌐 En línea con amigos']].map(([m, l]) => `<button onclick="V8L.mode('${m}')" class="${(L && L.mode || V8L._mode) === m ? 'btn-gold' : 'btn-ghost'} !py-1.5 !px-3 !text-xs">${l}</button>`).join('')}</div>
       ${body}</div>`; }
   const input = 'w-full bg-stone-950 border border-amber-700/50 rounded-lg px-3 py-2 text-sm text-stone-200';
+  const MODES = [['clasico', '🎲 Clásico', 'Sales con 6 y gana quien lleve sus 4 fichas a la meta.'], ['rapido', '⚡ Rápido', 'Las fichas empiezan afuera y gana quien lleve 2 a la meta.'], ['maestro', '🎓 Maestro', 'Tienes que atrapar al menos una ficha antes de poder entrar a la meta.'], ['equipos', '🤝 Equipos 2 vs 2', 'Gryffindor y Hufflepuff contra Slytherin y Ravenclaw. Gana la pareja que termine primero (4 jugadores).']];
+  const BETS = [0, 50, 200, 1000];
+  const SKINS = [['clasico', 'Clásico', 0], ['oro', 'Oro de Gringotts', 800], ['cristal', 'Cristal', 1200], ['fuego', 'Fuego de dragón', 2000], ['plata', 'Patronus plateado', 3000], ['obsidiana', 'Obsidiana', 4000]];
+  const lst = () => { const o = S.v9l || (S.v9l = {}); if (!o.stats) o.stats = { played: 0, won: 0, caps: 0, sixes: 0, streak: 0, best: 0 }; if (!o.skins) o.skins = ['clasico']; if (!o.skin) o.skin = 'clasico'; return o; };
+  const optHTML = (online, noBet) => {
+    const o = V8L._opt || (V8L._opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {}));
+    return `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Modo de juego</p><div class="grid grid-cols-2 gap-1.5">${MODES.map(([k, l]) => `<button onclick="V8L.setOpt('mode','${k}')" class="${o.mode === k ? 'btn-gold' : 'btn-ghost'} !py-1.5 !text-xs">${l}</button>`).join('')}</div><p class="text-[10px] text-stone-400 mt-1">${(MODES.find(m => m[0] === o.mode) || MODES[0])[2]}</p></div>
+      ${noBet ? '' : `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Apuesta de galeones ${online ? '(cada jugador pone lo mismo)' : ''}</p><div class="flex gap-1.5">${BETS.map(b => `<button onclick="V8L.setOpt('bet',${b})" class="${o.bet === b ? 'btn-gold' : 'btn-ghost'} flex-1 !py-1.5 !px-1 !text-xs">${b ? b + ' 🪙' : 'Sin apuesta'}</button>`).join('')}</div><p class="text-[10px] text-stone-400 mt-1">${o.bet ? `El ganador se lleva todo el pozo. Tienes ${(S.gold || 0).toLocaleString('es-PE')} 🪙.` : 'Jugar solo por diversión y puntos.'}</p></div>`}
+      <label class="flex items-center gap-2 text-xs text-stone-300"><input type="checkbox" ${o.timer ? 'checked' : ''} onchange="V8L.setOpt('timer',this.checked)"> ⏱️ Tiempo por turno (15 s; si se acaba, se juega solo)</label>`;
+  };
+  const statsHTML = () => { const t = lst().stats; return `<div class="grid grid-cols-5 gap-1 text-center text-[10px] text-stone-400">${[['🎲', t.played, 'partidas'], ['🏆', t.won, 'ganadas'], ['⚔️', t.caps, 'atrapadas'], ['6️⃣', t.sixes, 'seises'], ['🔥', t.best, 'mejor racha']].map(([e, v, l]) => `<div class="bg-black/30 rounded-lg py-1.5"><b class="block text-sm text-amber-200">${e} ${v}</b>${l}</div>`).join('')}</div>`; };
+  const skinsHTML = () => { const o = lst(); return `<details class="text-left"><summary class="text-[11px] font-bold text-amber-300 cursor-pointer">🎲 Dados mágicos</summary><div class="grid grid-cols-3 gap-1.5 mt-2">${SKINS.map(([k, n, pr]) => { const own = o.skins.includes(k); return `<button onclick="V8L.skin('${k}')" class="v9-dskin ${o.skin === k ? 'on' : ''}"><span class="v8-dice-mini sk-${k}"></span><small>${n}</small><b>${o.skin === k ? '✔ En uso' : own ? 'Usar' : pr.toLocaleString('es-PE') + ' 🪙'}</b></button>`; }).join('')}</div></details>`; };
   function setupIA(local) {
     const n = V8L._n || 4;
     const names = V8L._names || [V8.name(), 'Mago 2', 'Mago 3', 'Mago 4'];
@@ -233,7 +259,8 @@
       <div><p class="text-[11px] font-bold text-amber-300 mb-1">¿Cuántos jugadores?</p><div class="flex gap-2">${[2, 3, 4].map(k => `<button onclick="V8L._n=${k};V8L.mode('${local ? 'local' : 'ia'}')" class="${n === k ? 'btn-gold' : 'btn-ghost'} flex-1 !py-2">${k}</button>`).join('')}</div></div>
       ${local ? `<div class="space-y-2">${Array.from({ length: n }, (_, i) => `<label class="flex items-center gap-2"><span class="text-xl">${SEATS[seatsFor(n)[i]].emoji}</span><input id="lnm${i}" maxlength="14" class="${input}" value="${esc(names[i] || 'Mago ' + (i + 1))}"></label>`).join('')}</div>`
         : `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Nivel de la IA</p><select id="laiLvl" class="${input}"><option value="1">Fácil</option><option value="2" selected>Normal</option><option value="3">Difícil</option><option value="4">Gran Mago</option></select></div>`}
-      <button onclick="V8L.startLocal(${local})" class="btn-gold w-full"><i class="fa-solid fa-dice"></i> ¡Empezar!</button></div>`);
+      ${optHTML(false, local)}
+      <button onclick="V8L.startLocal(${local})" class="btn-gold w-full"><i class="fa-solid fa-dice"></i> ¡Empezar!</button>${statsHTML()}${skinsHTML()}</div>`);
   }
   // asientos según cantidad: 2 = casas enfrentadas
   function seatsFor(n, prefer) {
@@ -253,20 +280,26 @@
       else body.innerHTML = setupIA(m === 'local');
       sfx('tick');
     },
+    setOpt(k, v) { const o = this._opt || (this._opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {})); o[k] = v; lst().opt = Object.assign({}, o); save(); if (k === 'mode' && v === 'equipos') this._n = 4; if (NET.ch && NET.host) { netLobby(); return; } this.mode(this._mode); },
+    skin(k) { const o = lst(), sk = SKINS.find(x => x[0] === k); if (!sk) return; if (!o.skins.includes(k)) { if ((S.gold || 0) < sk[2]) return toast(`Te faltan ${(sk[2] - (S.gold || 0)).toLocaleString('es-PE')} galeones.`, '🪙'); S.gold -= sk[2]; o.skins.push(k); updateWallet(); sfx('achieve'); } o.skin = k; save(); if (!L) this.mode(this._mode); else { const d = $('ludoDice'); if (d) d.className = 'v8-dice sk-' + k; } },
     startLocal(local) {
-      const n = this._n || 4, mine = HOUSE_SEAT[S.house] ?? 0;
+      const n = this._n || 4, mine = HOUSE_SEAT[S.house] ?? 0, opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {}, this._opt || {});
+      if (local) opt.bet = 0;
+      if (opt.mode === 'equipos' && n !== 4) return toast('El modo Equipos es para 4 jugadores.', '🤝');
+      if (opt.bet && (S.gold || 0) < opt.bet) return toast(`Para apostar ${opt.bet} necesitas esos galeones.`, '🪙');
+      if (opt.bet) { S.gold -= opt.bet; updateWallet(); save(); toast(`Pusiste ${opt.bet} 🪙 en el pozo.`, '🪙'); }
       const seats = local ? seatsFor(n) : (n === 2 ? [mine, (mine + 2) % 4] : Array.from({ length: n }, (_, i) => (mine + i) % 4));
       const lvl = local ? 2 : +(($('laiLvl') || {}).value || 2);
       const players = seats.map((seat, i) => local ? { seat, name: (($(`lnm${i}`) || {}).value || `Mago ${i + 1}`).trim().slice(0, 14) || `Mago ${i + 1}`, kind: 'human', id: 'local' + i }
         : i === 0 ? { seat, name: V8.name(), kind: 'human', id: NET.myId } : { seat, name: ['Draco', 'Luna', 'Cedric', 'Cho'][seat] + ' 🤖', kind: 'ai', lvl, id: 'ai' + i });
       if (local) this._names = players.map(p => p.name);
-      startGame({ mode: local ? 'local' : 'ia', G: newGame(players), mySeat: local ? null : players[0].seat });
+      startGame({ mode: local ? 'local' : 'ia', G: newGame(players, opt), mySeat: local ? null : players[0].seat });
     },
     roll() { act('roll'); },
     move(k) { act('move', k); },
-    emo(e) { if (!NET.ch) return; netSend({ t: 'emo', id: NET.myId, e }); showEmo(NET.myId, e); },
+    emo(e) { if (Date.now() - (this._emoT || 0) < 1200) return; this._emoT = Date.now(); if (NET.ch) netSend({ t: 'emo', id: NET.myId, e }); showEmo(L && L.mode === 'online' ? NET.myId : (L && (L.G.players.find(p => p.kind === 'human') || {}).id), e); if (L && L.mode === 'ia' && Math.random() < .6) { const ai = L.G.players.filter(p => p.kind === 'ai'); const a = ai[Math.floor(Math.random() * ai.length)]; if (a) setTimeout(() => showEmo(a.id, V8.pick(['😏', '😂', '🍀', '👍', '😤'])), 900); } },
     gfx() { setGfx3d(!gfx3d()); if (L) { const st = { mode: L.mode, G: L.G, mySeat: L.mySeat }; teardown(); startGame(st, true); } },
-    again() { if (!L) return; if (L.mode === 'online') { if (NET.host) netStart(); return; } const pl = L.G.players; startGame({ mode: L.mode, G: newGame(pl), mySeat: L.mySeat }); },
+    again() { if (!L) return; if (L.mode === 'online') { if (NET.host) netStart(); return; } const opt = L.G.opt || {}; if (opt.bet) { if ((S.gold || 0) < opt.bet) { toast('No tienes galeones para la misma apuesta.', '🪙'); opt.bet = 0; } else { S.gold -= opt.bet; updateWallet(); save(); } } const pl = L.G.players; startGame({ mode: L.mode, G: newGame(pl, opt), mySeat: L.mySeat }); },
     exit() { endGame(true); netLeave(); this.mode(this._mode); },
     create: () => netCreate(), join: () => netJoin(), start: () => netStart(), leave: () => { netLeave(); V8L.mode('online'); },
     fill(v) { NET.fillAI = v; netLobby(); }
@@ -281,16 +314,18 @@
     body.innerHTML = shell(`<div class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-3 items-start">
       <div class="relative rounded-2xl overflow-hidden border-2 border-amber-800/50 shadow-2xl shadow-black/70 mx-auto w-full" style="max-width:min(78vh,720px);aspect-ratio:1/1" id="ludoBoard">
         <canvas id="ludoCv" class="block w-full h-full" style="touch-action:none"></canvas>
-        <div id="ludoEmo" class="absolute inset-x-0 top-2 flex justify-center pointer-events-none"></div>
+        <div id="ludoEmo" class="absolute inset-x-0 top-2 flex justify-center pointer-events-none"></div><div id="ludoBan" class="v9-lban"></div>
+        ${st.G.opt && (st.G.opt.bet || st.G.opt.mode !== 'clasico') ? `<span class="absolute top-2 left-2 text-[10px] font-bold text-amber-100 bg-black/55 rounded-full px-2 py-0.5 pointer-events-none">${(MODES.find(m => m[0] === st.G.opt.mode) || MODES[0])[1]}${st.G.opt.bet ? ' · Pozo ' + (st.G.opt.bet * st.G.players.filter(p => st.mode === 'online' || p.kind === 'human').length + (st.mode === 'ia' ? st.G.opt.bet * (st.G.players.length - 1) : 0)) + ' 🪙' : ''}</span>` : ''}
         <span class="absolute bottom-2 left-2 text-[10px] text-amber-100/70 bg-black/40 rounded-full px-2 py-0.5 pointer-events-none">${use3d ? 'Arrastra para girar · toca una ficha que brille' : 'Toca una ficha que brille'}</span>
       </div>
       <div class="space-y-3">
         <div id="ludoPlayers" class="space-y-1.5"></div>
         <div class="glass-card rounded-2xl p-3 flex items-center gap-3">
-          <div class="v8-dice-wrap"><div class="v8-dice" id="ludoDice">${[1, 2, 3, 4, 5, 6].map(n => `<div class="f f${n}">${pips(n)}</div>`).join('')}</div></div>
+          <div class="v8-dice-wrap" onclick="V8L.roll()" role="button" aria-label="Lanzar dado"><div class="v8-dice sk-${lst().skin}" id="ludoDice">${[1, 2, 3, 4, 5, 6].map(n => `<div class="f f${n}">${pips(n)}</div>`).join('')}</div></div>
           <div class="flex-grow space-y-1.5"><button id="ludoRoll" onclick="V8L.roll()" class="btn-gold w-full"><i class="fa-solid fa-dice"></i> Lanzar dado</button><p id="ludoMsg" class="text-[11px] text-stone-300 leading-snug min-h-[2.2em]"></p></div>
         </div>
-        ${st.mode === 'online' ? `<div class="v7-chips justify-center">${['👍', '😂', '😱', '😤', '🍀', '⚡', 'GG'].map(e => `<button onclick="V8L.emo('${e}')">${e}</button>`).join('')}</div>` : ''}
+        <div id="ludoTimer" class="v9-ltimer"><i></i></div>
+        ${st.mode !== 'local' ? `<div class="v7-chips justify-center">${['👍', '😂', '😱', '😤', '🍀', '⚡', 'GG'].map(e => `<button onclick="V8L.emo('${e}')">${e}</button>`).join('')}</div>` : ''}
         <div class="flex gap-2 justify-center flex-wrap">${M3.supported() ? `<button onclick="V8L.gfx()" class="btn-ghost !py-1 !px-2.5 !text-[10px]"><i class="fa-solid ${use3d ? 'fa-image' : 'fa-cube'}"></i> ${use3d ? 'Gráficos clásicos' : 'Gráficos 3D'}</button>` : ''}<button onclick="V8L.exit()" class="btn-ghost !py-1 !px-2.5 !text-[10px]"><i class="fa-solid fa-arrow-left"></i> Salir</button></div>
       </div></div>`);
     L.canvas = $('ludoCv');
@@ -303,7 +338,7 @@
     L.raf = requestAnimationFrame(loop);
     step();
   }
-  function teardown() { if (!L) return; cancelAnimationFrame(L.raf); clearTimeout(L.tmr); if (L.R) L.R.dispose(); L = null; }
+  function teardown() { if (!L) return; stopTimer(); cancelAnimationFrame(L.raf); clearTimeout(L.tmr); if (L.R) L.R.dispose(); L = null; }
   function endGame() { teardown(); }
   V8.impl('ludo', { init: () => { V8L.mode(V8L._mode === 'online' && NET.ch ? 'online' : (V8L._mode || 'ia')); }, stop: () => { teardown(); netLeave(); }, best: b => b ? `Victorias: ${b}` : '', howto: ['Toca «Lanzar dado». Con 6 sacas una ficha del patio y vuelves a tirar.', 'Toca la ficha que brilla para moverla.', 'Si caes sobre una ficha rival, la mandas a su patio (menos en estrellas ⭐ y salidas).', 'Lleva tus 4 fichas al centro con el número exacto para ganar.'] });
 
@@ -326,6 +361,7 @@
   }
   function act(kind, k) {
     if (!L || L.busy || !myTurn()) return;
+    stopTimer();
     if (L.mode === 'online' && !NET.host) { netSend({ t: kind, id: NET.myId, k, mv: L.G.mv }); L.canAct = false; renderUI(); return; }
     apply(kind, k);
   }
@@ -347,6 +383,15 @@
     if (last.kind === 'roll' || last.kind === 'nomove' || last.kind === 'skip') { showDice(G.dice, true); sfx('tick'); setTimeout(() => sfx('spell'), 500); }
     let wait = 0;
     if (last.kind === 'move' && prev) { wait = animateMove(prev, last); }
+    const meIdx = G.players.findIndex(p => L.mode === 'online' ? p.id === NET.myId : p.kind === 'human' && L.mode === 'ia');
+    if (last.kind === 'roll' && G.dice === 6) { banner('¡SEIS!', 'Tira otra vez', '#fbbf24', 600); if (prev && prev.turn === meIdx) { lst().stats.sixes++; } }
+    if (last.kind === 'skip') banner('¡TRES SEISES!', 'Pierde el turno', '#ef4444', 600);
+    if (last.kind === 'move' && last.captured && last.captured.length) {
+      setTimeout(() => banner('¡ATRAPADA!', `${G.players[last.pi].name} → ${G.players[last.captured[0][0]].name}`, '#ef4444'), wait - 300);
+      if (last.pi === meIdx) lst().stats.caps += last.captured.length;
+      if (L.mode === 'ia') { const v = G.players[last.captured[0][0]], c = G.players[last.pi]; setTimeout(() => { if (v.kind === 'ai') showEmo(v.id, V8.pick(['😤', '😱', '😭', '🤬'])); if (c.kind === 'ai') showEmo(c.id, V8.pick(['😂', '😎', '⚡', '😏'])); }, wait); }
+    }
+    if (last.kind === 'move' && last.to === 56) setTimeout(() => banner('¡A CASA!', `Una ficha de ${G.players[last.pi].name} llegó`, '#34d399'), wait - 300);
     if (last.kind === 'nomove' || last.kind === 'skip') wait = 1100;
     if (last.kind === 'roll') wait = 750;
     L.busy = true; renderUI();
@@ -388,11 +433,17 @@
       L.tmr = setTimeout(() => { if (!L) return; if (G.phase === 'roll') apply('roll'); else apply('move', aiChoose(G, p.lvl || 2)); }, G.phase === 'roll' ? 700 : 500);
       return;
     }
+    // tiempo por turno (como en el Ludo de Facebook): si se acaba, se juega solo
+    if (G.opt && G.opt.timer && p.kind === 'human' && myTurn()) startTimer(() => { if (!L || L.G.phase === 'over' || !myTurn()) return; L.miss = (L.miss || 0) + 1; toast(L.miss >= 3 ? 'Se acabó tu tiempo otra vez. ¡Atento al turno!' : 'Se acabó el tiempo: se jugó solo.', '⏱️'); if (L.G.phase === 'roll') act('roll'); else act('move', aiPick(L.G)); });
+    else stopTimer();
     // humano: si solo hay una ficha posible, se mueve sola
     if (G.phase === 'move' && L.opts.length === 1 && (L.mode !== 'online' || p.id === NET.myId)) L.tmr = setTimeout(() => { if (L && L.G.phase === 'move') apply('move', L.opts[0]); }, 650);
     // en línea: si alguien no juega en 25 s, se juega solo
     if (L.mode === 'online' && p.id !== NET.myId) L.tmr = setTimeout(() => { if (!L || L.G.phase === 'over') return; if (L.G.phase === 'roll') apply('roll'); else apply('move', aiPick(L.G)); }, 25000);
   }
+  function startTimer(fn) { stopTimer(); const el = $('ludoTimer'); if (!el) return; el.classList.remove('run'); void el.offsetWidth; el.classList.add('run'); L.tt = setTimeout(fn, 15000); L.tw = setTimeout(() => { if (L && myTurn()) { sfx('tick'); el.classList.add('warn'); } }, 10000); }
+  function stopTimer() { if (!L) return; clearTimeout(L.tt); clearTimeout(L.tw); const el = $('ludoTimer'); if (el) el.classList.remove('run', 'warn'); }
+  function banner(t, sub, col, ms) { const b = $('ludoBan'); if (!b) return; b.innerHTML = `<b style="color:${col}">${t}</b><small>${esc(sub || '')}</small>`; b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove('show'), ms || 1300); }
   function aiChoose(G, lvl) { const opts = movable(G, G.turn, G.dice); if (lvl === 1 && Math.random() < .5) return V8.pick(opts); if (lvl === 2 && Math.random() < .15) return V8.pick(opts); if (lvl >= 4) return aiPick4(G); return aiPick(G); }
   // Gran Mago: prueba cada jugada y mira cuántas de sus fichas quedarían a tiro de un rival
   function aiPick4(G) {
@@ -407,8 +458,14 @@
 
   function finish() {
     const G = L.G, w = G.players[G.winner];
-    renderUI();
-    const iWon = L.mode === 'online' ? w.id === NET.myId : L.mode === 'ia' ? w.kind === 'human' : true;
+    renderUI(); stopTimer();
+    let iWon = L.mode === 'online' ? w.id === NET.myId : L.mode === 'ia' ? w.kind === 'human' : true;
+    if (G.opt && G.opt.mode === 'equipos' && L.mode !== 'local') { const me = G.players.findIndex(p => L.mode === 'online' ? p.id === NET.myId : p.kind === 'human'); iWon = me === G.winner || mate(G, me, G.winner); }
+    let pot = 0;
+    if (L.mode !== 'local') { const t = lst().stats; t.played++; if (iWon) { t.won++; t.streak++; t.best = Math.max(t.best, t.streak); } else t.streak = 0;
+      if (G.opt && G.opt.bet && iWon) { pot = G.opt.bet * G.players.length; if (G.opt.mode === 'equipos') pot = Math.round(pot / 2); V8.gold(pot, 'Pozo del Ludo'); }
+      save(); }
+    if (pot) setTimeout(() => toast(`¡Ganaste el pozo: +${pot.toLocaleString('es-PE')} 🪙!`, '💰'), 600);
     if (iWon && L.mode !== 'local') { addPoints(L.mode === 'online' ? 60 : 40); const s = V8.st(); s.best.ludo = (s.best.ludo || 0) + 1; save(); refreshBest(); V8.emit('ludoWin', { online: L.mode === 'online' }); fireConfetti({ particleCount: 160, spread: 110 }); sfx('levelup'); }
     else if (L.mode === 'local') { fireConfetti({ particleCount: 120, spread: 100 }); sfx('levelup'); }
     else { sfx('wrong'); addXp(5); }
@@ -509,8 +566,8 @@
       <div class="space-y-1.5">${[0, 1, 2, 3].map(i => { const p = pl[i]; return p ? `<div class="v8-lplayer" style="--c:${SEATS[p.seat].color}"><span class="e">${SEATS[p.seat].emoji}</span><b class="flex-grow truncate">${esc(p.name)}${p.id === NET.myId ? ' (tú)' : ''}${i === 0 ? ' 👑' : ''}</b><small>${SEATS[p.seat].house}</small></div>` : `<div class="v8-lplayer empty"><span class="e">⏳</span><span class="flex-grow text-stone-500">${NET.host && NET.fillAI ? 'Puesto libre: lo jugará la IA' : 'Puesto libre'}</span></div>`; }).join('')}</div>
       ${NET.host ? `<label class="flex items-center gap-2 text-xs text-stone-300"><input type="checkbox" ${NET.fillAI ? 'checked' : ''} onchange="V8L.fill(this.checked)"> Completar los puestos libres con la IA (4 jugadores)</label>
         <button onclick="V8L.start()" class="btn-gold w-full" ${pl.length < 2 && !NET.fillAI ? 'disabled' : ''}><i class="fa-solid fa-dice"></i> Empezar (${pl.length} ${pl.length === 1 ? 'jugador' : 'jugadores'})</button>
-        <p class="text-[10px] text-stone-500 text-center">Pueden jugar 2, 3 o 4. No hace falta esperar a 4.</p>`
-        : '<p class="text-center text-xs text-stone-400"><i class="fa-solid fa-hourglass-half"></i> Esperando a que el anfitrión empiece…</p>'}
+        <p class="text-[10px] text-stone-500 text-center">Pueden jugar 2, 3 o 4. No hace falta esperar a 4.</p>${optHTML(true)}`
+        : `<p class="text-center text-xs text-stone-400"><i class="fa-solid fa-hourglass-half"></i> Esperando a que el anfitrión empiece…</p>${NET.opt ? `<p class="text-center text-[11px] text-amber-200">${(MODES.find(m => m[0] === NET.opt.mode) || MODES[0])[1]} · ${NET.opt.bet ? 'Apuesta ' + NET.opt.bet + ' 🪙' : 'Sin apuesta'}${NET.opt.timer ? ' · ⏱️ 15 s' : ''}</p>` : ''}`}
       <button onclick="V8L.leave()" class="btn-ghost w-full !text-xs">Salir de la sala</button></div>`;
   }
   V8.ludoUrl = () => `${(CONFIG.SITE_URL || (location.origin + location.pathname)).replace(/\?.*$/, '')}?ludo=${NET.code}`;
@@ -546,7 +603,7 @@
     if (NET.ch) { try { if (!silent) netSend({ t: 'bye', id: NET.myId }); await NET.ch.unsubscribe(); if (sb) sb.removeChannel(NET.ch); } catch (e) {} }
     NET.ch = null; NET.lobby = []; NET.started = false;
   }
-  function netLobby() { if (!NET.host) return; netSend({ t: 'lobby', players: NET.lobby, fill: NET.fillAI }); lobbyRefresh(); }
+  function netLobby() { if (!NET.host) return; netSend({ t: 'lobby', players: NET.lobby, fill: NET.fillAI, opt: V8L._opt || null }); lobbyRefresh(); }
   function pickSeat(house) { const used = NET.lobby.map(p => p.seat), pref = HOUSE_SEAT[house]; if (pref != null && !used.includes(pref)) return pref; return [0, 2, 1, 3].find(s => !used.includes(s)); }
   function netMsg(m) {
     if (!m || !m.t) return;
@@ -557,10 +614,10 @@
       sfx('spell'); toast(`${esc(m.name)} entró a la sala`, '🎲'); netLobby(); return;
     }
     if (m.t === 'full' && m.to === NET.myId) { status('<span class="text-red-300">Esa sala está llena o ya empezó.</span>'); netLeave(true); return; }
-    if (m.t === 'lobby' && !NET.host) { NET.lobby = m.players; NET.fillAI = m.fill; NET.hostId = m.players[0] && m.players[0].id; lobbyRefresh(); return; }
+    if (m.t === 'lobby' && !NET.host) { NET.lobby = m.players; NET.fillAI = m.fill; NET.opt = m.opt || null; NET.hostId = m.players[0] && m.players[0].id; lobbyRefresh(); return; }
     if (m.t === 'state' && !NET.host) {
       const prev = L ? L.G : null;
-      if (!L || L.mode !== 'online') { NET.started = true; startGame({ mode: 'online', G: m.g, mySeat: (m.g.players.find(p => p.id === NET.myId) || {}).seat }); return; }
+      if (!L || L.mode !== 'online') { NET.started = true; payBet(m.g); startGame({ mode: 'online', G: m.g, mySeat: (m.g.players.find(p => p.id === NET.myId) || {}).seat }); return; }
       if (m.g.mv < L.G.mv) return;
       const newer = m.g.mv !== L.G.mv || m.g.turn !== L.G.turn || m.g.players.length !== L.G.players.length;
       L.G = m.g; if (newer) onState(prev); else step();
@@ -577,10 +634,13 @@
     if (players.length < 2) { toast('Se necesitan al menos 2 jugadores.', '🎲'); return; }
     players.sort((a, b) => a.seat - b.seat);
     NET.started = true;
-    const G = newGame(players);
+    const G = newGame(players, Object.assign({}, V8L._opt || {}));
+    if (G.opt.mode === 'equipos' && players.length !== 4) toast('Equipos necesita 4 jugadores: se juega en modo Clásico.', '🤝');
+    payBet(G);
     startGame({ mode: 'online', G, mySeat: players.find(p => p.id === NET.myId).seat });
     netSend({ t: 'state', g: G });
   }
+  function payBet(G) { const b = G.opt && G.opt.bet; if (!b) return; const pay = Math.min(b, S.gold || 0); S.gold = (S.gold || 0) - pay; updateWallet(); save(); toast(`Pusiste ${pay} 🪙 en el pozo.`, '🪙'); }
   // alguien se fue: si es un jugador, lo reemplaza la IA; si es el anfitrión, termina
   function netPresence(ch, goneId) {
     if (!NET.ch || ch !== NET.ch) return;
