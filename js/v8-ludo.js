@@ -45,7 +45,7 @@
      MOTOR DEL JUEGO (igual para IA, mismo celular y en línea)
   ===================================================================== */
   // modos: clasico · rapido (fichas ya afuera, gana quien lleve 2) · maestro (hay que atrapar para entrar a la meta) · equipos (2 contra 2)
-  const newGame = (players, opt) => { opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, opt || {}); if (opt.mode === 'equipos' && players.length !== 4) opt.mode = 'clasico';
+  const newGame = (players, opt) => { opt = Object.assign({ mode: 'clasico', bet: 0, timer: false }, opt || {}); if (opt.mode === 'equipos' && players.length !== 4) opt.mode = 'clasico';
     return { players, opt, pieces: players.map(() => opt.mode === 'rapido' ? [0, 0, 0, 0] : [-1, -1, -1, -1]), kills: players.map(() => 0), done: [], turn: 0, dice: 0, phase: 'roll', sixes: 0, winner: -1, log: '¡Que empiece el juego!', mv: 0, last: null }; };
   const GOAL = G => (G.opt && G.opt.mode === 'rapido') ? 2 : 4;
   const homeN = (G, pi) => G.pieces[pi].filter(p => p === 56).length;
@@ -225,7 +225,10 @@
       x.font = `${c * .38}px serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(SEATS[pl.seat].emoji, px, py + 1);
       L.screen.push({ pi, k, x: px, y: py });
     }));
+    hints().forEach(w => { const pc = Tf([w[0] + 7.5, w[1] + 7.5]); x.save(); x.setLineDash([4, 3]); x.lineDashOffset = -performance.now() / 60; x.strokeStyle = '#fde047'; x.lineWidth = 2.5; x.beginPath(); x.arc(pc[0] * c, pc[1] * c, c * .42, 0, 7); x.stroke(); x.restore(); });
   }
+  // a dónde llegaría cada ficha que se puede mover
+  const hints = () => (lst().hint !== false && L.canAct && !L.busy && L.G.phase === 'move') ? L.opts.map(k => { const pi = L.G.turn, p = L.G.pieces[pi][k], d = p < 0 ? 0 : p + L.G.dice; return world(L.G.players[pi].seat, d, k); }) : [];
   const absOrHome = (G, pi, p) => p <= 50 ? absCell(G.players[pi].seat, p) : 100 + pi * 10 + p;
 
   /* =====================================================================
@@ -243,12 +246,17 @@
   const SKINS = [['clasico', 'Clásico', 0], ['oro', 'Oro de Gringotts', 800], ['cristal', 'Cristal', 1200], ['fuego', 'Fuego de dragón', 2000], ['plata', 'Patronus plateado', 3000], ['obsidiana', 'Obsidiana', 4000]];
   const lst = () => { const o = S.v9l || (S.v9l = {}); if (!o.stats) o.stats = { played: 0, won: 0, caps: 0, sixes: 0, streak: 0, best: 0 }; if (!o.skins) o.skins = ['clasico']; if (!o.skin) o.skin = 'clasico'; return o; };
   const optHTML = (online, noBet) => {
-    const o = V8L._opt || (V8L._opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {}));
+    const o = V8L._opt || (V8L._opt = Object.assign({ mode: 'clasico', bet: 0, timer: false }, lst().opt || {}));
     return `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Modo de juego</p><div class="grid grid-cols-2 gap-1.5">${MODES.map(([k, l]) => `<button onclick="V8L.setOpt('mode','${k}')" class="${o.mode === k ? 'btn-gold' : 'btn-ghost'} !py-1.5 !text-xs">${l}</button>`).join('')}</div><p class="text-[10px] text-stone-400 mt-1">${(MODES.find(m => m[0] === o.mode) || MODES[0])[2]}</p></div>
       ${noBet ? '' : `<div><p class="text-[11px] font-bold text-amber-300 mb-1">Apuesta de galeones ${online ? '(cada jugador pone lo mismo)' : ''}</p><div class="flex gap-1.5">${BETS.map(b => `<button onclick="V8L.setOpt('bet',${b})" class="${o.bet === b ? 'btn-gold' : 'btn-ghost'} flex-1 !py-1.5 !px-1 !text-xs">${b ? b + ' 🪙' : 'Sin apuesta'}</button>`).join('')}</div><p class="text-[10px] text-stone-400 mt-1">${o.bet ? `El ganador se lleva todo el pozo. Tienes ${(S.gold || 0).toLocaleString('es-PE')} 🪙.` : 'Jugar solo por diversión y puntos.'}</p></div>`}
-      <label class="flex items-center gap-2 text-xs text-stone-300"><input type="checkbox" ${o.timer ? 'checked' : ''} onchange="V8L.setOpt('timer',this.checked)"> ⏱️ Tiempo por turno (15 s; si se acaba, se juega solo)</label>`;
+      ${prefsHTML()}`;
   };
   const statsHTML = () => { const t = lst().stats; return `<div class="grid grid-cols-5 gap-1 text-center text-[10px] text-stone-400">${[['🎲', t.played, 'partidas'], ['🏆', t.won, 'ganadas'], ['⚔️', t.caps, 'atrapadas'], ['6️⃣', t.sixes, 'seises'], ['🔥', t.best, 'mejor racha']].map(([e, v, l]) => `<div class="bg-black/30 rounded-lg py-1.5"><b class="block text-sm text-amber-200">${e} ${v}</b>${l}</div>`).join('')}</div>`; };
+  const prefsHTML = () => { const o = lst(); return `<div class="grid grid-cols-1 gap-1.5 text-xs text-stone-300">
+      <label class="flex items-center gap-2"><input type="checkbox" ${o.auto ? 'checked' : ''} onchange="V8L.pref('auto',this.checked)"> 🎯 Tirar el dado solo cuando sea mi turno</label>
+      <label class="flex items-center gap-2"><input type="checkbox" ${o.fast !== false ? 'checked' : ''} onchange="V8L.pref('fast',this.checked)"> ⚡ Juego rápido (fichas y turnos más ágiles)</label>
+      <label class="flex items-center gap-2"><input type="checkbox" ${o.hint !== false ? 'checked' : ''} onchange="V8L.pref('hint',this.checked)"> 👣 Mostrar a dónde llega cada ficha</label></div>`; };
+  const SP = () => lst().fast === false ? 1 : .6;
   const skinsHTML = () => { const o = lst(); return `<details class="text-left"><summary class="text-[11px] font-bold text-amber-300 cursor-pointer">🎲 Dados mágicos</summary><div class="grid grid-cols-3 gap-1.5 mt-2">${SKINS.map(([k, n, pr]) => { const own = o.skins.includes(k); return `<button onclick="V8L.skin('${k}')" class="v9-dskin ${o.skin === k ? 'on' : ''}"><span class="v8-dice-mini sk-${k}"></span><small>${n}</small><b>${o.skin === k ? '✔ En uso' : own ? 'Usar' : pr.toLocaleString('es-PE') + ' 🪙'}</b></button>`; }).join('')}</div></details>`; };
   function setupIA(local) {
     const n = V8L._n || 4;
@@ -280,10 +288,11 @@
       else body.innerHTML = setupIA(m === 'local');
       sfx('tick');
     },
-    setOpt(k, v) { const o = this._opt || (this._opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {})); o[k] = v; lst().opt = Object.assign({}, o); save(); if (k === 'mode' && v === 'equipos') this._n = 4; if (NET.ch && NET.host) { netLobby(); return; } this.mode(this._mode); },
+    pref(k, v) { lst()[k] = v; save(); sfx('tick'); if (L && k === 'auto' && v) step(); if (L) renderUI(); },
+    setOpt(k, v) { const o = this._opt || (this._opt = Object.assign({ mode: 'clasico', bet: 0, timer: false }, lst().opt || {})); o[k] = v; lst().opt = Object.assign({}, o); save(); if (k === 'mode' && v === 'equipos') this._n = 4; if (NET.ch && NET.host) { netLobby(); return; } this.mode(this._mode); },
     skin(k) { const o = lst(), sk = SKINS.find(x => x[0] === k); if (!sk) return; if (!o.skins.includes(k)) { if ((S.gold || 0) < sk[2]) return toast(`Te faltan ${(sk[2] - (S.gold || 0)).toLocaleString('es-PE')} galeones.`, '🪙'); S.gold -= sk[2]; o.skins.push(k); updateWallet(); sfx('achieve'); } o.skin = k; save(); if (!L) this.mode(this._mode); else { const d = $('ludoDice'); if (d) d.className = 'v8-dice sk-' + k; } },
     startLocal(local) {
-      const n = this._n || 4, mine = HOUSE_SEAT[S.house] ?? 0, opt = Object.assign({ mode: 'clasico', bet: 0, timer: true }, lst().opt || {}, this._opt || {});
+      const n = this._n || 4, mine = HOUSE_SEAT[S.house] ?? 0, opt = Object.assign({ mode: 'clasico', bet: 0, timer: false }, lst().opt || {}, this._opt || {});
       if (local) opt.bet = 0;
       if (opt.mode === 'equipos' && n !== 4) return toast('El modo Equipos es para 4 jugadores.', '🤝');
       if (opt.bet && (S.gold || 0) < opt.bet) return toast(`Para apostar ${opt.bet} necesitas esos galeones.`, '🪙');
@@ -321,10 +330,9 @@
       <div class="space-y-3">
         <div id="ludoPlayers" class="space-y-1.5"></div>
         <div class="glass-card rounded-2xl p-3 flex items-center gap-3">
-          <div class="v8-dice-wrap" onclick="V8L.roll()" role="button" aria-label="Lanzar dado"><div class="v8-dice sk-${lst().skin}" id="ludoDice">${[1, 2, 3, 4, 5, 6].map(n => `<div class="f f${n}">${pips(n)}</div>`).join('')}</div></div>
+          <div class="v8-dice-wrap v9-dwrap" onclick="V8L.roll()" role="button" aria-label="Lanzar dado"><i class="v9-dsh"></i><div class="v8-dice sk-${lst().skin}" id="ludoDice">${[1, 2, 3, 4, 5, 6].map(n => `<div class="f f${n}">${pips(n)}</div>`).join('')}</div><b class="v9-dpop"></b></div>
           <div class="flex-grow space-y-1.5"><button id="ludoRoll" onclick="V8L.roll()" class="btn-gold w-full"><i class="fa-solid fa-dice"></i> Lanzar dado</button><p id="ludoMsg" class="text-[11px] text-stone-300 leading-snug min-h-[2.2em]"></p></div>
         </div>
-        <div id="ludoTimer" class="v9-ltimer"><i></i></div>
         ${st.mode !== 'local' ? `<div class="v7-chips justify-center">${['👍', '😂', '😱', '😤', '🍀', '⚡', 'GG'].map(e => `<button onclick="V8L.emo('${e}')">${e}</button>`).join('')}</div>` : ''}
         <div class="flex gap-2 justify-center flex-wrap">${M3.supported() ? `<button onclick="V8L.gfx()" class="btn-ghost !py-1 !px-2.5 !text-[10px]"><i class="fa-solid ${use3d ? 'fa-image' : 'fa-cube'}"></i> ${use3d ? 'Gráficos clásicos' : 'Gráficos 3D'}</button>` : ''}<button onclick="V8L.exit()" class="btn-ghost !py-1 !px-2.5 !text-[10px]"><i class="fa-solid fa-arrow-left"></i> Salir</button></div>
       </div></div>`);
@@ -344,13 +352,35 @@
 
   function pips(n) { const P = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] }[n]; return Array.from({ length: 9 }, (_, i) => `<i class="${P.includes(i + 1) ? 'on' : ''}"></i>`).join(''); }
   const FACE = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
+  const DICE_MS = 640;
   function showDice(n, spin) {
     const d = $('ludoDice'); if (!d || !n) return;
-    const [rx, ry] = FACE[n], extra = spin ? 720 : 0;
-    d.style.transition = spin && !V8.reduced() ? 'transform .9s cubic-bezier(.2,.8,.25,1)' : 'none';
-    if (spin && !V8.reduced()) { const w = d.parentElement; w.classList.remove('v9-throw'); void w.offsetWidth; w.classList.add('v9-throw'); if (window.V9 && V9.buzz) V9.buzz([20, 40, 20]); }
-    d.style.transform = `rotateX(${rx + extra}deg) rotateY(${ry + extra}deg)`;
+    const w = d.parentElement, [rx, ry] = FACE[n];
+    const tf = (a, b, c) => `rotateX(-20deg) rotateY(26deg) rotateX(${a}deg) rotateY(${b}deg) rotateZ(${c}deg)`;
+    if (!spin || V8.reduced() || !d.animate) { if (!d._a || d._n !== n) { d._a = [rx, ry]; d._n = n; d.style.transform = tf(rx, ry, 0); } w.dataset.n = n; return; }
+    // tumbos con giros completos en los 3 ejes: siempre la misma lista de giros para que se vean todas las vueltas
+    const a0 = d._a || [0, 0], kx = 2 + (Math.random() * 2 | 0), ky = 2 + (Math.random() * 2 | 0), sg = Math.random() < .5 ? -1 : 1;
+    const ax = rx + 360 * kx * sg, ay = ry + 360 * ky, wob = (Math.random() * 60 + 30) * (Math.random() < .5 ? -1 : 1);
+    if (d._anim) d._anim.cancel();
+    d._anim = d.animate([
+      { transform: tf(a0[0], a0[1], 0) },
+      { transform: tf(a0[0] + (ax - a0[0]) * .55, a0[1] + (ay - a0[1]) * .5, wob), offset: .45 },
+      { transform: tf(a0[0] + (ax - a0[0]) * .9, a0[1] + (ay - a0[1]) * .92, -wob * .3), offset: .75 },
+      { transform: tf(ax, ay, 0) }], { duration: DICE_MS, easing: 'cubic-bezier(.2,.65,.3,1)' });
+    d._a = [rx, ry]; d._n = n; d.style.transform = tf(rx, ry, 0);
+    // salto, rebote y aplastado al caer
+    w.animate([{ transform: 'translate(-12px,-14px) scale(1.1)' }, { transform: 'translate(0,-22px) scale(1.08)', offset: .3 }, { transform: 'translate(0,0) scale(1.08,.9)', offset: .58 },
+      { transform: 'translate(0,-6px) scale(.98,1.03)', offset: .76 }, { transform: 'translate(0,0) scale(1.03,.97)', offset: .9 }, { transform: 'none' }], { duration: DICE_MS, easing: 'ease-out' });
+    const sh = w.querySelector('.v9-dsh'); if (sh) sh.animate([{ transform: 'scale(.45)', opacity: .25 }, { transform: 'scale(.35)', opacity: .15, offset: .3 }, { transform: 'scale(1.05)', opacity: .7, offset: .58 }, { transform: 'scale(.8)', opacity: .5, offset: .76 }, { transform: 'scale(1)', opacity: .6 }], { duration: DICE_MS, easing: 'ease-out' });
+    w.classList.remove('land', 'six'); w.classList.add('rolling');
+    if (window.V9 && V9.buzz) V9.buzz([12, 30, 12]);
+    clearTimeout(w._t); w._t = setTimeout(() => {
+      w.classList.remove('rolling'); void w.offsetWidth; w.classList.add('land'); if (n === 6) w.classList.add('six');
+      w.dataset.n = n; const pop = w.querySelector('.v9-dpop'); if (pop) { pop.textContent = n; pop.classList.remove('go'); void pop.offsetWidth; pop.classList.add('go'); }
+      if (window.V9 && V9.buzz) V9.buzz(n === 6 ? [25, 40, 25, 40, 25] : 18);
+    }, DICE_MS - 40);
   }
+
 
   /* ---------- quién puede actuar en este dispositivo ---------- */
   function myTurn() {
@@ -380,7 +410,7 @@
   function onState(prev) {
     const G = L.G, last = G.last || {};
     clearTimeout(L.tmr);
-    if (last.kind === 'roll' || last.kind === 'nomove' || last.kind === 'skip') { showDice(G.dice, true); sfx('tick'); setTimeout(() => sfx('spell'), 500); }
+    if (last.kind === 'roll' || last.kind === 'nomove' || last.kind === 'skip') { showDice(G.dice, true); sfx('tick'); setTimeout(() => sfx(G.dice === 6 ? 'correct' : 'spell'), DICE_MS - 80); }
     let wait = 0;
     if (last.kind === 'move' && prev) { wait = animateMove(prev, last); }
     const meIdx = G.players.findIndex(p => L.mode === 'online' ? p.id === NET.myId : p.kind === 'human' && L.mode === 'ia');
@@ -392,15 +422,15 @@
       if (L.mode === 'ia') { const v = G.players[last.captured[0][0]], c = G.players[last.pi]; setTimeout(() => { if (v.kind === 'ai') showEmo(v.id, V8.pick(['😤', '😱', '😭', '🤬'])); if (c.kind === 'ai') showEmo(c.id, V8.pick(['😂', '😎', '⚡', '😏'])); }, wait); }
     }
     if (last.kind === 'move' && last.to === 56) setTimeout(() => banner('¡A CASA!', `Una ficha de ${G.players[last.pi].name} llegó`, '#34d399'), wait - 300);
-    if (last.kind === 'nomove' || last.kind === 'skip') wait = 1100;
-    if (last.kind === 'roll') wait = 750;
+    if (last.kind === 'nomove' || last.kind === 'skip') wait = 1000 * SP() + 250;
+    if (last.kind === 'roll') wait = DICE_MS + 60;
     L.busy = true; renderUI();
     L.tmr = setTimeout(() => { L.busy = false; if (G.phase === 'over') return finish(); step(); }, wait);
   }
   function animateMove(prev, m) {
     const pl = L.G.players[m.pi], seat = pl.seat, from = m.from, to = m.to;
     const steps = []; if (from < 0) steps.push(0); else for (let p = from + 1; p <= to; p++) steps.push(p);
-    const key = m.pi + '-' + m.k, dur = 170;
+    const key = m.pi + '-' + m.k, dur = Math.round(170 * (SP() < 1 ? .7 : 1));
     let i = 0, start = world(seat, from, m.k);
     const hop = () => {
       if (!L) return;
@@ -410,7 +440,7 @@
       setTimeout(() => { start = end; i++; hop(); }, dur);
     };
     hop();
-    return steps.length * dur + 380;
+    return steps.length * dur + 220;
   }
   function burstAt(pi, k) {
     try {
@@ -428,16 +458,20 @@
     renderUI();
     if (G.phase === 'over') return;
     const p = curP(G), driver = L.mode !== 'online' || NET.host;
-    if (!driver) return;
-    if (p.kind === 'ai') {
-      L.tmr = setTimeout(() => { if (!L) return; if (G.phase === 'roll') apply('roll'); else apply('move', aiChoose(G, p.lvl || 2)); }, G.phase === 'roll' ? 700 : 500);
+    if (!driver) {
+      if (myTurn() && G.phase === 'roll' && lst().auto) L.tmr = setTimeout(() => { if (L && L.G.phase === 'roll' && myTurn()) act('roll'); }, 260);
+      if (myTurn() && G.phase === 'move' && L.opts.length === 1) L.tmr = setTimeout(() => { if (L && L.G.phase === 'move' && myTurn()) act('move', L.opts[0]); }, 280 * SP());
       return;
     }
-    // tiempo por turno (como en el Ludo de Facebook): si se acaba, se juega solo
-    if (G.opt && G.opt.timer && p.kind === 'human' && myTurn()) startTimer(() => { if (!L || L.G.phase === 'over' || !myTurn()) return; L.miss = (L.miss || 0) + 1; toast(L.miss >= 3 ? 'Se acabó tu tiempo otra vez. ¡Atento al turno!' : 'Se acabó el tiempo: se jugó solo.', '⏱️'); if (L.G.phase === 'roll') act('roll'); else act('move', aiPick(L.G)); });
-    else stopTimer();
+    if (p.kind === 'ai') {
+      L.tmr = setTimeout(() => { if (!L) return; if (G.phase === 'roll') apply('roll'); else apply('move', aiChoose(G, p.lvl || 2)); }, (G.phase === 'roll' ? 650 : 420) * SP());
+      return;
+    }
+    stopTimer();
+    // tirar solo: si lo activaste, el dado se lanza apenas es tu turno
+    if (G.phase === 'roll' && lst().auto && myTurn()) { L.tmr = setTimeout(() => { if (L && L.G.phase === 'roll' && myTurn()) act('roll'); }, 260); return; }
     // humano: si solo hay una ficha posible, se mueve sola
-    if (G.phase === 'move' && L.opts.length === 1 && (L.mode !== 'online' || p.id === NET.myId)) L.tmr = setTimeout(() => { if (L && L.G.phase === 'move') apply('move', L.opts[0]); }, 650);
+    if (G.phase === 'move' && L.opts.length === 1 && (L.mode !== 'online' || p.id === NET.myId)) L.tmr = setTimeout(() => { if (L && L.G.phase === 'move') act('move', L.opts[0]); }, 280 * SP());
     // en línea: si alguien no juega en 25 s, se juega solo
     if (L.mode === 'online' && p.id !== NET.myId) L.tmr = setTimeout(() => { if (!L || L.G.phase === 'over') return; if (L.G.phase === 'roll') apply('roll'); else apply('move', aiPick(L.G)); }, 25000);
   }
@@ -488,7 +522,9 @@
     btn.disabled = !(can && G.phase === 'roll');
     btn.innerHTML = G.phase === 'over' ? '🏆 Terminó' : can && G.phase === 'roll' ? `<i class="fa-solid fa-dice"></i> Lanzar dado` : G.phase === 'move' && can ? '👆 Elige una ficha' : `<i class="fa-solid fa-hourglass-half"></i> Turno de ${esc(p.name)}`;
     msg.textContent = G.log;
+    const dw = document.querySelector('.v9-dwrap'); if (dw) dw.classList.toggle('ready', !!(can && G.phase === 'roll'));
     if (G.dice) showDice(G.dice, false);
+    if (can && !L._myT) { L._myT = true; if (window.V9 && V9.buzz && L.mode !== 'local') V9.buzz(15); } if (!can) L._myT = false;
   }
 
   /* ---------- toques sobre el tablero ---------- */
@@ -535,6 +571,7 @@
       const mov = L.canAct && !L.busy && L.G.turn === pi && L.opts.includes(k);
       if (mov) pts.push({ p: [p[0], .25, p[1]], c: [1, .9, .5, .45 + .35 * Math.sin(t * 6)], s: .9 }, { p: [p[0], 1.05 + Math.sin(t * 5) * .08, p[1]], c: [1, .95, .7, .9], s: .22 });
     }));
+    hints().forEach(w => { for (let j = 0; j < 10; j++) { const a = j / 10 * 6.2832 + t * 2.2; pts.push({ p: [w[0] + Math.cos(a) * .4, .22, w[1] + Math.sin(a) * .4], c: [1, .93, .55, 1], s: .2 }); } pts.push({ p: [w[0], .22, w[1]], c: [1, .85, .4, .4 + .2 * Math.sin(t * 6)], s: 1.1 }); });
     L.mats.forEach((m, pi) => { m.em = L.G.turn === pi && L.G.phase !== 'over' ? [.05 + .04 * Math.sin(t * 4), .04, .02] : [0, 0, 0]; });
     if (L.hop && R.shadow) R.shadow.dirty = true;
     if (L.flames) { L.flames.forEach((f, i) => { const k = 1 + Math.sin(t * 9 + i * 2) * .08 + Math.sin(t * 23 + i) * .05; f.scl = [k, 1.9 * k, k]; }); R.pl[1].color = [.9 * (1 + Math.sin(t * 11) * .08), .55, .25]; R.pl[0].color = [.6 + Math.sin(t * 7) * .04, .45, .25]; }
@@ -567,7 +604,7 @@
       ${NET.host ? `<label class="flex items-center gap-2 text-xs text-stone-300"><input type="checkbox" ${NET.fillAI ? 'checked' : ''} onchange="V8L.fill(this.checked)"> Completar los puestos libres con la IA (4 jugadores)</label>
         <button onclick="V8L.start()" class="btn-gold w-full" ${pl.length < 2 && !NET.fillAI ? 'disabled' : ''}><i class="fa-solid fa-dice"></i> Empezar (${pl.length} ${pl.length === 1 ? 'jugador' : 'jugadores'})</button>
         <p class="text-[10px] text-stone-500 text-center">Pueden jugar 2, 3 o 4. No hace falta esperar a 4.</p>${optHTML(true)}`
-        : `<p class="text-center text-xs text-stone-400"><i class="fa-solid fa-hourglass-half"></i> Esperando a que el anfitrión empiece…</p>${NET.opt ? `<p class="text-center text-[11px] text-amber-200">${(MODES.find(m => m[0] === NET.opt.mode) || MODES[0])[1]} · ${NET.opt.bet ? 'Apuesta ' + NET.opt.bet + ' 🪙' : 'Sin apuesta'}${NET.opt.timer ? ' · ⏱️ 15 s' : ''}</p>` : ''}`}
+        : `<p class="text-center text-xs text-stone-400"><i class="fa-solid fa-hourglass-half"></i> Esperando a que el anfitrión empiece…</p>${NET.opt ? `<p class="text-center text-[11px] text-amber-200">${(MODES.find(m => m[0] === NET.opt.mode) || MODES[0])[1]} · ${NET.opt.bet ? 'Apuesta ' + NET.opt.bet + ' 🪙' : 'Sin apuesta'}</p>` : ''}`}
       <button onclick="V8L.leave()" class="btn-ghost w-full !text-xs">Salir de la sala</button></div>`;
   }
   V8.ludoUrl = () => `${(CONFIG.SITE_URL || (location.origin + location.pathname)).replace(/\?.*$/, '')}?ludo=${NET.code}`;

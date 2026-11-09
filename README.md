@@ -22,8 +22,8 @@
 
 ## 🆕 Versión 9.6 · Ludo Club, Retratos reales y progreso por cuenta
 
-- **Ludo estilo Ludo Club**: modos Clásico, Rápido (fichas afuera, ganan 2 a la meta), Maestro (hay que atrapar una ficha antes de entrar a casa) y Equipos 2 vs 2; pozo de galeones (0, 50, 200 o 1000 por jugador); tiempo de 15 s por turno; avisos de ¡SEIS!, ¡ATRAPADA! y ¡A CASA!; emojis en la partida; dados mágicos comprables; estadísticas (partidas, ganadas, atrapadas, seises, racha). Todo funciona también en línea.
-- **Adivina el Retrato** pasa a ser juego principal: 79 retratos reales, 10 rondas, racha con premio y galería de aciertos al final.
+- **Ludo estilo Ludo Club**: modos Clásico, Rápido (fichas afuera, ganan 2 a la meta), Maestro (hay que atrapar una ficha antes de entrar a casa) y Equipos 2 vs 2; pozo de galeones (0, 50, 200 o 1000 por jugador); sin tiempo de espera para tirar; dado con lanzamiento realista (giros, rebote y número grande al caer); opciones de tirar solo, juego rápido y ver a dónde llega cada ficha; avisos de ¡SEIS!, ¡ATRAPADA! y ¡A CASA!; emojis en la partida; dados mágicos comprables; estadísticas (partidas, ganadas, atrapadas, seises, racha). Todo funciona también en línea.
+- **Adivina el Retrato** pasa a ser juego principal: solo con las 79 fotos reales de la carpeta img/personajes (se cargan antes de empezar, nunca sale un retrato vacío), 10 rondas, racha con premio y galería de aciertos al final.
 - **Progreso por cuenta**: patronus, marcos, túnicas, mascotas, nombre, historia, dados y estadísticas del Ludo se juntan bien entre celulares. El nombre del ranking es siempre tu nombre de mago y cambiarlo se sube al instante.
 
 ## Versión 9.4 · Toda la página más fluida

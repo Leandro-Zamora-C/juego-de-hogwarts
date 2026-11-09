@@ -578,16 +578,20 @@
     ['riddle', 'Tom Riddle', 'Slytherin', '📓', 'El joven que abrió la Cámara de los Secretos.']
   ].map(([id, name, house, sym, info]) => ({ id, name, house, sym, info }));
   // todos los retratos: los cromos (menos los fantasmas sin foto) + los personajes extra
-  const RETRATOS_POOL = () => [...V8.CARDS.filter(c => !['nearly', 'fraile', 'dama', 'baron'].includes(c.id)), ...RETRATOS_EXTRA];
+  // solo personajes con foto real en img/personajes (las que mandó Leandro)
+  const FOTOS = new Set('aberforth agrippa arthur bagshot bellatrix bill bowman cedric cho circe cliodna crouch dean dobby draco dudley dumbledore filch flamel fleur flitwick fredgeorge fudge ginny godric grindelwald griphook hagrid harry helga hengist hermione hooch james karkaroff kingsley kreacher krum lavender lily lockhart lucius luna lupin maxime mcgonagall merlin molly moody morgana myrtle narcissa neville newt ollivander paracelso percy pettigrew petunia pomfrey quirrell riddle ron rowena salazar scrimgeour seamus sirius slughorn snape sprout tonks trelawney umbridge uric vernon voldemort wood xenophilius'.split(' '));
+  const RETRATOS_POOL = () => [...V8.CARDS, ...RETRATOS_EXTRA].filter((c, i, a) => FOTOS.has(c.id) && a.findIndex(x => x.id === c.id) === i);
+  const fotoOk = {};
+  const precarga = id => new Promise(res => { if (fotoOk[id] != null) return res(fotoOk[id]); const im = new Image(); im.onload = () => res(fotoOk[id] = true); im.onerror = () => res(fotoOk[id] = false); im.src = `img/personajes/${id}.jpg`; });
 
   def('retrato', {
-    howto: ['El retrato (o la tarjeta con pistas) está tapado por 16 cuadros que se van destapando.', 'Elige quién es antes de que se vea todo: más rápido, más puntos.', 'Puedes poner tus propias imágenes en la carpeta img/personajes (lee la guía).'],
+    howto: ['El retrato está tapado por 16 cuadros que se van destapando.', 'Elige quién es antes de que se vea todo: más rápido, más puntos.', 'Tres aciertos seguidos o más dan puntos extra.'],
     best: b => b ? `Récord: ${b}` : '',
     intro: () => intro('retrato', '🖼️', 'Diez retratos tapados de entre casi 80 personajes. Se destapan de a poco: adivina quién es cuanto antes para ganar más puntos.'),
     play() {
       begin('retrato');
       const POOL = RETRATOS_POOL(), N = 10;
-      const rounds = V8.shuffle(POOL).slice(0, N); const plans = rounds.map(() => V8.rng(Math.floor(Math.random() * 2 ** 31))); let r = 0, score = 0, streak = 0, hits = [];
+      const rounds = []; const plans = Array.from({ length: N }, () => V8.rng(Math.floor(Math.random() * 2 ** 31))); let r = 0, score = 0, streak = 0, hits = [];
       const next = () => {
         if (!RUN || RUN.id !== 'retrato') return;
         if (r >= rounds.length) return end('retrato', { icon: '🖼️', title: `${score} puntos`, lines: [`Acertaste ${hits.length} de ${N} retratos.`, hits.length ? `<span class="v9-rt-gal">${hits.map(id => `<img src="img/personajes/${id}.jpg" alt="">`).join('')}</span>` : '¡Sigue practicando!'], points: Math.round(score / 20), record: score });
@@ -595,14 +599,20 @@
         const rr = plans[r], c = rounds[r++], same = V8.shuffle(POOL.filter(x => x.id !== c.id && x.house === c.house), rr), rest = V8.shuffle(POOL.filter(x => x.id !== c.id && x.house !== c.house), rr);
         const opts = V8.shuffle([c, ...same.slice(0, 2), ...rest].slice(0, 4), rr);
         const order = V8.shuffle([...Array(16).keys()], rr); let shown = 0, answered = false;
-        body().innerHTML = wrap(`${hud([['rtR', 'Retrato', `${r}/${N}`], ['rtS', 'Puntos', score], ['rtK', 'Racha', streak ? '🔥' + streak : '—']])}<div class="v8-portrait-game"><div class="pic" id="rtPic"><div class="clue"><span>${c.sym}</span><b>${c.house || 'Sin casa'}</b><p>${esc(c.info)}</p></div><img alt="" id="rtImg" style="display:none"><div class="tiles">${order.map(i => `<i data-i="${i}"></i>`).join('')}</div></div>
+        body().innerHTML = wrap(`${hud([['rtR', 'Retrato', `${r}/${N}`], ['rtS', 'Puntos', score], ['rtK', 'Racha', streak ? '🔥' + streak : '—']])}<div class="v8-portrait-game"><div class="pic" id="rtPic"><img alt="" id="rtImg" src="img/personajes/${c.id}.jpg" style="display:block"><div class="tiles">${order.map(i => `<i data-i="${i}"></i>`).join('')}</div></div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">${opts.map(o => `<button class="opt-btn" data-id="${o.id}">${esc(o.name)}</button>`).join('')}</div></div>`);
-        const img = $('rtImg'); img.onload = () => { img.style.display = 'block'; const cl = $('rtPic').querySelector('.clue'); if (cl) cl.style.display = 'none'; }; img.src = `img/personajes/${c.id}.jpg`;
+        
         const tiles = [...document.querySelectorAll('.v8-portrait-game .tiles i')];
         const reveal = every(() => { if (answered) return; if (shown < 16) { const t = tiles.find(x => +x.dataset.i === order[shown]); t && t.classList.add('off'); shown++; } }, 900);
         document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(b => b.onclick = () => { if (answered) return; answered = true; clearInterval(reveal); const good = b.dataset.id === c.id; tiles.forEach(t => t.classList.add('off')); document.querySelectorAll('.v8-portrait-game .opt-btn').forEach(x => { x.disabled = true; if (x.dataset.id === c.id) x.classList.add('correct'); }); if (!good) b.classList.add('wrong'); if (good) { streak++; hits.push(c.id); score += Math.max(10, 100 - shown * 6) + (streak >= 3 ? 20 : 0); set('rtS', score); set('rtK', '🔥' + streak); } else { streak = 0; set('rtK', '—'); } sfx(good ? 'correct' : 'wrong'); later(next, 1300); });
       };
-      next();
+      // se cargan las 10 fotos antes de empezar: nunca se ve un retrato vacío
+      body().innerHTML = wrap(`<div class="text-center py-16 text-amber-200"><div class="text-5xl animate-pulse">🖼️</div><p class="mt-3 text-sm">Colgando los retratos…</p></div>`);
+      (async () => {
+        for (const c of V8.shuffle(POOL)) { if (rounds.length >= N) break; if (await precarga(c.id)) rounds.push(c); }
+        if (!RUN || RUN.id !== 'retrato') return;
+        next();
+      })();
     }
   });
 
