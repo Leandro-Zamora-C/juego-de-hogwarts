@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invitación a Hogwarts</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f0a1e;color:#fde68a;font-family:Georgia,serif;text-align:center;padding:16px;box-sizing:border-box}
+  a{display:inline-block;margin:8px;padding:12px 20px;border-radius:14px;background:#d4a94a;color:#1c1003;font-weight:bold;text-decoration:none}
+  a.web{background:#2a2140;color:#fde68a;border:1px solid #d4a94a}
+  p{color:#cbd5e1;font-family:system-ui,sans-serif;font-size:14px}
+</style>
+</head>
+<body>
+<div>
+  <h1>🪄 Te invitaron a jugar</h1>
+  <p id="t">Abriendo la sala…</p>
+  <a id="app" href="#">📱 Abrir en la app</a>
+  <a id="web" class="web" href="./">🌐 Jugar en la web</a>
+</div>
+<script>
+  // Lee el juego y el código de la sala, y abre la app (si está instalada) o la web.
+  var q = new URLSearchParams(location.search);
+  var j = (q.get('j') || 'ludo').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  var c = (q.get('c') || '').replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 4);
+  var base = location.origin + '/';
+  var web = j === 'ludo' ? base + '?ludo=' + c : base + '?juego=' + j + '&sala=' + c;
+  var app = 'intent://sala/' + j + '/' + c + '#Intent;scheme=hogwarts;package=com.leandrozamora.hogwarts;S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
+  document.getElementById('t').textContent = 'Sala ' + c + ' · ' + (j === 'ludo' ? 'Ludo Mágico' : j === 'chess' ? 'Ajedrez mágico' : j);
+  document.getElementById('web').href = web;
+  document.getElementById('app').href = /android/i.test(navigator.userAgent) ? app : web;
+  if (c.length === 4) {
+    if (/android/i.test(navigator.userAgent)) location.href = app; else location.replace(web);
+  }
+</script>
+</body>
+</html>
